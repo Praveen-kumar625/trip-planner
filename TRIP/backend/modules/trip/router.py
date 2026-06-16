@@ -2,25 +2,18 @@
 
 from __future__ import annotations
 
-import json
 from typing import Optional
 
-from fastapi import APIRouter, HTTPException, Request, Depends
+from fastapi import APIRouter, Header, HTTPException, Request, Depends
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from backend.core.auth import decode_token
 from backend.core.database import get_session
 from backend.core.security import SecurityService
-from backend.core.cache import POI_TTL, get_cached, poi_cache_key, set_cached
-from backend.modules.trip.helpers import amap_key, restaurant_to_dict
-from backend.providers.amap.poi import (
-    ATTRACTION_TYPE,
-    normalize_address,
-    poi_to_spot,
-    search_around_pois_async,
-    search_city_pois_async,
-)
+from backend.core.cache import POI_TTL, cache_service, poi_cache_key
+from backend.modules.trip.helpers import restaurant_to_dict
 from backend.modules.trip.repository import TripRepository
 from backend.modules.trip.service import TripService
 
@@ -98,31 +91,6 @@ async def optimize_day(
         raise HTTPException(status_code=500, detail=f"Internal error: {str(e)}")
 
 
-class ConfirmModificationRequest(BaseModel):
-    pending_id: str
-    parent_plan_id: str | None = None
-
-
-@router.post("/api/plan/confirm_modification")
-async def confirm_modification(
-    req: ConfirmModificationRequest, 
-    user_id: str = Depends(SecurityService.get_current_user_id), 
-    session: AsyncSession = Depends(get_session)
-):
-    repo = TripRepository(session)
-    service = TripService(repo)
-
-    return StreamingResponse(
-        service.confirm_modification_stream(user_id, req.pending_id, req.parent_plan_id),
-        media_type="text/event-stream",
-        headers={
-            "Cache-Control": "no-cache",
-            "X-Accel-Buffering": "no",
-            "Connection": "keep-alive",
-        },
-    )
-
-
 @router.get("/api/poi/search")
 async def poi_search(
     city: str,
@@ -130,6 +98,8 @@ async def poi_search(
     kind: str = "attraction",
     user_id: str = Depends(SecurityService.get_current_user_id),
 ):
+    from backend.providers.google.places import google_maps_client
+    
     if kind not in ("attraction", "restaurant"):
         raise HTTPException(status_code=400, detail="kind sirf attraction ya restaurant ho sakta hai")
 
@@ -139,25 +109,17 @@ async def poi_search(
         raise HTTPException(status_code=400, detail="city aur kw dono zaruri hai")
 
     cache_key = poi_cache_key(city, f"manual:{kind}:{kw}")
-    cached = get_cached(cache_key)
+    cached = await cache_service.get_cached(cache_key)
     if cached is not None:
         return {"results": cached}
 
-    types = ATTRACTION_TYPE if kind == "attraction" else "catering services"
+    types = "point_of_interest" if kind == "attraction" else "restaurant"
     try:
-        raw = await search_city_pois_async(city, amap_key(), keywords=kw, types=types, offset=8)
-    except RuntimeError as e:
+        results = await google_maps_client.search_city_pois_async(city, kw, types=types, limit=8)
+    except Exception as e:
         raise HTTPException(status_code=502, detail=str(e))
 
-    results: list[dict] = []
-    for poi in raw:
-        parsed = poi_to_spot(poi) if kind == "attraction" else restaurant_to_dict(poi)
-        if parsed:
-            if kind == "attraction":
-                parsed["address"] = normalize_address(poi.get("address"))
-            results.append(parsed)
-
-    set_cached(cache_key, results, POI_TTL)
+    await cache_service.set_cached(cache_key, results, POI_TTL)
     return {"results": results}
 
 
@@ -169,34 +131,12 @@ async def route_walking(
     dest_lat: float,
     user_id: str = Depends(SecurityService.get_current_user_id),
 ):
-    import httpx
-    key = amap_key()
-    url = "https://restapi.amap.com/v3/direction/walking"
-    params = {
-        "key": key,
-        "origin": f"{origin_lng},{origin_lat}",
-        "destination": f"{dest_lng},{dest_lat}",
-        "output": "json",
-    }
+    from backend.providers.google.directions import get_walking_route_async
+    
+    origin = {"lat": origin_lat, "lng": origin_lng}
+    destination = {"lat": dest_lat, "lng": dest_lng}
+    
     try:
-        async with httpx.AsyncClient() as client:
-            resp = await client.get(url, params=params, timeout=8.0)
-            resp.raise_for_status()
-            data = resp.json()
+        return await get_walking_route_async(origin, destination)
     except Exception as e:
-        raise HTTPException(status_code=502, detail=f"Amap request fail ho gaya: {e}")
-
-    if data.get("status") != "1" or not data.get("route", {}).get("paths"):
-        raise HTTPException(status_code=502, detail="Walking route plan fail ho gaya")
-
-    path = data["route"]["paths"][0]
-    coords: list[list[float]] = []
-    for step in path.get("steps", []):
-        for pair in step.get("polyline", "").split(";"):
-            parts = pair.strip().split(",")
-            if len(parts) == 2:
-                try:
-                    coords.append([float(parts[0]), float(parts[1])])
-                except ValueError: pass
-
-    return {"coords": coords, "distance": path.get("distance"), "duration": path.get("duration")}
+        raise HTTPException(status_code=502, detail=f"Google Maps request fail ho gaya: {e}")

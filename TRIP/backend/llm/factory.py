@@ -8,34 +8,34 @@ from pydantic import BaseModel
 from backend.core.env import settings
 
 SchemaT = TypeVar("SchemaT", bound=BaseModel)
-LLMProvider = Literal["deepseek", "doubao", "openai", "dashscope"]
+LLMProvider = Literal["openai", "google", "anthropic"]
 
-DEFAULT_PROVIDER = "deepseek"
+DEFAULT_PROVIDER = "openai"
 
 
 def resolve_llm_provider() -> LLMProvider:
     """"""
-    # In a real app, this might come from settings or user preference
-    # For now, we'll try to find a provider that has a key
-    if settings.DEEPSEEK_API_KEY:
-        return "deepseek"
-    if settings.DOUBAO_API_KEY:
-        return "doubao"
     if settings.OPENAI_API_KEY:
         return "openai"
+    if settings.GOOGLE_API_KEY:
+        return "google"
+    if settings.ANTHROPIC_API_KEY:
+        return "anthropic"
     return DEFAULT_PROVIDER
 
 
 def build_chat_llm(*, model: str | None = None, temperature: float = 0) -> Any:
     """"""
     provider = resolve_llm_provider()
-    if provider == "deepseek":
-        from backend.llm.deepseek import build_chat_deepseek
-        return build_chat_deepseek(model=model, temperature=temperature)
-    elif provider == "doubao":
-        from backend.llm.doubao import build_chat_doubao
-        return build_chat_doubao(model=model, temperature=temperature)
-    # Add other providers as needed
+    if provider == "openai":
+        from langchain_openai import ChatOpenAI
+        return ChatOpenAI(model=model or "gpt-4o", temperature=temperature)
+    elif provider == "google":
+        from langchain_google_genai import ChatGoogleGenerativeAI
+        return ChatGoogleGenerativeAI(model=model or "gemini-1.5-pro", temperature=temperature)
+    elif provider == "anthropic":
+        from langchain_anthropic import ChatAnthropic
+        return ChatAnthropic(model=model or "claude-3-5-sonnet-latest", temperature=temperature)
 
 
 def build_structured_llm(
@@ -45,11 +45,5 @@ def build_structured_llm(
     temperature: float = 0,
 ) -> Any:
     """"""
-    provider = resolve_llm_provider()
-    if provider == "deepseek":
-        from backend.llm.deepseek import build_structured_deepseek
-        return build_structured_deepseek(schema, model=model, temperature=temperature)
-    elif provider == "doubao":
-        from backend.llm.doubao import build_structured_doubao
-        return build_structured_doubao(schema, model=model, temperature=temperature)
-    # Add other providers as needed
+    llm = build_chat_llm(model=model, temperature=temperature)
+    return llm.with_structured_output(schema)
