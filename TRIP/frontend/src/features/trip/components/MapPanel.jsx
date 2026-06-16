@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, Fragment } from 'react';
-import { initAmapForDay, drawNavPairRoute, restoreFullRoute, destroyAmap } from '@/services/api';
+import { initGoogleMapsForDay, drawNavPairRoute, restoreFullRoute, destroyGoogleMaps } from '@/services/api';
 
 export function DayMap({ mapPoints, dayKey }) {
   const pts = mapPoints || [];
@@ -55,29 +55,27 @@ export function DayMap({ mapPoints, dayKey }) {
 }
 
 export function MapPanel({ day, dayIdx, navPair, onNavClear }) {
-  const amapRef = useRef(null);
-  const [amapReady, setAmapReady] = useState(null);
+  const mapRef = useRef(null);
+  const [mapReady, setMapReady] = useState(null);
   const hasGeo = (day.mapPoints || []).some(p => p.lat && p.lng);
 
-  const ptsSig = (day.mapPoints || []).map(p => p.name).join("|");
-
   useEffect(() => {
-    if (!hasGeo) { setAmapReady(false); return; }
+    if (!hasGeo) { setMapReady(false); return; }
     let alive = true;
-    initAmapForDay(amapRef.current, day.mapPoints).then(ok => { if (alive) setAmapReady(ok); });
+    initGoogleMapsForDay(mapRef.current, day.mapPoints).then(ok => { if (alive) setMapReady(ok); });
     return () => { alive = false; };
-  }, [dayIdx, hasGeo, ptsSig]);
+  }, [day, hasGeo]);
 
   useEffect(() => {
-    if (amapReady !== true) return;
+    if (mapReady !== true) return;
     if (navPair) {
-      drawNavPairRoute(amapRef.current, navPair.from, navPair.to);
+      drawNavPairRoute(mapRef.current, navPair.from, navPair.to);
     } else {
-      restoreFullRoute(amapRef.current, day.mapPoints);
+      restoreFullRoute(mapRef.current, day.mapPoints);
     }
-  }, [navPair, amapReady, day.mapPoints]); 
+  }, [navPair, mapReady, day.mapPoints]); 
 
-  useEffect(() => () => destroyAmap(amapRef.current), []);
+  useEffect(() => () => destroyGoogleMaps(mapRef.current), []);
 
   return (
     <div className="flex flex-col h-full bg-white dark:bg-surface-900 rounded-3xl shadow-sm border border-surface-200 dark:border-surface-800 overflow-hidden">
@@ -88,26 +86,32 @@ export function MapPanel({ day, dayIdx, navPair, onNavClear }) {
             ✕ Stop Navigation
           </button>
         )}
-        {amapReady !== true && !navPair && <span className="text-xs font-medium text-surface-500 bg-surface-200 dark:bg-surface-800 px-2 py-1 rounded-md">Location Map · Relative Positions</span>}
+        {mapReady !== true && !navPair && <span className="text-xs font-medium text-surface-500 bg-surface-200 dark:bg-surface-800 px-2 py-1 rounded-md">Location Map · Relative Positions</span>}
+        {navPair && <span className="text-xs font-medium text-blue-600 bg-blue-50 dark:bg-blue-900/30 px-2 py-1 rounded-md flex items-center gap-1"><Navigation2 size={12}/> Route Estimating</span>}
       </div>
-      <div className="flex-1 relative min-h-[300px]">
-        <DayMap mapPoints={day.mapPoints} dayKey={dayIdx} />
-        {hasGeo && (
-          <div
-            ref={amapRef}
-            className="absolute inset-0 z-10"
-            style={{
-              opacity: amapReady === true ? 1 : 0,
-              pointerEvents: amapReady === true ? "auto" : "none",
-              transition: "opacity .4s ease",
+      <div className="relative w-full h-[300px] overflow-hidden bg-surface-100 dark:bg-surface-800 rounded-lg">
+        <div 
+            ref={mapRef} 
+            className="absolute inset-0 transition-opacity duration-300"
+            style={{ 
+              opacity: mapReady === true ? 1 : 0,
+              pointerEvents: mapReady === true ? "auto" : "none",
             }}
-          />
+        />
+        {mapReady === null && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="text-sm text-surface-500 flex items-center gap-2">
+              <span className="w-4 h-4 border-2 border-surface-300 border-t-primary-500 rounded-full animate-spin"></span>
+              Loading Maps...
+            </span>
+          </div>
         )}
+        {mapReady !== true && <DayMap mapPoints={day.mapPoints} dayKey={dayIdx} />}
       </div>
       <div className="p-3 border-t border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-950 flex flex-wrap gap-4 text-xs font-medium text-surface-600 dark:text-surface-400">
         <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-primary-500"></span>Attraction</span>
         <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-second-500 transform rotate-45"></span>Restaurant</span>
-        {amapReady !== true && <span className="ml-auto italic opacity-80">Dotted line shows travel route</span>}
+        {mapReady !== true && <span className="ml-auto italic opacity-80">Dotted line shows travel route</span>}
       </div>
     </div>
   );

@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { motion, AnimatePresence } from 'framer-motion';
 import { getProfile, getAuth } from '@/services/api';
 import { JourneyStepper } from './JourneyStepper';
 import { useTripPlanner, JOURNEY_STEPS } from '@/hooks/useTripPlanner';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
+import { Sparkles, MapPin, Navigation } from 'lucide-react';
 
 export function PlanPage({ onRequestLogin, currentUsername, onPhaseChange, onPlanReady, modifyTrigger, onManageProfile }) {
   const { t } = useTranslation();
@@ -32,71 +34,72 @@ export function PlanPage({ onRequestLogin, currentUsername, onPhaseChange, onPla
   };
 
   const examples = [
-    "A 3-day weekend trip to Kyoto for cherry blossoms",
-    "Food tour in Delhi for 2 days",
-    "Adventure sports in Manali with family",
+    "A 3-day romantic weekend to Kyoto, mostly quiet temples and omakase.",
+    "A fast-paced 5-day food and culture tour of Delhi and Agra.",
+    "A relaxing 7-day wellness retreat in Bali, avoiding tourist traps.",
   ];
 
   const profileRows = profile ? [
-    { key: "attr", label: "Attractions", cls: "bg-[#7C3AED] text-white", items: profile.attraction_prefs || [] },
-    { key: "food", label: "Food", cls: "bg-[#FF4F4F] text-white", items: profile.food_prefs || [] },
-    { key: "habit", label: "Habits", cls: "bg-[#00C853] text-white", items: profile.habit_prefs || [] },
+    { key: "attr", label: "Attractions", items: profile.attraction_prefs || [] },
+    { key: "food", label: "Dining", items: profile.food_prefs || [] },
+    { key: "habit", label: "Pace", items: profile.habit_prefs || [] },
   ].filter(r => r.items.length) : [];
 
   if (phase === "loading") {
     return (
-      <main id="main-content" className="min-h-screen bg-[#F4F2EE] font-sans" style={{ fontFamily: "'Outfit', sans-serif" }}>
-         <style>
-          {`
-            @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;900&display=swap');
-          `}
-        </style>
+      <main id="main-content" className="min-h-screen bg-primary-950 text-primary-50">
         <JourneyStepper steps={JOURNEY_STEPS} activeNode={activeNode} doneNodes={doneNodes} stageLabel={stageLabel} />
       </main>
     );
   }
 
   return (
-    <main id="main-content" className="flex min-h-screen flex-col items-center justify-center p-4 md:p-8 bg-[#F4F2EE] text-[#111]" style={{ fontFamily: "'Outfit', sans-serif" }}>
-      <style>
-        {`
-          @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;900&display=swap');
-        `}
-      </style>
+    <main id="main-content" className="flex min-h-screen flex-col items-center justify-center p-6 md:p-12 bg-primary-950 text-primary-50 relative overflow-hidden font-sans">
       
-      <div className="w-full max-w-4xl relative z-10">
-        
-        {/* Title Section */}
-        <div className="text-center mb-12">
-          <div className="inline-block px-4 py-2 rounded-full bg-white border-2 border-black font-bold text-sm mb-6 shadow-[4px_4px_0_0_#FF4F4F]">
-            ✨ {t('common.smartest_planner', 'The smartest trip planner')}
-          </div>
-          <h1 className="text-5xl md:text-7xl font-black tracking-tight leading-[1.05]">
-            Design your perfect trip <br className="hidden md:block" />
-            <span className="text-[#7C3AED]">in seconds.</span>
+      <motion.div 
+        className="w-full max-w-4xl relative z-10"
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+      >
+        <div className="text-center mb-16">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2 }}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary-800 text-xs font-bold text-accent-400 uppercase tracking-widest mb-8 border-2 border-primary-700"
+          >
+            <Sparkles className="w-4 h-4" />
+            <span>AI-Powered Travel Architect</span>
+          </motion.div>
+          <h1 className="text-5xl md:text-7xl font-black tracking-tight leading-[1.1] text-white">
+            Where to <span className="text-brand-gradient">next?</span>
           </h1>
         </div>
 
-        {/* Profile Section */}
         {profileRows.length > 0 && (
-          <section className="mb-8 bg-white border-2 border-black p-6 rounded-3xl shadow-[6px_6px_0_0_#111]" aria-labelledby="profile-vibe-title">
-            <div className="flex justify-between items-center mb-6">
-              <h3 id="profile-vibe-title" className="font-bold text-xl">Your Travel Vibe</h3>
+          <motion.section 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="mb-10 card-solid"
+          >
+            <div className="flex justify-between items-center mb-6 border-b-2 border-primary-800 pb-4">
+              <h3 className="font-bold text-lg text-white tracking-wide uppercase">Your Travel Profile</h3>
               <button 
-                className="text-sm font-bold text-[#111] border-b-2 border-black hover:text-[#7C3AED] hover:border-[#7C3AED] transition-all" 
+                className="text-sm font-bold text-primary-400 hover:text-accent-500 transition-colors" 
                 onClick={onManageProfile}
-                aria-label="Manage your travel profile"
               >
-                Edit Profile
+                Refine Profile
               </button>
             </div>
-            <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {profileRows.map(r => (
                 <div key={r.key}>
-                  <span className="block text-xs font-black uppercase tracking-wider text-[#666] mb-3">{r.label}</span>
+                  <span className="block text-xs font-bold uppercase tracking-widest text-primary-400 mb-3">{r.label}</span>
                   <div className="flex flex-wrap gap-2">
                     {r.items.map((it, i) => (
-                      <span key={i} className={`px-4 py-1.5 rounded-full text-xs font-bold border-2 border-black shadow-[2px_2px_0_0_#111] ${r.cls}`}>
+                      <span key={i} className="px-3 py-1.5 rounded-xl bg-primary-800 text-white text-xs font-bold border-2 border-primary-700">
                         {it}
                       </span>
                     ))}
@@ -104,94 +107,117 @@ export function PlanPage({ onRequestLogin, currentUsername, onPhaseChange, onPla
                 </div>
               ))}
             </div>
-          </section>
+          </motion.section>
         )}
 
-        {/* Input Box */}
-        <section className="bg-white rounded-3xl shadow-[8px_8px_0_0_#111] border-2 border-black overflow-hidden flex flex-col transition-all hover:shadow-[12px_12px_0_0_#111]" aria-labelledby="planner-input-title">
-          <div className="p-8">
-            <label id="planner-input-title" htmlFor="trip-query" className="block text-2xl font-black text-[#111] mb-6">{t('planner.where_to')}</label>
+        <motion.section 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="card-solid p-0 overflow-hidden"
+        >
+          <div className="p-8 md:p-10">
+            <label htmlFor="trip-query" className="flex items-center gap-3 text-xl font-black text-white mb-6">
+              <Navigation className="w-6 h-6 text-accent-500" />
+              <span>Describe your ideal journey</span>
+            </label>
             <textarea
               id="trip-query"
-              className="w-full h-40 rounded-2xl border-2 border-black bg-[#F4F2EE] px-6 py-4 text-lg font-medium focus:bg-white transition-colors outline-none resize-none shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.05)]"
-              placeholder={t('planner.placeholder')}
+              className="w-full h-48 rounded-2xl bg-primary-800 border-2 border-primary-700 px-6 py-5 text-lg font-bold text-white placeholder:text-primary-500 focus:bg-primary-900 focus:border-accent-500 transition-all outline-none resize-none"
+              placeholder="e.g. A 5-day luxury escape to the hills of Munnar with a focus on private tea estate tours and authentic Kerala cuisine."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={(e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) handleStartPlan(); }}
-              aria-required="true"
             />
             
-            {missingFields.length > 0 && (
-              <div className="mt-4 flex gap-2 flex-wrap" role="alert">
-                {missingFields.map(f => (
-                  <span key={f} className="px-3 py-1 bg-[#FF4F4F] text-white border-2 border-black rounded-full text-xs font-bold shadow-[2px_2px_0_0_#111]">
-                    Missing: {f}
-                  </span>
-                ))}
-              </div>
-            )}
-            
-            {errMsg && (
-              <div className="mt-6 text-white text-sm font-bold bg-[#111] p-4 rounded-xl border-2 border-red-500 shadow-[4px_4px_0_0_#FF4F4F]" role="alert">
-                {errMsg}
-              </div>
-            )}
+            <AnimatePresence>
+              {missingFields.length > 0 && (
+                <motion.div 
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="mt-6 flex gap-2 flex-wrap"
+                >
+                  {missingFields.map(f => (
+                    <span key={f} className="px-4 py-1.5 bg-second-600 text-white border-2 border-second-500 rounded-xl text-xs font-bold">
+                      Please specify: {f}
+                    </span>
+                  ))}
+                </motion.div>
+              )}
+              
+              {errMsg && (
+                <motion.div 
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="mt-6 text-white text-sm font-bold bg-red-600 px-6 py-4 rounded-xl border-2 border-red-500"
+                >
+                  {errMsg}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
           
-          <div className="bg-[#F4F2EE] p-6 flex flex-col sm:flex-row items-center justify-between border-t-2 border-black gap-6">
-            <div className="flex flex-wrap gap-3" role="group" aria-label="Query examples">
+          <div className="bg-primary-800 p-6 md:p-8 flex flex-col md:flex-row items-center justify-between border-t-2 border-primary-700 gap-6">
+            <div className="flex flex-wrap gap-2 w-full md:w-auto">
+              <span className="text-xs font-bold uppercase tracking-widest text-primary-400 w-full mb-2 block">Inspirations</span>
               {examples.map((ex) => (
                 <button 
                   key={ex} 
-                  className="px-4 py-2 bg-white rounded-full text-xs font-bold text-[#111] border-2 border-black hover:-translate-y-1 hover:shadow-[4px_4px_0_0_#7C3AED] transition-all" 
+                  className="px-4 py-2 bg-primary-900 rounded-xl text-xs font-bold text-primary-200 border-2 border-primary-700 hover:border-accent-500 hover:text-white transition-colors text-left" 
                   onClick={() => setQuery(ex)}
-                  aria-label={`Try example: ${ex}`}
                 >
-                  {ex.slice(0, 30)}...
+                  {ex.slice(0, 35)}...
                 </button>
               ))}
             </div>
             <button 
-              className="w-full sm:w-auto px-10 py-4 bg-[#7C3AED] text-white rounded-full font-black border-2 border-black hover:-translate-y-1 shadow-[6px_6px_0_0_#111] active:shadow-none active:translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed transition-all text-lg shrink-0"
+              className="btn-primary whitespace-nowrap w-full md:w-auto"
               onClick={handleStartPlan} 
               disabled={!query.trim()}
             >
-              {t('planner.generate')}
+              Curate Itinerary
             </button>
           </div>
-        </section>
-      </div>
+        </motion.section>
+      </motion.div>
       
-      {/* Modal */}
-      {concernModal && (
-        <div className="fixed inset-0 bg-[#F4F2EE]/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div 
-            ref={concernRef}
-            className="bg-white rounded-3xl max-w-lg w-full p-8 border-2 border-black shadow-[12px_12px_0_0_#FF4F4F]"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="concern-title"
+      <AnimatePresence>
+        {concernModal && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-primary-950/80 backdrop-blur-md flex items-center justify-center p-4 z-50"
           >
-            <h3 id="concern-title" className="text-3xl font-black mb-4 text-[#111]">Wait a sec...</h3>
-            <p className="text-[#444] font-medium mb-8 text-lg leading-relaxed">{concernModal.concern}</p>
-            <div className="flex justify-end gap-4">
-              <button 
-                className="px-6 py-3 font-bold text-[#111] hover:text-[#FF4F4F] transition-colors" 
-                onClick={() => {}}
-                aria-label="Cancel modification"
-              >
-                Cancel
-              </button>
-              <button 
-                className="px-8 py-3 bg-[#111] text-white font-bold rounded-full border-2 border-[#111] shadow-[4px_4px_0_0_#FF4F4F] hover:-translate-y-1 transition-all" 
-                onClick={confirmConcern}
-              >
-                Continue Anyway
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+            <motion.div 
+              ref={concernRef}
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              className="bg-primary-900 rounded-[2rem] max-w-lg w-full p-10 shadow-solid border-2 border-primary-800"
+            >
+              <h3 className="text-2xl font-black mb-4 text-white tracking-tight">Review Adjustment</h3>
+              <p className="text-primary-200 font-bold mb-10 leading-relaxed">{concernModal.concern}</p>
+              <div className="flex justify-end gap-4">
+                <button 
+                  className="px-6 py-3 font-bold text-primary-400 hover:text-white transition-colors" 
+                  onClick={() => {}}
+                >
+                  Cancel
+                </button>
+                <button 
+                  className="btn-primary px-8 py-3" 
+                  onClick={confirmConcern}
+                >
+                  Confirm & Proceed
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </main>
   );
 }

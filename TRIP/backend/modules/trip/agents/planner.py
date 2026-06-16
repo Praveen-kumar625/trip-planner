@@ -34,7 +34,7 @@ async def attraction_search_node(state: TravelPlanState) -> dict[str, Any]:
     api_key = ""
     spots = await fetch_city_spots_async(state.destination or "", api_key, max_spots=state.max_spots)
     kept, _ = filter_by_rating(spots, state.min_rating)
-    note = f"AMap POI Search: fetched {len(spots)} spots, rating≥{state.min_rating} kept {len(kept)} spots"
+    note = f"Google Maps POI Search: fetched {len(spots)} spots, rating≥{state.min_rating} kept {len(kept)} spots"
     return {"pois": kept, "history": state.history + [note]}
 
 def _travel_dates_block(state: TravelPlanState) -> str:
@@ -120,7 +120,17 @@ def make_planner_node(model_name: str | None):
             f"{final_note}\n\n"
             f"Please provide {state.days}-day itinerary with daily spots arranged"
         )
-        result: TravelRoute = await async_invoke_structured(llm, [("system", PLANNER_SYSTEM), ("human", prompt)])
+        try:
+            result: TravelRoute = await async_invoke_structured(llm, [("system", PLANNER_SYSTEM), ("human", prompt)])
+        except RuntimeError:
+            logger.warning("[planner round %d] LLM failed, fallback to safe state", state.review_round + 1)
+            return {
+                "route": state.route or [],
+                "review_round": state.review_round + 1,
+                "history": state.history + [f"[Round {state.review_round + 1}] Planner failed due to LLM error"],
+                "planner_reviewer_dialogue": state.planner_reviewer_dialogue + ["Planner failed to generate route."],
+                "modification_concern": "LLM generation failed.",
+            }
         route = [d.model_dump() for d in result.days]
         rnd = state.review_round + 1
 
@@ -207,7 +217,18 @@ def make_reviewer_node(model_name: str | None):
             f"Please review and conclude. ⚠️ Opening hours checked by time_check Agent, "
             f"do not review opening time issues."
         )
-        result: RouteReview = await async_invoke_structured(llm, [("system", REVIEWER_SYSTEM), ("human", prompt)])
+        try:
+            result: RouteReview = await async_invoke_structured(llm, [("system", REVIEWER_SYSTEM), ("human", prompt)])
+        except RuntimeError:
+            logger.warning("[reviewer] LLM failed, fallback to rejected state")
+            return {
+                "approved": False,
+                "need_modify_route": True,
+                "route_modify_opinion": "LLM failed during review.",
+                "reviewer_issues": ["Review agent failed to generate a response."],
+                "history": state.history + [f"[Round {state.review_round}] Reviewer failed"],
+                "planner_reviewer_dialogue": state.planner_reviewer_dialogue + ["Reviewer failed to evaluate route."],
+            }
         approved = result.approved and not bad_unknown
         verdict  = "✅Approved" if approved else "❌Rejected"
 

@@ -6,7 +6,6 @@ from backend.modules.trip.schemas import DayMealPick, SingleDayMealPick, TravelP
 from backend.modules.trip.helpers import dinner_anchor_spot, last_spot_of_period, restaurant_to_dict, spot_location_map, async_invoke_structured
 from backend.core.env import settings
 
-def get_amap_key(): return ""
 from backend.providers.google.places import google_maps_client
 from backend.modules.trip.prompts import MEAL_SYSTEM
 import asyncio
@@ -16,7 +15,7 @@ async def search_around_pois_async(location, radius, types, keyword=""):
 
 
 async def meal_search_node(state: TravelPlanState) -> dict[str, Any]:
-    api_key  = get_amap_key()
+    api_key  = settings.GOOGLE_MAPS_API_KEY
     loc_map  = spot_location_map(state.pois)
     meal_candidates: list[dict[str, Any]] = []
     warnings: list[str] = []

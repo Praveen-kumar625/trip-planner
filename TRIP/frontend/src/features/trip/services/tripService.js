@@ -1,4 +1,4 @@
-import apiClient from './apiClient';
+import apiClient from '@/services/apiClient';
 
 const API_BASE_URL = '/api/plan';
 

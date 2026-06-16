@@ -3,7 +3,8 @@ from pathlib import Path
 from contextlib import asynccontextmanager
 import secrets
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, HTTPException
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
@@ -22,6 +23,7 @@ from backend.modules.itinerary.router import router as history_router
 from backend.modules.trip.router import router as plan_router
 from backend.modules.user.router import router as profile_router
 from backend.modules.system.router import router as system_router
+from backend.modules.finance.router import router as finance_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -45,12 +47,26 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    return JSONResponse(
+        status_code=422,
+        content={"detail": "Validation error", "errors": exc.errors()},
+    )
+
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"detail": exc.detail},
+    )
+
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
-    logger.error(f"Unhandled exception: {exc}")
+    logger.error(f"Unhandled exception: {exc}", exc_info=True)
     return JSONResponse(
         status_code=500,
-        content={"detail": "Internal server error occurred."}
+        content={"detail": "Internal server error occurred.", "type": type(exc).__name__}
     )
 
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
@@ -103,6 +119,7 @@ app.include_router(history_router)
 app.include_router(profile_router)
 app.include_router(plan_router)
 app.include_router(system_router)
+app.include_router(finance_router)
 
 app.add_middleware(
     CORSMiddleware,

@@ -55,13 +55,13 @@ Create a `.env` file in the root directory:
 
 ```env
 # API Keys
-AMAP_API_KEY=your_amap_key
-DEEPSEEK_API_KEY=your_deepseek_key
+GOOGLE_MAPS_API_KEY=your_google_maps_api_key
 OPENAI_API_KEY=your_openai_key
+# Or use Gemini
+# GOOGLE_API_KEY=your_gemini_api_key
 
 # Frontend Config
-AMAP_JS_KEY=your_amap_js_key
-AMAP_JS_SECURITY_CODE=your_js_secret
+VITE_GOOGLE_MAPS_API_KEY=your_google_maps_api_key
 
 # Infrastructure
 DATABASE_URL=sqlite+aiosqlite:///./data/app.db

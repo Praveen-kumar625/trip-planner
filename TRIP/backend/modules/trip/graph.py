@@ -108,7 +108,7 @@ def build_graph(
 _NODE_LABELS: dict[str, str] = {
     "query_rewrite":     "🔎 User profile ke sath query rewrite kar rahe hain",
     "intent":            "🧭 Trip intent samajh rahe hain (Destination / Dates / Preferences)",
-    "attraction_search": "🗺 Amap se attractions search kar rahe hain",
+    "attraction_search": "🗺 Google Maps se attractions search kar rahe hain",
     "orchestrator":      "🤹 Multi-city trip coordinate kar rahe hain",
     "planner":           "✍️ Day-by-day trip plan bana rahe hain",
     "reviewer":          "🔍 Trip plan review kar rahe hain",

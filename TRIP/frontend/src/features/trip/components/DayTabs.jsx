@@ -1,8 +1,10 @@
+import { motion } from 'framer-motion';
+
 export function DayTabs({ days, activeDay, setActiveDay }) {
   if (!days || days.length === 0) return null;
   
   return (
-    <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide pt-2" role="tablist" aria-label="Trip days">
+    <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide pt-2" role="tablist" aria-label="Trip days">
       {days.map((d, i) => {
         const isActive = activeDay === i;
         return (
@@ -12,16 +14,25 @@ export function DayTabs({ days, activeDay, setActiveDay }) {
             aria-selected={isActive}
             aria-controls={`day-panel-${i}`}
             id={`day-tab-${i}`}
-            className={`flex-shrink-0 flex flex-col items-center justify-center w-20 h-24 rounded-2xl border-2 transition-all duration-300 font-bold ${
+            className={`flex-shrink-0 flex flex-col items-center justify-center w-24 h-28 rounded-[1.5rem] border transition-all duration-500 font-bold relative overflow-hidden ${
               isActive 
-                ? 'border-primary-500 bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300 shadow-md transform -translate-y-1' 
-                : 'border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-800 text-surface-500 hover:border-primary-300 hover:bg-surface-50 dark:hover:bg-surface-700'
+                ? 'border-primary-600 bg-primary-600 text-white shadow-luxury transform -translate-y-2' 
+                : 'border-primary-900/10 bg-white text-primary-900/60 hover:border-primary-300 hover:text-primary-900 hover:shadow-luxury'
             }`}
             onClick={() => setActiveDay(i)}
             aria-label={`${d.day_label || `Day ${i + 1}`}, ${d.date_str}`}
           >
-            <span className="text-sm opacity-80 uppercase tracking-widest mb-1" aria-hidden="true">{d.day_label || `Day ${i + 1}`}</span>
-            <span className="text-xl" aria-hidden="true">{d.date_str}</span>
+            {isActive && (
+              <motion.div 
+                className="absolute inset-0 bg-gradient-to-t from-primary-700 to-primary-500 z-0"
+                layoutId="activeTab"
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              />
+            )}
+            <div className="relative z-10 flex flex-col items-center">
+              <span className={`text-[10px] uppercase tracking-[0.2em] mb-2 ${isActive ? 'text-primary-200' : ''}`} aria-hidden="true">{d.day_label || `Day ${i + 1}`}</span>
+              <span className={`text-2xl font-black ${isActive ? 'text-white' : ''}`} aria-hidden="true">{d.date_str}</span>
+            </div>
           </button>
         );
       })}

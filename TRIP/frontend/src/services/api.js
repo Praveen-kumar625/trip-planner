@@ -164,7 +164,7 @@ export async function getConfig() {
 }
 
 let googleMapScriptPromise = null;
-export function ensureAMap() {
+export function ensureGoogleMaps() {
   if (window.google && window.google.maps) return Promise.resolve(window.google.maps);
   if (googleMapScriptPromise) return googleMapScriptPromise;
   googleMapScriptPromise = getConfig().then(conf => {
@@ -180,13 +180,13 @@ export function ensureAMap() {
   return googleMapScriptPromise;
 }
 
-export async function initAmapForDay(container, points) {
+export async function initGoogleMapsForDay(container, points) {
   if (!points || !points.length) return false;
   try {
-    const maps = await ensureAMap();
+    const maps = await ensureGoogleMaps();
     if (!container) return false;
     const map = new maps.Map(container, { zoom: 12, center: {lat: points[0].lat, lng: points[0].lng} });
-    container._amapInstance = map;
+    container._googleMapInstance = map;
     restoreFullRoute(container, points);
     return true;
   } catch (e) {
@@ -196,7 +196,7 @@ export async function initAmapForDay(container, points) {
 }
 
 export function drawNavPairRoute(container, from, to) {
-  const map = container?._amapInstance;
+  const map = container?._googleMapInstance;
   if (!map || !from || !to || !window.google || !window.google.maps) return;
   const maps = window.google.maps;
   
@@ -222,7 +222,7 @@ export function drawNavPairRoute(container, from, to) {
 }
 
 export function restoreFullRoute(container, points) {
-  const map = container?._amapInstance;
+  const map = container?._googleMapInstance;
   if (!map || !window.google || !window.google.maps || !points || !points.length) return;
   const maps = window.google.maps;
   
@@ -268,7 +268,7 @@ export function restoreFullRoute(container, points) {
   }
 }
 
-export function destroyAmap(container) {
+export function destroyGoogleMaps(container) {
   if (container) {
     if (container._directionsRenderer) {
         container._directionsRenderer.setMap(null);
@@ -282,8 +282,8 @@ export function destroyAmap(container) {
       container._poly.setMap(null);
       delete container._poly;
     }
-    if (container._amapInstance) {
-        delete container._amapInstance;
+    if (container._googleMapInstance) {
+        delete container._googleMapInstance;
     }
   }
 }

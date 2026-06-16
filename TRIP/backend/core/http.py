@@ -7,7 +7,7 @@ import urllib.parse
 from typing import Any, Optional
 
 import httpx
-from tenacity import retry, stop_after_attempt, wait_exponential
+from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception
 
 logger = logging.getLogger(__name__)
 
@@ -18,6 +18,14 @@ USER_AGENT = (
 
 _SECRET_QUERY_KEYS = ("key", "api_key", "access_token", "token")
 
+def is_transient_error(e: Exception) -> bool:
+    if isinstance(e, httpx.TimeoutException):
+        return True
+    if isinstance(e, httpx.RequestError):
+        return True
+    if isinstance(e, httpx.HTTPStatusError):
+        return e.response.status_code >= 500 or e.response.status_code == 429
+    return False
 
 def redact_url(url: str) -> str:
     """"""
@@ -28,7 +36,6 @@ def redact_url(url: str) -> str:
             query[secret_key] = ["<redacted>"]
     redacted_query = urllib.parse.urlencode(query, doseq=True)
     return urllib.parse.urlunparse(parsed._replace(query=redacted_query))
-
 
 class AsyncHttpClient:
     """"""
@@ -53,6 +60,7 @@ class AsyncHttpClient:
     @retry(
         stop=stop_after_attempt(3),
         wait=wait_exponential(multiplier=1, min=2, max=10),
+        retry=retry_if_exception(is_transient_error),
         reraise=True
     )
     async def get_json(self, url: str, params: Optional[dict] = None) -> dict[str, Any]:
@@ -66,6 +74,25 @@ class AsyncHttpClient:
             raise
         except Exception as e:
             logger.error("Request failed for URL: %s - %s", redact_url(url), str(e))
+            raise
+
+    @retry(
+        stop=stop_after_attempt(3),
+        wait=wait_exponential(multiplier=1, min=2, max=10),
+        retry=retry_if_exception(is_transient_error),
+        reraise=True
+    )
+    async def post_json(self, url: str, json_data: dict, params: Optional[dict] = None) -> dict[str, Any]:
+        client = self.get_client()
+        try:
+            resp = await client.post(url, json=json_data, params=params)
+            resp.raise_for_status()
+            return resp.json()
+        except httpx.HTTPStatusError as e:
+            logger.error("HTTP POST error %d for URL: %s", e.response.status_code, redact_url(url))
+            raise
+        except Exception as e:
+            logger.error("POST Request failed for URL: %s - %s", redact_url(url), str(e))
             raise
 
 

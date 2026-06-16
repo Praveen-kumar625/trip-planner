@@ -1,4 +1,5 @@
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { TripDetailPage } from '@/features/trip/components/TripDetailPage';
 import { useTrip } from '@/features/trip/hooks/useTrip';
 
@@ -12,47 +13,45 @@ export function TripPage() {
 
   if (loading && !plan) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#F4F2EE] text-[#111]" style={{ fontFamily: "'Outfit', sans-serif" }}>
-        <style>
-          {`
-            @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;900&display=swap');
-          `}
-        </style>
-        <div className="bg-white border-2 border-black p-8 rounded-3xl shadow-[6px_6px_0_0_#7C3AED] flex flex-col items-center gap-4">
-          <div className="w-10 h-10 border-4 border-[#F4F2EE] border-t-[#7C3AED] rounded-full animate-spin"></div>
-          <div className="text-lg font-bold text-[#111] animate-pulse">Cooking up your trip... ✨</div>
-        </div>
+      <div className="flex min-h-screen items-center justify-center bg-[var(--color-paper)] text-primary-900">
+        <motion.div 
+          className="glass-panel p-12 rounded-[2.5rem] flex flex-col items-center gap-6"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+        >
+          <div className="w-12 h-12 border-4 border-primary-100 border-t-accent-500 rounded-full animate-spin"></div>
+          <div className="text-xl font-bold tracking-tight text-primary-900 animate-pulse">Curating your experience...</div>
+        </motion.div>
       </div>
     );
   }
 
   if (error && !plan) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-[#F4F2EE] p-8 text-[#111]" style={{ fontFamily: "'Outfit', sans-serif" }}>
-        <style>
-          {`
-            @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;900&display=swap');
-          `}
-        </style>
-        <div className="bg-white border-2 border-black p-10 rounded-3xl shadow-[8px_8px_0_0_#FF4F4F] max-w-md w-full text-center">
-          <div className="w-16 h-16 bg-[#FF4F4F] text-white rounded-2xl flex items-center justify-center text-3xl mx-auto mb-6 border-2 border-black shadow-[4px_4px_0_0_#111]">
-            ❌
+      <div className="flex min-h-screen flex-col items-center justify-center bg-[var(--color-paper)] p-8 text-primary-900">
+        <motion.div 
+          className="glass-panel p-12 rounded-[2.5rem] max-w-lg w-full text-center border-red-500/20"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <div className="w-20 h-20 bg-red-50 text-red-500 rounded-3xl flex items-center justify-center text-4xl mx-auto mb-8 shadow-sm">
+            !
           </div>
-          <div className="text-2xl font-black mb-2">Yikes. Something broke.</div>
-          <div className="text-[#666] font-medium mb-8">{error}</div>
+          <div className="text-3xl font-bold mb-4 tracking-tight">Unable to load journey</div>
+          <div className="text-primary-600/70 font-medium mb-10 leading-relaxed">{error}</div>
           <button 
-            className="w-full px-6 py-4 bg-[#111] text-white font-bold rounded-full border-2 border-[#111] shadow-[4px_4px_0_0_#FF4F4F] hover:-translate-y-1 hover:shadow-[6px_6px_0_0_#FF4F4F] transition-all" 
+            className="btn-luxury w-full" 
             onClick={() => navigate('/planner')}
           >
-            Try Again 🔄
+            Return to Planner
           </button>
-        </div>
+        </motion.div>
       </div>
     );
   }
 
   return (
-    <main id="main-content">
+    <main id="main-content" className="bg-[var(--color-paper)] min-h-screen">
       <TripDetailPage 
         plan={plan} 
         planId={id} 

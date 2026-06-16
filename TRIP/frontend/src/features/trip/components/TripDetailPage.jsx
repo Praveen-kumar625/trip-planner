@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Timeline } from './TripTimeline';
 import { MapPanel } from './MapPanel';
 import { NearbySearchModal } from './NearbySearchModal';
@@ -25,7 +26,6 @@ export function TripDetailPage({ plan: planProp, planId: planIdProp, onRequestMo
   const [nearbyTarget, setNearbyTarget] = useState(null);
   const [themeInput, setThemeInput] = useState('');
   
-  // Local notes state for TripNotes
   const [metaDirty, setMetaDirty] = useState(false);
   const [metaSaving, setMetaSaving] = useState(false);
 
@@ -106,28 +106,57 @@ export function TripDetailPage({ plan: planProp, planId: planIdProp, onRequestMo
   const isOptimized = optimizedDays[dayIdx] !== undefined;
 
   return (
-    <div className="flex min-h-[calc(100vh-80px)] flex-col bg-[#F4F2EE] text-[#111] p-4 md:p-8 animate-fade-in" style={{ fontFamily: "'Outfit', sans-serif" }}>
-      <style>
-        {`
-          @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;900&display=swap');
-        `}
-      </style>
-      <div className="w-full max-w-7xl mx-auto space-y-8">
-        
-        {/* Aesthetic Wrap for Header */}
-        <div className="bg-white border-2 border-black rounded-3xl p-6 shadow-[6px_6px_0_0_#7C3AED]">
+    <motion.div 
+      className="flex min-h-[calc(100vh-80px)] flex-col bg-primary-950 text-primary-50 p-6 md:p-12 relative font-sans"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.6 }}
+    >
+      <div className="w-full max-w-[1400px] mx-auto space-y-8 relative z-10">
+        <motion.div 
+          className="card-solid p-0 overflow-hidden border-4"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.1 }}
+        >
           <TripHeader plan={plan} />
+        </motion.div>
+
+        {/* View Switcher */}
+        <div className="flex gap-4 border-b-2 border-primary-800 pb-2">
+          {['itinerary', 'finance'].map(v => (
+            <button
+              key={v}
+              onClick={() => setActiveView(v)}
+              className={`px-6 py-2 text-sm font-bold uppercase tracking-widest transition-all ${activeView === v ? 'text-accent-50 text-accent-500 border-b-2 border-accent-500' : 'text-primary-400 hover:text-white'}`}
+            >
+              {v}
+            </button>
+          ))}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 space-y-6">
-            <DayTabs days={viewPlan.days} activeDay={dayIdx} setActiveDay={(i) => { setDayIdx(i); setActiveNavKey(null); setActiveNavPair(null); }} />
-
-            <div className="bg-white border-2 border-black rounded-3xl p-6 shadow-[8px_8px_0_0_#111]">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-6 border-b-2 border-black/10">
+        {activeView === 'finance' ? (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+            <TravelFinanceDashboard planId={planId} />
+          </motion.div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <motion.div 
+              className="lg:col-span-7 space-y-6"
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.2 }}
+            >
+              <DayTabs days={viewPlan.days} activeDay={dayIdx} setActiveDay={(i) => { setDayIdx(i); setActiveNavKey(null); setActiveNavPair(null); }} />
+        ...
+            </motion.div>
+          </div>
+        )}
+            <div className="card-solid p-8">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-8 pb-6 border-b-2 border-primary-800">
                 {editing ? (
                   <input
-                    className="text-2xl font-black bg-[#F4F2EE] border-2 border-black rounded-xl px-4 py-3 focus:ring-0 transition-all outline-none w-full sm:w-2/3 shadow-[inset_2px_2px_0_0_rgba(0,0,0,0.05)] focus:bg-white"
+                    className="text-2xl font-black bg-primary-800 border-2 border-primary-700 rounded-xl px-4 py-3 focus:ring-0 transition-all outline-none w-full sm:w-2/3 focus:bg-primary-900 focus:border-accent-500 text-white"
                     value={themeInput}
                     onChange={e => setThemeInput(e.target.value)}
                     onBlur={() => {
@@ -137,85 +166,108 @@ export function TripDetailPage({ plan: planProp, planId: planIdProp, onRequestMo
                     onKeyDown={e => e.key === 'Enter' && e.target.blur()}
                   />
                 ) : (
-                  <h3 className="text-3xl font-black text-[#111]">{day.theme}</h3>
+                  <h3 className="text-3xl font-black text-white tracking-tight">{day.theme}</h3>
                 )}
                 
-                <div className="flex gap-2">
+                <div className="flex gap-3">
                   {!editing && planId && (
                     <button 
-                      className="px-6 py-2 bg-white text-[#111] font-bold rounded-full border-2 border-black shadow-[4px_4px_0_0_#111] hover:-translate-y-1 hover:shadow-[6px_6px_0_0_#7C3AED] transition-all" 
+                      className="btn-outline px-6 py-2 text-sm" 
                       onClick={enterEdit}
                     >
-                      Edit Trip
+                      Curate Details
                     </button>
                   )}
                   {!editing && hasAttractions && planId && (
                     isOptimized ? (
                       <button 
-                        className="px-6 py-2 bg-[#FF4F4F] text-white font-bold rounded-full border-2 border-black shadow-[4px_4px_0_0_#111] hover:-translate-y-1 hover:shadow-[6px_6px_0_0_#111] transition-all" 
+                        className="btn-primary bg-primary-800 hover:bg-primary-700 px-6 py-2 text-sm" 
                         onClick={() => handleRevert(dayNo)}
                       >
-                        Undo Optimize
+                        Restore Route
                       </button>
                     ) : (
                       <button 
-                        className="px-6 py-2 bg-[#7C3AED] text-white font-bold rounded-full border-2 border-black shadow-[4px_4px_0_0_#111] hover:-translate-y-1 hover:shadow-[6px_6px_0_0_#111] transition-all disabled:opacity-50" 
+                        className="btn-primary px-6 py-2 text-sm" 
                         disabled={optimizingDay === dayNo} 
                         onClick={() => handleOptimize(dayNo)}
                       >
-                        {optimizingDay === dayNo ? 'Optimizing...' : 'Optimize Route'}
+                        {optimizingDay === dayNo ? 'Optimizing...' : 'Smart Routing'}
                       </button>
                     )
                   )}
                 </div>
               </div>
 
-              {dayMsg && dayMsg.day === dayNo && (
-                <div className="mb-6 p-4 bg-[#7C3AED] text-white border-2 border-black rounded-2xl text-sm font-bold shadow-[4px_4px_0_0_#111] animate-pulse">
-                  {dayMsg.text}
-                </div>
-              )}
+              <AnimatePresence>
+                {dayMsg && dayMsg.day === dayNo && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="mb-8 p-4 bg-primary-800 text-accent-400 border-2 border-primary-700 rounded-2xl text-sm font-bold flex items-center gap-3"
+                  >
+                    <div className="w-3 h-3 rounded-full bg-accent-500 animate-pulse" />
+                    {dayMsg.text}
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
-              <div className="space-y-6" role="tabpanel" id={`day-panel-${dayIdx}`} aria-labelledby={`day-tab-${dayIdx}`}>
+              <div className="space-y-6" role="tabpanel">
                 <Timeline items={day.items || []} onNav={handleNav} activeNavKey={activeNavKey} />
               </div>
             </div>
-          </div>
+          </motion.div>
 
-          <div className="lg:col-span-1 space-y-6">
-            <div className="h-[400px] lg:h-[500px] sticky top-8 rounded-3xl overflow-hidden shadow-[8px_8px_0_0_#111] border-2 border-black bg-white">
+          <motion.div 
+            className="lg:col-span-5 space-y-6"
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.3 }}
+          >
+            <div className="h-[400px] lg:h-[500px] sticky top-32 rounded-3xl overflow-hidden shadow-solid border-4 border-primary-800 bg-primary-900 z-10">
               <MapPanel day={day} dayIdx={dayIdx} navPair={activeNavPair} onNavClear={() => { setActiveNavKey(null); setActiveNavPair(null); }} />
             </div>
             
-            <div className="bg-white border-2 border-black rounded-3xl p-6 shadow-[8px_8px_0_0_#FF4F4F]">
+            <div className="card-solid p-8">
               <TripNotes plan={plan} onUpdateField={handleUpdateField} />
             </div>
             
-            {metaDirty && (
-              <button 
-                className="w-full px-6 py-4 bg-[#111] text-white font-bold rounded-full border-2 border-[#111] shadow-[6px_6px_0_0_#7C3AED] hover:-translate-y-1 hover:shadow-[8px_8px_0_0_#7C3AED] transition-all disabled:opacity-50"
-                disabled={metaSaving} 
-                onClick={handleSaveMeta}
-              >
-                {metaSaving ? 'Saving Notes...' : 'Save Notes ✨'}
-              </button>
-            )}
-          </div>
+            <AnimatePresence>
+              {metaDirty && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                >
+                  <button 
+                    className="btn-primary w-full py-4 text-base"
+                    disabled={metaSaving} 
+                    onClick={handleSaveMeta}
+                  >
+                    {metaSaving ? 'Syncing...' : 'Save Preferences'}
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
         </div>
       </div>
       
-      {nearbyTarget && (
-        <NearbySearchModal 
-          location={nearbyTarget.location} 
-          name={nearbyTarget.name} 
-          onClose={() => setNearbyTarget(null)} 
-          onPickMeal={(poi, type) => {
-            setSearchTarget({ dayI: nearbyTarget.dayI, addType: type });
-            handlePoiPick(poi);
-            setNearbyTarget(null);
-          }} 
-        />
-      )}
-    </div>
+      <AnimatePresence>
+        {nearbyTarget && (
+          <NearbySearchModal 
+            location={nearbyTarget.location} 
+            name={nearbyTarget.name} 
+            onClose={() => setNearbyTarget(null)} 
+            onPickMeal={(poi, type) => {
+              setSearchTarget({ dayI: nearbyTarget.dayI, addType: type });
+              handlePoiPick(poi);
+              setNearbyTarget(null);
+            }} 
+          />
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 }

@@ -48,7 +48,8 @@ async def _plan_city_segment(segment: CitySegment, state: TravelPlanState, model
     logger.info("[worker] Planning city: %s for %d days", segment.city, segment.days)
     
     # 1. Fetch POIs for this city
-    api_key = get_amap_key()
+    from backend.core.env import settings
+    api_key = settings.GOOGLE_MAPS_API_KEY
     spots = await fetch_city_spots_async(segment.city, api_key, max_spots=state.max_spots)
     kept, _ = filter_by_rating(spots, state.min_rating)
     

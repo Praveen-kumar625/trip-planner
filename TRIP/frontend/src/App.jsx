@@ -1,14 +1,15 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom';
+import { ThemeProvider } from './core/theme';
+import { Dashboard } from './pages/Dashboard';
 
 function App() {
   return (
-    <div className="min-h-screen bg-background text-text">
+    <ThemeProvider>
       <Routes>
-        <Route path="/" element={<div className="p-8 text-2xl font-bold">Trip Planner v2</div>} />
-        {/* We will add more routes here */}
+        <Route path="/" element={<Dashboard />} />
       </Routes>
-    </div>
-  )
+    </ThemeProvider>
+  );
 }
 
-export default App
+export default App;
