@@ -104,8 +104,14 @@ def parse_iso_date(date_str: str) -> date | None:
     except ValueError:
         return None
 
+def invoke_structured(llm, messages, retries=3):
+    return None
+
 # Additional helper stubs as needed by planner
 def cluster_pois_by_location(spots, days): return {s["name"]: 0 for s in spots}
 def filter_by_rating(spots, min_rating): return [s for s in spots if (s.get("rating") or 0) >= min_rating], []
 def unknown_spots(route, pois): return []
 def restaurant_to_dict(p): return p
+def dinner_anchor_spot(day, route): return None
+def last_spot_of_period(day_items, period): return None
+def spot_location_map(pois): return {}

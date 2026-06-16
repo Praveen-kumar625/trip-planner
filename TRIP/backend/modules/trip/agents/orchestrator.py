@@ -4,7 +4,7 @@ from typing import Any, List
 
 from backend.modules.trip.schemas import TravelPlanState, CitySegment
 from backend.modules.trip.agents.planner import make_planner_node, attraction_search_node
-from backend.modules.trip.helpers import amap_key, fetch_city_spots_async, filter_by_rating
+from backend.modules.trip.helpers import fetch_city_spots_async, filter_by_rating
 
 logger = logging.getLogger(__name__)
 
@@ -48,7 +48,7 @@ async def _plan_city_segment(segment: CitySegment, state: TravelPlanState, model
     logger.info("[worker] Planning city: %s for %d days", segment.city, segment.days)
     
     # 1. Fetch POIs for this city
-    api_key = amap_key()
+    api_key = get_amap_key()
     spots = await fetch_city_spots_async(segment.city, api_key, max_spots=state.max_spots)
     kept, _ = filter_by_rating(spots, state.min_rating)
     

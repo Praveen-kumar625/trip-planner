@@ -3,7 +3,7 @@ from typing import Any
 
 from backend.llm.factory import build_structured_llm
 from backend.modules.trip.schemas import IntentExtraction, RewrittenQuery, TravelPlanState, CitySegment
-from backend.modules.trip.helpers import clean_pref, fetch_weather_for_dates_async, parse_iso_date, amap_key, async_invoke_structured
+from backend.modules.trip.helpers import clean_pref, fetch_weather_for_dates_async, parse_iso_date, async_invoke_structured
 from backend.modules.trip.prompts import INTENT_SYSTEM, QUERY_REWRITE_SYSTEM, WEEKDAYS
 from backend.core.database import get_session
 from backend.core.memory import get_user_profile
@@ -123,7 +123,7 @@ def make_intent_node(model_name: str | None, profile_hint: str = ""):
         w_note: str | None = None
         # Weather for primary destination only for now (simplified)
         if not missing and primary_destination and start and end:
-            forecast, w_note = await fetch_weather_for_dates_async(primary_destination, start, end, amap_key())
+            forecast, w_note = await fetch_weather_for_dates_async(primary_destination, start, end, "")
 
         opt = clean_pref
         note = (

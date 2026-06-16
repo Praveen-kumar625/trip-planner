@@ -1,3 +1,5 @@
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
 export function getAuth() {
   try { return JSON.parse(localStorage.getItem("auth")); } catch { return null; }
 }
@@ -13,13 +15,17 @@ export function clearAuth() {
 
 export function authHeaders() {
   const a = getAuth();
-  return a ? { "Authorization": "Bearer " + a.token } : {};
+  const headers = a ? { "Authorization": "Bearer " + a.token } : {};
+  const xsrfToken = document.cookie.split('; ').find(row => row.startsWith('XSRF-TOKEN='))?.split('=')[1];
+  if (xsrfToken) headers['X-XSRF-TOKEN'] = xsrfToken;
+  return headers;
 }
 
 export async function loginApi(username, password) {
-  const r = await fetch("/api/auth/login", {
+  const r = await fetch(API_URL + "/api/auth/login", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    headers: { ...authHeaders(), "Content-Type": "application/json" },
     body: JSON.stringify({ username, password }),
   });
   const d = await r.json();
@@ -28,9 +34,10 @@ export async function loginApi(username, password) {
 }
 
 export async function registerApi(username, password) {
-  const r = await fetch("/api/auth/register", {
+  const r = await fetch(API_URL + "/api/auth/register", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    headers: { ...authHeaders(), "Content-Type": "application/json" },
     body: JSON.stringify({ username, password }),
   });
   const d = await r.json();
@@ -42,7 +49,7 @@ export async function checkAuth() {
   const a = getAuth();
   if (!a) return null;
   try {
-    const r = await fetch("/api/auth/me", { headers: authHeaders() });
+    const r = await fetch(API_URL + "/api/auth/me", { credentials: "include", headers: authHeaders() });
     if (!r.ok) throw new Error("Auth invalid");
     const d = await r.json();
     return d.username;
@@ -53,13 +60,13 @@ export async function checkAuth() {
 }
 
 export async function getProfile() {
-  const r = await fetch("/api/user/profile", { headers: authHeaders() });
+  const r = await fetch(API_URL + "/api/user/profile", { credentials: "include", headers: authHeaders() });
   if (!r.ok) throw new Error("Failed to get profile");
   return r.json();
 }
 
 export async function getPlan(id) {
-  const r = await fetch(`/api/plan/${id}`, { headers: authHeaders() });
+  const r = await fetch(API_URL + `/api/plan/${id}`, { credentials: "include", headers: authHeaders() });
   const d = await r.json();
   if (!r.ok) throw new Error(d.detail || "Failed to load plan");
   return d;
@@ -70,8 +77,9 @@ export function streamPlan(body, callbacks) {
   const abortCtrl = new AbortController();
   onAbort && onAbort(() => abortCtrl.abort());
 
-  fetch("/api/plan/stream", {
+  fetch(API_URL + "/api/plan/stream", {
     method: "POST",
+    credentials: "include",
     headers: { ...authHeaders(), "Content-Type": "application/json" },
     body: JSON.stringify(body),
     signal: abortCtrl.signal,
@@ -114,8 +122,9 @@ export function confirmModification(pendingId, parentPlanId, callbacks) {
   const abortCtrl = new AbortController();
   onAbort && onAbort(() => abortCtrl.abort());
 
-  fetch("/api/plan/confirm_modification", {
+  fetch(API_URL + "/api/plan/confirm_modification", {
     method: "POST",
+    credentials: "include",
     headers: { ...authHeaders(), "Content-Type": "application/json" },
     body: JSON.stringify({ pending_id: pendingId, parent_plan_id: parentPlanId }),
     signal: abortCtrl.signal,
@@ -150,91 +159,139 @@ export function confirmModification(pendingId, parentPlanId, callbacks) {
 }
 
 export async function getConfig() {
-  const r = await fetch("/api/system/config");
+  const r = await fetch(API_URL + "/api/config");
   return r.json();
 }
 
-let amapScriptPromise = null;
+let googleMapScriptPromise = null;
 export function ensureAMap() {
-  if (window.AMap) return Promise.resolve(window.AMap);
-  if (amapScriptPromise) return amapScriptPromise;
-  amapScriptPromise = getConfig().then(conf => {
-    if (!conf.amap_web_key || !conf.amap_security_code) throw new Error("No AMap config");
-    window._AMapSecurityConfig = { securityJsCode: conf.amap_security_code };
+  if (window.google && window.google.maps) return Promise.resolve(window.google.maps);
+  if (googleMapScriptPromise) return googleMapScriptPromise;
+  googleMapScriptPromise = getConfig().then(conf => {
+    if (!conf.google_maps_api_key) throw new Error("No Google Maps config");
     return new Promise((resolve, reject) => {
-      window._amapInit = () => { resolve(window.AMap); delete window._amapInit; };
+      window._googleMapInit = () => { resolve(window.google.maps); delete window._googleMapInit; };
       const s = document.createElement("script");
-      s.src = `https://webapi.amap.com/maps?v=2.0&key=${conf.amap_web_key}&plugin=AMap.Driving,AMap.Transfer,AMap.Walking&callback=_amapInit`;
-      s.onerror = () => reject(new Error("AMap load fail"));
+      s.src = `https://maps.googleapis.com/maps/api/js?key=${conf.google_maps_api_key}&libraries=places,geometry&callback=_googleMapInit`;
+      s.onerror = () => reject(new Error("Google Maps load fail"));
       document.head.appendChild(s);
     });
   });
-  return amapScriptPromise;
+  return googleMapScriptPromise;
 }
 
 export async function initAmapForDay(container, points) {
   if (!points || !points.length) return false;
   try {
-    const AMap = await ensureAMap();
+    const maps = await ensureAMap();
     if (!container) return false;
-    const map = new AMap.Map(container, { zoom: 12, mapStyle: "amap://styles/normal" });
+    const map = new maps.Map(container, { zoom: 12, center: {lat: points[0].lat, lng: points[0].lng} });
     container._amapInstance = map;
     restoreFullRoute(container, points);
     return true;
   } catch (e) {
-    console.error("AMap init fail:", e);
+    console.error("Map init fail:", e);
     return false;
   }
 }
 
 export function drawNavPairRoute(container, from, to) {
   const map = container?._amapInstance;
-  if (!map || !from || !to || !window.AMap) return;
-  map.clearMap();
-  const driving = new window.AMap.Driving({ map, hideMarkers: false });
-  driving.search(
-    new window.AMap.LngLat(from.lng, from.lat),
-    new window.AMap.LngLat(to.lng, to.lat)
-  );
+  if (!map || !from || !to || !window.google || !window.google.maps) return;
+  const maps = window.google.maps;
+  
+  const directionsService = new maps.DirectionsService();
+  const directionsRenderer = new maps.DirectionsRenderer({ map: map });
+  
+  if (container._directionsRenderer) {
+      container._directionsRenderer.setMap(null);
+  }
+  container._directionsRenderer = directionsRenderer;
+
+  directionsService.route({
+    origin: { lat: from.lat, lng: from.lng },
+    destination: { lat: to.lat, lng: to.lng },
+    travelMode: maps.TravelMode.DRIVING
+  }, (response, status) => {
+    if (status === 'OK') {
+      directionsRenderer.setDirections(response);
+    } else {
+      console.error("Directions request failed due to " + status);
+    }
+  });
 }
 
 export function restoreFullRoute(container, points) {
   const map = container?._amapInstance;
-  if (!map || !window.AMap || !points || !points.length) return;
-  map.clearMap();
+  if (!map || !window.google || !window.google.maps || !points || !points.length) return;
+  const maps = window.google.maps;
+  
+  if (container._directionsRenderer) {
+      container._directionsRenderer.setMap(null);
+  }
+
+  if (container._markers) {
+    container._markers.forEach(m => m.setMap(null));
+  }
+  container._markers = [];
+  
+  if (container._poly) {
+    container._poly.setMap(null);
+  }
+
   const path = [];
+  const bounds = new maps.LatLngBounds();
+
   points.forEach((p, i) => {
     if (!p.lng || !p.lat) return;
-    const ll = new window.AMap.LngLat(p.lng, p.lat);
+    const ll = { lat: p.lat, lng: p.lng };
     path.push(ll);
-    const m = new window.AMap.Marker({
+    bounds.extend(ll);
+
+    const m = new maps.Marker({
       position: ll,
-      content: `<div class="w-6 h-6 flex items-center justify-center rounded-full text-white font-bold text-xs shadow-md ${p.type==='meal'?'bg-second-500':'bg-primary-500'}">${p.type==='meal'?'🍴':i+1}</div>`,
-      offset: new window.AMap.Pixel(-12, -12),
+      map: map,
+      label: p.type === 'meal' ? '🍴' : `${i+1}`,
     });
-    map.add(m);
+    container._markers.push(m);
   });
+
   if (path.length > 1) {
-    const poly = new window.AMap.Polyline({
-      path, strokeColor: "#4f46e5", strokeOpacity: 0.8, strokeWeight: 4, strokeStyle: "dashed"
+    container._poly = new maps.Polyline({
+      path, strokeColor: "#4f46e5", strokeOpacity: 0.8, strokeWeight: 4
     });
-    map.add(poly);
+    container._poly.setMap(map);
   }
+  
   if (path.length > 0) {
-    map.setFitView();
+    map.fitBounds(bounds);
   }
 }
 
 export function destroyAmap(container) {
-  if (container?._amapInstance) {
-    container._amapInstance.destroy();
-    delete container._amapInstance;
+  if (container) {
+    if (container._directionsRenderer) {
+        container._directionsRenderer.setMap(null);
+        delete container._directionsRenderer;
+    }
+    if (container._markers) {
+      container._markers.forEach(m => m.setMap(null));
+      delete container._markers;
+    }
+    if (container._poly) {
+      container._poly.setMap(null);
+      delete container._poly;
+    }
+    if (container._amapInstance) {
+        delete container._amapInstance;
+    }
   }
 }
 
 export async function saveProfile(data) {
-  const r = await fetch("/api/user/profile", {
+  const r = await fetch(API_URL + "/api/user/profile", {
     method: "PUT",
+    credentials: "include",
     headers: { ...authHeaders(), "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
@@ -243,8 +300,9 @@ export async function saveProfile(data) {
 }
 
 export async function optimizeDay(planId, day) {
-  const r = await fetch("/api/plan/optimize_day", {
+  const r = await fetch(API_URL + "/api/plan/optimize_day", {
     method: "POST",
+    credentials: "include",
     headers: { ...authHeaders(), "Content-Type": "application/json" },
     body: JSON.stringify({ plan_id: planId, day }),
   });
@@ -254,8 +312,9 @@ export async function optimizeDay(planId, day) {
 }
 
 export async function revertDay(planId, day, original_timeline) {
-  const r = await fetch("/api/plan/revert_day", {
+  const r = await fetch(API_URL + "/api/plan/revert_day", {
     method: "POST",
+    credentials: "include",
     headers: { ...authHeaders(), "Content-Type": "application/json" },
     body: JSON.stringify({ plan_id: planId, day, original_timeline }),
   });
@@ -265,8 +324,9 @@ export async function revertDay(planId, day, original_timeline) {
 }
 
 export async function saveTimeline(planId, days) {
-  const r = await fetch(`/api/plan/${planId}/timeline`, {
+  const r = await fetch(API_URL + `/api/plan/${planId}/timeline`, {
     method: "PUT",
+    credentials: "include",
     headers: { ...authHeaders(), "Content-Type": "application/json" },
     body: JSON.stringify({ days }),
   });
@@ -276,8 +336,9 @@ export async function saveTimeline(planId, days) {
 }
 
 export async function savePlanMetadata(planId, data) {
-  const r = await fetch(`/api/plan/${planId}/metadata`, {
+  const r = await fetch(API_URL + `/api/plan/${planId}/metadata`, {
     method: "PUT",
+    credentials: "include",
     headers: { ...authHeaders(), "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
@@ -288,7 +349,7 @@ export async function savePlanMetadata(planId, data) {
 
 export async function searchPoi(city, kw, kind) {
   const q = new URLSearchParams({ city, kw, kind });
-  const r = await fetch(`/api/poi/search?${q.toString()}`, { headers: authHeaders() });
+  const r = await fetch(API_URL + `/api/poi/search?${q.toString()}`, { credentials: "include", headers: authHeaders() });
   const d = await r.json();
   if (!r.ok) throw new Error(d.detail || "Search failed");
   return d;
@@ -296,7 +357,7 @@ export async function searchPoi(city, kw, kind) {
 
 export async function searchNearby(lat, lng, type, radius=1500) {
   const q = new URLSearchParams({ lat, lng, type, radius });
-  const r = await fetch(`/api/poi/nearby?${q.toString()}`, { headers: authHeaders() });
+  const r = await fetch(API_URL + `/api/poi/nearby?${q.toString()}`, { credentials: "include", headers: authHeaders() });
   const d = await r.json();
   if (!r.ok) throw new Error(d.detail || "Nearby search failed");
   return d;

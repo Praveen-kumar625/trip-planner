@@ -14,7 +14,12 @@ logger = logging.getLogger(__name__)
 class GoogleMapsClient:
     """"""
     def __init__(self, api_key: str):
-        self.client = googlemaps.Client(key=api_key)
+        self.api_key = api_key
+        try:
+            self.client = googlemaps.Client(key=api_key) if api_key else None
+        except ValueError:
+            self.client = None
+            logger.warning("Invalid Google Maps API key provided. Client not initialized.")
 
     async def search_city_pois_async(
         self,

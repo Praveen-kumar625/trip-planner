@@ -13,7 +13,6 @@ from backend.modules.trip.schemas import (
     TravelRoute,
 )
 from backend.modules.trip.helpers import (
-    amap_key,
     cluster_pois_by_location,
     fetch_city_spots_async,
     filter_by_rating,
@@ -32,7 +31,7 @@ from backend.modules.trip.prompts import (
 logger = logging.getLogger(__name__)
 
 async def attraction_search_node(state: TravelPlanState) -> dict[str, Any]:
-    api_key = amap_key()
+    api_key = ""
     spots = await fetch_city_spots_async(state.destination or "", api_key, max_spots=state.max_spots)
     kept, _ = filter_by_rating(spots, state.min_rating)
     note = f"AMap POI Search: fetched {len(spots)} spots, rating≥{state.min_rating} kept {len(kept)} spots"

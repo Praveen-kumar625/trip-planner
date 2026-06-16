@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useAuthStore } from '../store/authStore';
 
 const apiClient = axios.create({
-  baseURL: '/',
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000',
   withCredentials: true, // Required for HttpOnly cookies
 });
 
@@ -35,7 +35,7 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
-        const response = await axios.post('/api/auth/refresh', { refresh_token: refreshToken }, { withCredentials: true });
+        const response = await axios.post('/api/auth/refresh', { refresh_token: refreshToken }, { withCredentials: true, baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000' });
         const { access_token } = response.data;
         updateAccessToken(access_token);
         originalRequest.headers.Authorization = `Bearer ${access_token}`;

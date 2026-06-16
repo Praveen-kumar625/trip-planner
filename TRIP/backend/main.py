@@ -1,12 +1,16 @@
 import os
 from pathlib import Path
 from contextlib import asynccontextmanager
+import secrets
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.base import BaseHTTPMiddleware
+import logging
+
+logger = logging.getLogger(__name__)
 
 from backend.core.database import init_db
 from backend.core.env import settings
@@ -22,18 +26,32 @@ from backend.modules.system.router import router as system_router
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
-    await init_db()
+    try:
+        await init_db()
+    except Exception as e:
+        logger.error(f"Failed to initialize database: {e}")
     yield
     # Shutdown
     from backend.core.cache import cache_service
-    await cache_service.close()
-    await http_client.close()
+    try:
+        await cache_service.close()
+        await http_client.close()
+    except Exception as e:
+        logger.error(f"Failed to close services: {e}")
 
 app = FastAPI(
     title="Wandersync AI",
     version="0.2.0",
     lifespan=lifespan
 )
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    logger.error(f"Unhandled exception: {exc}")
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "Internal server error occurred."}
+    )
 
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request, call_next):
@@ -44,15 +62,13 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
         response.headers["Content-Security-Policy"] = (
             "default-src 'self'; "
-            "script-src 'self' 'unsafe-inline' https://webapi.amap.com https://restapi.amap.com; "
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://maps.googleapis.com; "
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
             "font-src 'self' https://fonts.gstatic.com; "
-            "img-src 'self' data: https: blob:; "
-            "connect-src 'self' https://restapi.amap.com https://*.amap.com;"
+            "img-src 'self' data: https: blob: https://maps.gstatic.com https://maps.googleapis.com; "
+            "connect-src 'self' https://maps.googleapis.com;"
         )
         return response
-
-import secrets
 
 class CSRFMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request, call_next):
@@ -73,8 +89,8 @@ class CSRFMiddleware(BaseHTTPMiddleware):
                 key="XSRF-TOKEN",
                 value=secrets.token_urlsafe(32),
                 httponly=False, # Must be accessible to frontend JS
-                samesite="strict",
-                secure=True
+                samesite="lax",
+                secure=False
             )
         return response
 
@@ -90,7 +106,7 @@ app.include_router(system_router)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # Tighten in production
+    allow_origins=["http://localhost:5173"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -103,8 +119,7 @@ async def health():
 @app.get("/api/config")
 async def config():
     return {
-        "amap_js_key": settings.AMAP_JS_KEY,
-        "amap_js_security_code": settings.AMAP_JS_SECURITY_CODE,
+        "google_maps_api_key": settings.GOOGLE_MAPS_API_KEY,
     }
 
 _FRONTEND_DIR = Path(__file__).resolve().parent.parent / "frontend" / "dist"

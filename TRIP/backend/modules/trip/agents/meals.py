@@ -3,13 +3,20 @@ from typing import Any
 
 from backend.llm.factory import build_structured_llm
 from backend.modules.trip.schemas import DayMealPick, SingleDayMealPick, TravelPlanState
-from backend.modules.trip.helpers import amap_key, dinner_anchor_spot, last_spot_of_period, restaurant_to_dict, spot_location_map, async_invoke_structured
-from backend.providers.amap.poi import search_around_pois_async
+from backend.modules.trip.helpers import dinner_anchor_spot, last_spot_of_period, restaurant_to_dict, spot_location_map, async_invoke_structured
+from backend.core.env import settings
+
+def get_amap_key(): return ""
+from backend.providers.google.places import google_maps_client
 from backend.modules.trip.prompts import MEAL_SYSTEM
 import asyncio
 
+async def search_around_pois_async(location, radius, types, keyword=""):
+    return await google_maps_client.search_around_pois_async(location, radius, types, keyword)
+
+
 async def meal_search_node(state: TravelPlanState) -> dict[str, Any]:
-    api_key  = amap_key()
+    api_key  = get_amap_key()
     loc_map  = spot_location_map(state.pois)
     meal_candidates: list[dict[str, Any]] = []
     warnings: list[str] = []

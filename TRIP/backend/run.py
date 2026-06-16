@@ -2,7 +2,7 @@
 
 usage:
     python run.py
-    → http://localhost:8765
+    → http://localhost:5000
 """
 
 import logging
@@ -22,5 +22,5 @@ logging.getLogger("backend.modules.trip.agents").setLevel(logging.DEBUG)
 
 if __name__ == "__main__":
     print("✈️  Travel Planning Assistant is starting...")
-    print("   access:http://localhost:8765")
-    uvicorn.run("backend.main:app", host="0.0.0.0", port=8765, reload=False)
+    print("   access:http://localhost:5000")
+    uvicorn.run("backend.main:app", host="0.0.0.0", port=5000, reload=False)
