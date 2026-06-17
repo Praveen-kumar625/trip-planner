@@ -1,22 +1,12 @@
-import { useNavigate } from 'react-router-dom';
-import { PlanPage } from '@/features/trip/components/PlanPage';
+import React from 'react';
+import { AiConcierge } from '@/features/ai/components/AiConcierge';
 
 export function PlannerPage() {
-  const navigate = useNavigate();
-
-  const handlePlanReady = (adaptedPlan, planId) => {
-    navigate(`/trip/${planId}`, { state: { plan: adaptedPlan } });
-  };
-
-  const handleRequestLogin = () => {
-    // Show AuthModal logic here
-    console.log("Login requested");
-  };
-
   return (
-    <PlanPage 
-      onRequestLogin={handleRequestLogin} 
-      onPlanReady={handlePlanReady}
-    />
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-4 md:p-8">
+      <div className="max-w-6xl mx-auto h-[80vh]">
+        <AiConcierge />
+      </div>
+    </div>
   );
 }

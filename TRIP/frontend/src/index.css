@@ -1,123 +1,140 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
 
-@theme {
-  --font-sans: "Outfit", "Inter", system-ui, sans-serif;
-  
-  /* Solid Dark Luxury Navy */
-  --color-primary-50: #e0e6ed;
-  --color-primary-100: #b3c2d1;
-  --color-primary-200: #8099b3;
-  --color-primary-300: #547596;
-  --color-primary-400: #335c7a;
-  --color-primary-500: #1a425e;
-  --color-primary-600: #0d2b42;
-  --color-primary-700: #0a2133;
-  --color-primary-800: #061624;
-  --color-primary-900: #030d17;
-  --color-primary-950: #01060b;
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* Elegant smooth scrollbar for webkit */
+  }
 
-  /* Solid Saffron Gold */
-  --color-accent-400: #fca835;
-  --color-accent-500: #f58f0a;
-  --color-accent-600: #cc7400;
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.2);
+  }
 
-  /* Solid Emerald Green */
-  --color-second-400: #34d399;
-  --color-second-500: #10b981;
-  --color-second-600: #059669;
+  :root {
+    /* Premium Modern Light Theme */
+    --background: 0 0% 100%; /* White */
+    --foreground: 222 47% 11%; /* Deep Indigo/Black */
 
-  /* Shadows without transparency */
-  --shadow-solid: 0 10px 25px rgba(0, 0, 0, 1);
-  --shadow-solid-hover: 0 15px 35px rgba(0, 0, 0, 1);
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    /* Primary: Saffron Gold - Taj Hotels inspired */
+    --primary: 43 96% 56%; 
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary: Elegant Neutral */
+    --secondary: 210 40% 96.1%; 
+    --secondary-foreground: 222 47% 11%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222 47% 11%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 43 96% 56%;
+
+    --radius: 1rem;
+  }
 }
 
 @layer base {
-  :root {
-    --background: var(--color-primary-950);
-    --foreground: var(--color-primary-50);
-    font-family: var(--font-sans);
-    scroll-behavior: smooth;
+  * {
+    border-color: hsl(var(--border));
   }
-
   body {
-    background-color: var(--background);
-    color: var(--foreground);
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    /* Subtle grain texture overlay for a magazine print feel */
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.02'/%3E%3C/svg%3E");
   }
 
   ::selection {
-    background: var(--color-accent-500);
-    color: var(--color-primary-950);
-  }
-}
-
-@layer components {
-  /* Premium Glassmorphic Buttons */
-  .btn-primary {
-    @apply relative overflow-hidden inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-accent-500 to-accent-600 px-6 py-3 text-sm font-bold tracking-wide text-primary-950 shadow-[0_0_20px_rgba(245,143,10,0.3)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_30px_rgba(245,143,10,0.6)] active:scale-95 disabled:opacity-100 disabled:bg-primary-700 disabled:text-primary-400 disabled:pointer-events-none;
-  }
-  
-  .btn-outline {
-    @apply inline-flex items-center justify-center rounded-xl bg-white/5 backdrop-blur-md border border-white/10 px-6 py-3 text-sm font-bold tracking-wide text-primary-50 transition-all duration-300 hover:-translate-y-1 hover:bg-white/10 hover:border-white/20 hover:shadow-[0_0_20px_rgba(255,255,255,0.05)] active:scale-95 disabled:opacity-100 disabled:bg-primary-900 disabled:border-primary-800 disabled:text-primary-500 disabled:pointer-events-none;
-  }
-
-  /* Glassmorphism Cards */
-  .glass-card {
-    @apply rounded-3xl bg-white/[0.03] backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.4)] transition-all duration-500 hover:-translate-y-2 hover:bg-white/[0.06] hover:border-white/20 hover:shadow-[0_16px_48px_rgba(0,0,0,0.6)];
-  }
-
-  .glass-panel {
-    @apply rounded-3xl bg-primary-900/60 backdrop-blur-2xl border border-white/5 shadow-[0_8px_32px_rgba(0,0,0,0.5)];
-  }
-
-  .glass-nav {
-    @apply bg-primary-950/60 backdrop-blur-xl border-b border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.1)];
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
   }
 }
 
 @layer utilities {
-  .text-brand-gradient {
-    @apply bg-clip-text text-[color:transparent] bg-gradient-to-r from-accent-400 via-accent-500 to-second-400;
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .pt-safe {
+    padding-top: env(safe-area-inset-top);
   }
   
-  .bg-mesh {
-    background-color: var(--color-primary-950);
-    background-image: 
-      radial-gradient(at 0% 0%, rgba(13, 43, 66, 0.4) 0px, transparent 50%),
-      radial-gradient(at 100% 0%, rgba(245, 143, 10, 0.15) 0px, transparent 50%),
-      radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.15) 0px, transparent 50%),
-      radial-gradient(at 0% 100%, rgba(10, 33, 51, 0.5) 0px, transparent 50%);
+  /* Subtle, elegant premium shadows */
+  .shadow-premium {
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
   }
-
-  .animate-float {
-    animation: float 6s ease-in-out infinite;
+  .shadow-premium-hover {
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.02);
   }
   
-  .animate-float-delayed {
-    animation: float 6s ease-in-out 3s infinite;
+  /* Premium Glassmorphism (Apple-esque) */
+  .glass-premium {
+    background: rgba(255, 255, 255, 0.7);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    backdrop-filter: saturate(180%) blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
   }
 
-  @keyframes float {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-15px); }
-    100% { transform: translateY(0px); }
+  /* Luxury Text Gradients */
+  .text-gradient-luxury {
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-image: linear-gradient(135deg, hsl(43, 96%, 56%) 0%, hsl(20, 90%, 50%) 100%);
+  }
+
+  .text-gradient-midnight {
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-image: linear-gradient(135deg, hsl(222, 47%, 11%) 0%, hsl(230, 40%, 30%) 100%);
+  }
+
+  /* Shimmer effect for loaders and buttons */
+  .animate-shimmer {
+    background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%);
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
   }
 }
 
-/* Lenis Smooth Scroll Utilities */
-html.lenis, html.lenis body { height: auto; }
-.lenis.lenis-smooth { scroll-behavior: auto !important; }
-.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
-.lenis.lenis-stopped { overflow: hidden; }
-.lenis.lenis-scrolling iframe { pointer-events: none; }
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
 
-@media (prefers-reduced-motion: reduce) {
-  * {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
+/* Image reveal animations */
+.reveal-image {
+  clip-path: inset(100% 0 0 0);
+  animation: reveal 1.2s cubic-bezier(0.77, 0, 0.175, 1) forwards;
+}
+
+@keyframes reveal {
+  to { clip-path: inset(0 0 0 0); }
 }

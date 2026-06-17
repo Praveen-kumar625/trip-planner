@@ -1,0 +1,34 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Core Security Rule: Deny all by default
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Phase 5 Enforcement: Users can only read their own data
+    // Writes are EXCLUSIVELY handled by Node.js backend (Admin SDK bypasses these rules)
+    match /users/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow write: if false; 
+    }
+
+    match /trips/{tripId} {
+      // Allow read if the user owns the trip
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+      // All trip creations and mutations MUST go through the backend
+      allow write: if false;
+    }
+
+    match /expenses/{expenseId} {
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow write: if false;
+    }
+
+    match /budgets/{budgetId} {
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow write: if false;
+    }
+  }
+}
