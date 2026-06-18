@@ -7,10 +7,11 @@ export const useTripStore = create((set, get) => ({
   isLoading: false,
   error: null,
 
-  fetchTrips: async () => {
+  fetchTrips: async (userId) => {
+    if (!userId) return;
     set({ isLoading: true, error: null });
     try {
-      const response = await tripsService.getAllTrips();
+      const response = await tripsService.getAllTrips(userId);
       set({ trips: response.data, isLoading: false });
     } catch (error) {
       set({ error: error.message, isLoading: false });
@@ -32,7 +33,7 @@ export const useTripStore = create((set, get) => ({
     try {
       const response = await tripsService.createTrip(tripData);
       set((state) => ({ 
-        trips: [...state.trips, response.data],
+        trips: [response.data, ...state.trips], // prepend new trip
         isLoading: false 
       }));
       return response.data;

@@ -36,7 +36,7 @@ export class ErrorBoundary extends React.Component {
             
             <button
               onClick={() => window.location.reload()}
-              className="w-full py-3 px-4 bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 dark:text-slate-900 text-white font-medium rounded-xl transition-colors flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+              className="w-full py-3 px-4 bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 dark:text-slate-900 text-white font-medium rounded-xl transition-colors flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
             >
               <RefreshCw className="w-5 h-5 mr-2" />
               Reload Application

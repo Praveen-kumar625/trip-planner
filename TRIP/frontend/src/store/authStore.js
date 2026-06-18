@@ -1,47 +1,107 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 import { authService } from '../services/api/auth.service';
+import { auth, db } from '../config/firebase';
+import { onAuthStateChanged } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
 
-export const useAuthStore = create(
-  persist(
-    (set, get) => ({
-      user: null,
-      accessToken: null,
-      refreshToken: null,
-      isAuthenticated: false,
-      isLoading: false,
+export const useAuthStore = create((set, get) => ({
+  user: null,
+  isAuthenticated: false,
+  isGuest: false,
+  isLoading: true, // starts true until firebase responds
+  isInitialized: false,
 
-      setTokens: (accessToken, refreshToken) => set({ accessToken, refreshToken, isAuthenticated: !!accessToken }),
-
-      syncUser: async (firebaseToken) => {
-        set({ isLoading: true });
+  initAuthListener: () => {
+    if (get().isInitialized) return;
+    set({ isInitialized: true });
+    
+    onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser) {
         try {
-          const res = await authService.syncFirebaseUser(firebaseToken);
-          set({
-            user: res.data.user,
-            accessToken: res.data.token,
-            isAuthenticated: true,
-            isLoading: false
-          });
+          // Fetch user profile from firestore
+          const userRef = doc(db, 'users', firebaseUser.uid);
+          const userSnap = await getDoc(userRef);
+          const isGuest = firebaseUser.isAnonymous;
+          
+          if (userSnap.exists()) {
+            set({ 
+              user: userSnap.data(), 
+              isAuthenticated: true, 
+              isGuest,
+              isLoading: false 
+            });
+          } else {
+            // Fallback if sync failed earlier
+            const syncedUser = await authService.syncUserToFirestore(firebaseUser, isGuest);
+            set({ 
+              user: syncedUser, 
+              isAuthenticated: true, 
+              isGuest,
+              isLoading: false 
+            });
+          }
         } catch (error) {
-          set({ isLoading: false, isAuthenticated: false });
-          throw error;
+          console.error("Error fetching user profile:", error);
+          set({ user: null, isAuthenticated: false, isGuest: false, isLoading: false });
         }
-      },
-
-      logout: async () => {
-        try {
-          await authService.logout();
-        } catch (e) {
-          console.warn('Backend logout failed', e);
-        } finally {
-          set({ user: null, accessToken: null, refreshToken: null, isAuthenticated: false });
-        }
+      } else {
+        set({ user: null, isAuthenticated: false, isGuest: false, isLoading: false });
       }
-    }),
-    {
-      name: 'wandersync-auth',
-      partialize: (state) => ({ accessToken: state.accessToken, refreshToken: state.refreshToken, user: state.user, isAuthenticated: state.isAuthenticated })
+    });
+  },
+
+  loginWithEmail: async (email, password) => {
+    set({ isLoading: true });
+    try {
+      await authService.loginWithEmail(email, password);
+    } catch (e) {
+      set({ isLoading: false });
+      throw e;
     }
-  )
-);
+  },
+
+  signupWithEmail: async (email, password, displayName) => {
+    set({ isLoading: true });
+    try {
+      await authService.signupWithEmail(email, password, displayName);
+    } catch (e) {
+      set({ isLoading: false });
+      throw e;
+    }
+  },
+
+  loginWithGoogle: async () => {
+    set({ isLoading: true });
+    try {
+      await authService.loginWithGoogle();
+    } catch (e) {
+      set({ isLoading: false });
+      throw e;
+    }
+  },
+
+  loginAsGuest: async () => {
+    set({ isLoading: true });
+    try {
+      await authService.loginAsGuest();
+    } catch (e) {
+      set({ isLoading: false });
+      throw e;
+    }
+  },
+
+  resetPassword: async (email) => {
+    await authService.resetPassword(email);
+  },
+
+  logout: async () => {
+    set({ isLoading: true });
+    try {
+      await authService.logout();
+    } catch (e) {
+      console.warn('Logout failed', e);
+    } finally {
+      set({ user: null, isAuthenticated: false, isGuest: false, isLoading: false });
+    }
+  }
+}));

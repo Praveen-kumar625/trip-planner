@@ -24,10 +24,10 @@ export const BudgetTracker = ({ tripId }) => {
     <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center">
-          <Wallet className="w-5 h-5 mr-2 text-indigo-500" />
+          <Wallet className="w-5 h-5 mr-2 text-amber-500" />
           Trip Budget
         </h2>
-        <button className="p-2 text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg hover:bg-indigo-100 transition-colors">
+        <button className="p-2 text-amber-600 bg-amber-50 dark:bg-amber-900/30 rounded-lg hover:bg-amber-100 transition-colors">
           <Plus className="w-5 h-5" />
         </button>
       </div>
@@ -40,11 +40,11 @@ export const BudgetTracker = ({ tripId }) => {
             <span className="text-2xl font-bold text-slate-900 dark:text-white">{totalBudget.toLocaleString('en-IN')}</span>
           </div>
         </div>
-        <div className="p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl">
-          <p className="text-sm text-indigo-600 dark:text-indigo-400 font-medium">Remaining</p>
+        <div className="p-4 bg-amber-50 dark:bg-amber-900/20 rounded-xl">
+          <p className="text-sm text-amber-600 dark:text-amber-400 font-medium">Remaining</p>
           <div className="flex items-center mt-1">
-            <IndianRupee className="w-5 h-5 text-indigo-700 dark:text-indigo-300" />
-            <span className="text-2xl font-bold text-indigo-700 dark:text-indigo-300">{remaining.toLocaleString('en-IN')}</span>
+            <IndianRupee className="w-5 h-5 text-amber-700 dark:text-amber-300" />
+            <span className="text-2xl font-bold text-amber-700 dark:text-amber-300">{remaining.toLocaleString('en-IN')}</span>
           </div>
         </div>
       </div>
@@ -76,7 +76,7 @@ export const BudgetTracker = ({ tripId }) => {
             expenses.slice(0, 5).map(expense => (
               <div key={expense.id} className="flex items-center justify-between p-3 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors">
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-semibold">
+                  <div className="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center text-amber-600 dark:text-amber-400 font-semibold">
                     {expense.category.charAt(0).toUpperCase()}
                   </div>
                   <div>

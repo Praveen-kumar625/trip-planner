@@ -1,16 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+vi.unmock('axios'); // Remove global mock
 import apiClient from './apiClient';
-import { useAuthStore } from '../../store/authStore';
+import { auth } from '../../config/firebase';
 
-vi.mock('../../store/authStore', () => ({
-  useAuthStore: {
-    getState: vi.fn()
+vi.mock('../../config/firebase', () => ({
+  auth: {
+    currentUser: null
   }
 }));
 
 describe('apiClient', () => {
   beforeEach(() => {
     vi.resetAllMocks();
+    auth.currentUser = null;
   });
 
   it('should be created with base URL', () => {
@@ -18,7 +20,9 @@ describe('apiClient', () => {
   });
 
   it('should inject token into headers if available', async () => {
-    useAuthStore.getState.mockReturnValue({ token: 'test-jwt-token' });
+    auth.currentUser = {
+      getIdToken: vi.fn().mockResolvedValue('test-jwt-token')
+    };
     
     // Create a mock config
     const config = { headers: {} };
@@ -30,7 +34,7 @@ describe('apiClient', () => {
   });
 
   it('should not inject token if not available', async () => {
-    useAuthStore.getState.mockReturnValue({ token: null });
+    auth.currentUser = null;
     
     const config = { headers: {} };
     const resultConfig = await apiClient.interceptors.request.handlers[0].fulfilled(config);

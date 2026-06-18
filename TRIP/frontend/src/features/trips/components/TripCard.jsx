@@ -15,7 +15,7 @@ export const TripCard = ({ trip, onClick }) => {
         {trip.coverImage ? (
           <img src={trip.coverImage} alt={trip.title} className="w-full h-full object-cover" />
         ) : (
-          <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+          <div className="absolute inset-0 bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center">
             <MapPin className="w-12 h-12 text-white opacity-50" />
           </div>
         )}

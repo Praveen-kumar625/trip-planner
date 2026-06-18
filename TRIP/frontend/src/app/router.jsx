@@ -1,5 +1,6 @@
 import { createBrowserRouter } from 'react-router-dom';
 import RootLayout from '@/layouts/RootLayout';
+import { AuthGuard } from '@/features/auth/components/AuthGuard';
 
 export const router = createBrowserRouter([
   {
@@ -14,10 +15,26 @@ export const router = createBrowserRouter([
         },
       },
       {
+        path: 'login',
+        lazy: async () => {
+          const { LoginPage } = await import('@/pages/auth/LoginPage');
+          return { Component: LoginPage };
+        },
+      },
+      {
+        path: 'signup',
+        lazy: async () => {
+          const { SignupPage } = await import('@/pages/auth/SignupPage');
+          return { Component: SignupPage };
+        },
+      },
+      {
         path: 'planner',
         lazy: async () => {
           const { TripsPage } = await import('@/pages/TripsPage');
-          return { Component: TripsPage };
+          return { 
+            Component: () => <AuthGuard><TripsPage /></AuthGuard>
+          };
         },
       },
       {
@@ -37,7 +54,14 @@ export const router = createBrowserRouter([
       {
         path: 'ai-concierge',
         lazy: async () => {
-          const { PlannerPage } = await import('@/pages/PlannerPage'); // This is the AI chat
+          const { PlannerPage } = await import('@/pages/PlannerPage');
+          return { Component: PlannerPage };
+        },
+      },
+      {
+        path: 'new-trip',
+        lazy: async () => {
+          const { PlannerPage } = await import('@/pages/PlannerPage');
           return { Component: PlannerPage };
         },
       },
@@ -49,10 +73,21 @@ export const router = createBrowserRouter([
         },
       },
       {
+        path: 'profile',
+        lazy: async () => {
+          const { ProfilePage } = await import('@/pages/ProfilePage');
+          return {
+            Component: () => <AuthGuard><ProfilePage /></AuthGuard>
+          };
+        },
+      },
+      {
         path: 'trip/:id',
         lazy: async () => {
           const { TripPage } = await import('@/pages/TripPage');
-          return { Component: TripPage };
+          return { 
+            Component: () => <AuthGuard><TripPage /></AuthGuard>
+          };
         },
       },
       {

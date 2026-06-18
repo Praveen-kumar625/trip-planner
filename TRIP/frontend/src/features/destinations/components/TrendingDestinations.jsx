@@ -35,10 +35,10 @@ export const TrendingDestinations = () => {
     <section>
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center">
-          <Compass className="w-6 h-6 mr-2 text-indigo-500" />
+          <Compass className="w-6 h-6 mr-2 text-amber-500" />
           Trending Discoveries
         </h2>
-        <button className="text-indigo-600 dark:text-indigo-400 font-medium hover:underline text-sm">
+        <button className="text-amber-600 dark:text-amber-400 font-medium hover:underline text-sm">
           Explore All
         </button>
       </div>
@@ -61,7 +61,7 @@ export const TrendingDestinations = () => {
                 <MapPin className="w-3 h-3 mr-1" />
                 {dest.country}
               </div>
-              <h3 className="text-xl font-bold text-white group-hover:text-indigo-300 transition-colors">
+              <h3 className="text-xl font-bold text-white group-hover:text-amber-300 transition-colors">
                 {dest.name}
               </h3>
               <p className="text-sm text-white/70 mt-2 line-clamp-2">

@@ -38,7 +38,7 @@ export const NotificationBell = () => {
     <div className="relative">
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors relative focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors relative focus:outline-none focus:ring-2 focus:ring-amber-500"
       >
         <Bell className="w-6 h-6 text-slate-700 dark:text-slate-300" />
         {unreadCount > 0 && (
@@ -51,7 +51,7 @@ export const NotificationBell = () => {
           <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
             <h3 className="font-semibold text-slate-900 dark:text-white">Notifications</h3>
             {unreadCount > 0 && (
-              <span className="text-xs bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300 px-2 py-1 rounded-full font-medium">
+              <span className="text-xs bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300 px-2 py-1 rounded-full font-medium">
                 {unreadCount} New
               </span>
             )}
@@ -70,7 +70,7 @@ export const NotificationBell = () => {
                   onClick={() => handleMarkAsRead(notif.id)}
                   className="p-3 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl cursor-pointer transition-colors mb-1 group"
                 >
-                  <p className="text-sm font-medium text-slate-900 dark:text-white mb-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                  <p className="text-sm font-medium text-slate-900 dark:text-white mb-1 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
                     {notif.title}
                   </p>
                   <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">

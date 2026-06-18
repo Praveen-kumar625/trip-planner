@@ -1,31 +1,146 @@
-import apiClient from './apiClient';
+import { db } from '../../config/firebase';
+import { 
+  collection, doc, getDoc, getDocs, addDoc, 
+  updateDoc, deleteDoc, query, where, orderBy, serverTimestamp 
+} from 'firebase/firestore';
+
+const TRIPS_COLLECTION = 'trips';
 
 export const tripsService = {
-  getAllTrips: async () => {
-    return apiClient.get('/trips');
+  /**
+   * Get all trips for a specific user
+   */
+  getAllTrips: async (userId) => {
+    if (!userId) throw new Error("User ID is required to fetch trips");
+    
+    const tripsRef = collection(db, TRIPS_COLLECTION);
+    const q = query(tripsRef, where("userId", "==", userId), orderBy("createdAt", "desc"));
+    
+    const querySnapshot = await getDocs(q);
+    const trips = [];
+    querySnapshot.forEach((doc) => {
+      trips.push({ id: doc.id, ...doc.data() });
+    });
+    
+    return { data: trips };
   },
   
+  /**
+   * Get a specific trip by ID
+   */
   getTripById: async (id) => {
-    return apiClient.get(`/trips/${id}`);
+    if (!id) throw new Error("Trip ID is required");
+    
+    const tripRef = doc(db, TRIPS_COLLECTION, id);
+    const tripSnap = await getDoc(tripRef);
+    
+    if (!tripSnap.exists()) {
+      throw new Error("Trip not found");
+    }
+    
+    return { data: { id: tripSnap.id, ...tripSnap.data() } };
   },
 
+  /**
+   * Create a new trip
+   */
   createTrip: async (tripData) => {
-    return apiClient.post('/trips', tripData);
+    if (!tripData.userId) throw new Error("User ID is required to create a trip");
+    
+    const tripsRef = collection(db, TRIPS_COLLECTION);
+    const newTripData = {
+      ...tripData,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    };
+    
+    const docRef = await addDoc(tripsRef, newTripData);
+    
+    return { 
+      data: { 
+        id: docRef.id, 
+        ...newTripData,
+        // Mock the timestamp for immediate UI update before server response
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      } 
+    };
   },
 
+  /**
+   * Update an existing trip
+   */
   updateTrip: async (id, tripData) => {
-    return apiClient.put(`/trips/${id}`, tripData);
+    if (!id) throw new Error("Trip ID is required");
+    
+    const tripRef = doc(db, TRIPS_COLLECTION, id);
+    const updateData = {
+      ...tripData,
+      updatedAt: serverTimestamp()
+    };
+    
+    await updateDoc(tripRef, updateData);
+    
+    return { data: { id, ...updateData } };
   },
 
+  /**
+   * Delete a trip
+   */
   deleteTrip: async (id) => {
-    return apiClient.delete(`/trips/${id}`);
+    if (!id) throw new Error("Trip ID is required");
+    
+    const tripRef = doc(db, TRIPS_COLLECTION, id);
+    await deleteDoc(tripRef);
+    
+    return { success: true };
   },
 
-  duplicateTrip: async (id) => {
-    return apiClient.post(`/trips/${id}/duplicate`);
+  /**
+   * Duplicate a trip
+   */
+  duplicateTrip: async (id, userId) => {
+    if (!id || !userId) throw new Error("Trip ID and User ID are required");
+    
+    const tripSnap = await getDoc(doc(db, TRIPS_COLLECTION, id));
+    if (!tripSnap.exists()) {
+      throw new Error("Trip not found");
+    }
+    
+    const originalTrip = tripSnap.data();
+    const newTripData = {
+      ...originalTrip,
+      title: `${originalTrip.title || 'Trip'} (Copy)`,
+      userId,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    };
+    
+    const tripsRef = collection(db, TRIPS_COLLECTION);
+    const docRef = await addDoc(tripsRef, newTripData);
+    
+    return { 
+      data: { 
+        id: docRef.id, 
+        ...newTripData,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      } 
+    };
   },
 
+  /**
+   * Archive a trip (soft delete or status change)
+   */
   archiveTrip: async (id) => {
-    return apiClient.post(`/trips/${id}/archive`);
+    if (!id) throw new Error("Trip ID is required");
+    
+    const tripRef = doc(db, TRIPS_COLLECTION, id);
+    await updateDoc(tripRef, { 
+      status: 'archived',
+      updatedAt: serverTimestamp() 
+    });
+    
+    return { success: true };
   }
 };

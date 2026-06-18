@@ -16,10 +16,10 @@ export const ExpenseAnalytics = () => {
   // Colors for categories
   const categoryColors = {
     Flights: 'bg-blue-500',
-    Accommodation: 'bg-indigo-500',
+    Accommodation: 'bg-amber-500',
     Food: 'bg-emerald-500',
     Transport: 'bg-amber-500',
-    Activities: 'bg-purple-500',
+    Activities: 'bg-orange-500',
     Shopping: 'bg-pink-500',
     Other: 'bg-slate-500'
   };

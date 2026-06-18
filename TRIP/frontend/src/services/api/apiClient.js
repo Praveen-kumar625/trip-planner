@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { toast } from 'sonner';
+import { auth } from '../../config/firebase';
 import { useAuthStore } from '../../store/authStore';
 
 const rawBase = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'http://localhost:5000';
@@ -12,11 +13,13 @@ const apiClient = axios.create({
   }
 });
 
-// Request Interceptor: Inject JWT Token
+// Request Interceptor: Inject Firebase JWT Token
 apiClient.interceptors.request.use(
-  (config) => {
-    const token = useAuthStore.getState().token;
-    if (token) {
+  async (config) => {
+    const user = auth.currentUser;
+    if (user) {
+      // Get the fresh JWT from Firebase
+      const token = await user.getIdToken();
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
@@ -35,14 +38,14 @@ apiClient.interceptors.response.use(
       originalRequest._retry = true;
       
       try {
-        const authStore = useAuthStore.getState();
-        if (authStore.refreshToken) {
-          const newToken = await authStore.refreshToken();
+        const user = auth.currentUser;
+        if (user) {
+          // Force refresh the token
+          const newToken = await user.getIdToken(true);
           originalRequest.headers.Authorization = `Bearer ${newToken}`;
           return apiClient(originalRequest);
         } else {
-          // No refresh token, force logout
-          authStore.logout();
+          useAuthStore.getState().logout();
           toast.error("Session Expired", { description: "Please log in again." });
           return Promise.reject(error);
         }

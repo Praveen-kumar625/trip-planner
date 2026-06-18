@@ -1,39 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { MapPin, Calendar, Users, ArrowRight, Plus } from 'lucide-react';
-import { Link } from 'react-router-dom';
-
-const mockTrips = [
-  {
-    id: '1',
-    destination: 'Kyoto, Japan',
-    date: 'Oct 15 - Oct 25, 2026',
-    travelers: 2,
-    status: 'upcoming',
-    image: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=800&auto=format&fit=crop'
-  },
-  {
-    id: '2',
-    destination: 'Santorini, Greece',
-    date: 'Jul 10 - Jul 18, 2026',
-    travelers: 4,
-    status: 'upcoming',
-    image: 'https://images.unsplash.com/photo-1613395877344-13d4a8e0d49e?q=80&w=800&auto=format&fit=crop'
-  }
-];
+import { MapPin, Calendar, Users, ArrowRight, Plus, Sparkles } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useTripStore } from '@/store/tripStore';
+import { useAuthStore } from '@/store/authStore';
 
 export function TripsPage() {
-  const [isLoading, setIsLoading] = useState(true);
-  const [trips, setTrips] = useState([]);
+  const { trips, isLoading, fetchTrips } = useTripStore();
+  const { user } = useAuthStore();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // Simulate fetching trips
-    const timer = setTimeout(() => {
-      setTrips(mockTrips);
-      setIsLoading(false);
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, []);
+    if (user?.uid) {
+      fetchTrips(user.uid);
+    }
+  }, [user, fetchTrips]);
+
+  const handleTripClick = (tripId) => {
+    navigate(`/trip/${tripId}`);
+  };
 
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 pb-20">
@@ -95,33 +80,35 @@ export function TripsPage() {
               >
                 <div className="h-48 overflow-hidden relative">
                   <img 
-                    src={trip.image} 
-                    alt={trip.destination}
+                    src={trip.image || 'https://images.unsplash.com/photo-1488085061387-422e29b40080?q=80&w=800&auto=format&fit=crop'} 
+                    alt={trip.destination?.city || 'Trip'}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                   <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm text-xs font-semibold px-3 py-1 rounded-full text-neutral-900">
-                    {trip.status.toUpperCase()}
+                    {(trip.status || 'upcoming').toUpperCase()}
                   </div>
                 </div>
                 <div className="p-6">
-                  <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-2">{trip.destination}</h3>
+                  <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-2">
+                    {trip.destination?.city ? `${trip.destination.city}, ${trip.destination.country}` : trip.title || 'Unknown Destination'}
+                  </h3>
                   <div className="flex flex-col gap-2 text-sm text-neutral-500 dark:text-neutral-400">
                     <div className="flex items-center gap-2">
                       <Calendar className="w-4 h-4" />
-                      <span>{trip.date}</span>
+                      <span>{trip.startDate} - {trip.endDate}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Users className="w-4 h-4" />
                       <span>{trip.travelers} Travelers</span>
                     </div>
                   </div>
-                  <Link 
-                    to={`/trip/${trip.id}`}
+                  <button 
+                    onClick={() => handleTripClick(trip.id)}
                     className="mt-6 flex items-center gap-2 text-primary-600 font-medium hover:text-primary-700 transition-colors"
                   >
                     View Itinerary
                     <ArrowRight className="w-4 h-4" />
-                  </Link>
+                  </button>
                 </div>
               </motion.div>
             ))}
