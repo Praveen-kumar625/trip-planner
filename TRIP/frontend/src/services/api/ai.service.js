@@ -13,7 +13,7 @@ export const aiService = {
   // Method to get a native SSE stream reader with exponential backoff and retry
   streamChat: async (payload, onMessage, onError, onComplete, retries = 3, delay = 1000) => {
     const token = (await import('../../store/authStore')).useAuthStore.getState().token;
-    const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
+    const baseURL = apiClient.defaults.baseURL;
 
     try {
       if (!navigator.onLine) {
