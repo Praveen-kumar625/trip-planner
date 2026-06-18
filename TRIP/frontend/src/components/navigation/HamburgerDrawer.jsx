@@ -102,14 +102,6 @@ export default function HamburgerDrawer({ isOpen, onClose }) {
                 ))}
               </div>
             </div>
-
-            {/* Footer */}
-            <div className="p-6 border-t border-neutral-100">
-              <button className="w-full flex items-center justify-center gap-2 py-3 px-4 text-red-600 hover:bg-red-50 font-medium rounded-xl transition-colors">
-                <LogOut className="w-5 h-5" />
-                Sign Out
-              </button>
-            </div>
           </motion.div>
         </>
       )}

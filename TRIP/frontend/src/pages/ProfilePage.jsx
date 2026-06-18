@@ -93,31 +93,8 @@ export function ProfilePage() {
     }));
   };
 
-  const handleLogout = async () => {
-    await logout();
-    navigate('/');
-  };
 
-  if (isGuest) {
-    return (
-      <div className="min-h-screen bg-neutral-50 flex items-center justify-center px-4">
-        <div className="text-center max-w-md">
-          <div className="w-20 h-20 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-6">
-            <User className="w-10 h-10 text-amber-500" />
-          </div>
-          <h2 className="text-2xl font-bold text-neutral-900 mb-2">Guest Account</h2>
-          <p className="text-neutral-500 mb-8">Sign in to save your trips, preferences, and access your full profile.</p>
-          <Link
-            to="/login"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-amber-500 text-white rounded-2xl font-semibold hover:bg-amber-600 transition-colors shadow-lg shadow-amber-500/20"
-          >
-            <LogOut className="w-5 h-5" />
-            Sign In
-          </Link>
-        </div>
-      </div>
-    );
-  }
+
 
   if (loading) {
     return (
@@ -308,20 +285,7 @@ export function ProfilePage() {
           <QuickLink icon={Sparkles} label="AI Preferences" to="/settings" />
         </motion.div>
 
-        {/* Logout */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-        >
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-red-50 text-red-600 rounded-2xl font-semibold hover:bg-red-100 transition-colors border border-red-100"
-          >
-            <LogOut className="w-5 h-5" />
-            Sign Out
-          </button>
-        </motion.div>
+
       </div>
     </div>
   );

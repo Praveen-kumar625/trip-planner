@@ -84,32 +84,14 @@ export default function TopNavigation() {
               <Menu className="w-5 h-5" />
             </button>
 
-            {/* Auth-aware user avatar */}
-            {isAuthenticated && !isGuest ? (
-              <Link
-                to="/profile"
-                className="ml-2 w-9 h-9 rounded-full border-2 border-white shadow-sm overflow-hidden flex items-center justify-center hover:ring-2 hover:ring-amber-500 transition-all"
-              >
-                {user?.photoURL ? (
-                  <img src={user.photoURL} alt="Profile" className="w-full h-full object-cover" />
-                ) : initials ? (
-                  <div className="w-full h-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white text-xs font-bold">
-                    {initials}
-                  </div>
-                ) : (
-                  <div className="w-full h-full bg-neutral-200 flex items-center justify-center">
-                    <User className="w-5 h-5 text-neutral-500" />
-                  </div>
-                )}
-              </Link>
-            ) : (
-              <Link
-                to="/login"
-                className="ml-2 px-4 py-2 bg-amber-500 text-white text-sm font-semibold rounded-full hover:bg-amber-600 transition-colors"
-              >
-                Sign In
-              </Link>
-            )}
+            <Link
+              to="/profile"
+              className="ml-2 w-9 h-9 rounded-full border-2 border-white shadow-sm overflow-hidden flex items-center justify-center hover:ring-2 hover:ring-amber-500 transition-all"
+            >
+              <div className="w-full h-full bg-neutral-200 flex items-center justify-center">
+                <User className="w-5 h-5 text-neutral-500" />
+              </div>
+            </Link>
           </nav>
         </div>
       </header>

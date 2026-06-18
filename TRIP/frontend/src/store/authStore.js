@@ -45,40 +45,24 @@ export const useAuthStore = create((set, get) => ({
           set({ user: null, isAuthenticated: false, isGuest: false, isLoading: false });
         }
       } else {
-        set({ user: null, isAuthenticated: false, isGuest: false, isLoading: false });
+        // No user found, sign in anonymously automatically
+        try {
+          const syncedUser = await authService.loginAsGuest();
+          set({ 
+            user: syncedUser, 
+            isAuthenticated: true, 
+            isGuest: true, 
+            isLoading: false 
+          });
+        } catch (error) {
+          console.error("Error signing in as guest:", error);
+          set({ user: null, isAuthenticated: false, isGuest: false, isLoading: false });
+        }
       }
     });
   },
 
-  loginWithEmail: async (email, password) => {
-    set({ isLoading: true });
-    try {
-      await authService.loginWithEmail(email, password);
-    } catch (e) {
-      set({ isLoading: false });
-      throw e;
-    }
-  },
 
-  signupWithEmail: async (email, password, displayName) => {
-    set({ isLoading: true });
-    try {
-      await authService.signupWithEmail(email, password, displayName);
-    } catch (e) {
-      set({ isLoading: false });
-      throw e;
-    }
-  },
-
-  loginWithGoogle: async () => {
-    set({ isLoading: true });
-    try {
-      await authService.loginWithGoogle();
-    } catch (e) {
-      set({ isLoading: false });
-      throw e;
-    }
-  },
 
   loginAsGuest: async () => {
     set({ isLoading: true });
@@ -90,9 +74,7 @@ export const useAuthStore = create((set, get) => ({
     }
   },
 
-  resetPassword: async (email) => {
-    await authService.resetPassword(email);
-  },
+
 
   logout: async () => {
     set({ isLoading: true });
