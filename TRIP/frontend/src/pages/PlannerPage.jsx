@@ -8,7 +8,7 @@ import { ProgressivePreferenceForm } from '@/features/trips/components/Progressi
 import { AiResearchOverlay } from '@/features/trips/components/AiResearchOverlay';
 
 export function PlannerPage() {
-  const { messages, isThinking, addMessage, updateLastMessage, setThinking, clearChat } = useAiStore();
+  const { messages, isThinking, addMessage, updateLastMessage, setThinking, clearChat, lastStructuredResponse, setLastStructuredResponse } = useAiStore();
   const [input, setInput] = useState('');
   const [showWizard, setShowWizard] = useState(true);
   const messagesEndRef = useRef(null);
@@ -46,7 +46,12 @@ export function PlannerPage() {
           if (data.type === 'token') {
             updateLastMessage(data.text);
           } else if (data.data) {
-            updateLastMessage(typeof data.data === 'string' ? data.data : JSON.stringify(data.data));
+            if (typeof data.data === 'object') {
+              setLastStructuredResponse(data.data);
+              updateLastMessage("✨ I have meticulously researched and prepared your luxury travel itinerary. You can save this trip to your profile or ask me any follow-up questions.");
+            } else {
+              updateLastMessage(data.data);
+            }
           } else if (data.content) {
             updateLastMessage(data.content);
           }
@@ -83,7 +88,12 @@ export function PlannerPage() {
           if (data.type === 'token') {
             updateLastMessage(data.text);
           } else if (data.data) {
-            updateLastMessage(typeof data.data === 'string' ? data.data : JSON.stringify(data.data));
+            if (typeof data.data === 'object') {
+              setLastStructuredResponse(data.data);
+              updateLastMessage("✨ I have updated your travel itinerary. You can save this trip to your profile or ask me any follow-up questions.");
+            } else {
+              updateLastMessage(data.data);
+            }
           } else if (data.content) {
             updateLastMessage(data.content);
           }
@@ -159,10 +169,13 @@ export function PlannerPage() {
                   
                   try {
                     const payload = useTripGeneratorStore.getState().generatePayload();
+                    const aiStoreState = useAiStore.getState();
                     await createTrip({ 
                       ...payload, 
                       userId: user.uid,
-                      itinerary: messages.map(m => m.content).join('\n\n') // Store AI context
+                      itinerary: aiStoreState.lastStructuredResponse 
+                        ? JSON.stringify(aiStoreState.lastStructuredResponse) 
+                        : messages.map(m => m.content).join('\n\n') // Fallback to chat context
                     });
                     alert('Trip saved successfully!');
                   } catch (e) {

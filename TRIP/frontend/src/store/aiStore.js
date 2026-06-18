@@ -4,9 +4,11 @@ export const useAiStore = create((set) => ({
   isOpen: false,
   messages: [],
   isThinking: false,
+  lastStructuredResponse: null,
   
   toggleOpen: () => set((state) => ({ isOpen: !state.isOpen })),
   setOpen: (isOpen) => set({ isOpen }),
+  setLastStructuredResponse: (data) => set({ lastStructuredResponse: data }),
   
   addMessage: (message) => set((state) => ({ 
     messages: [...state.messages, message] 
@@ -25,5 +27,5 @@ export const useAiStore = create((set) => ({
 
   setThinking: (isThinking) => set({ isThinking }),
   
-  clearChat: () => set({ messages: [] })
+  clearChat: () => set({ messages: [], lastStructuredResponse: null })
 }));

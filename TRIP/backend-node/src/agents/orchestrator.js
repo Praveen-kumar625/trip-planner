@@ -113,16 +113,19 @@ class ConciergeAgent extends BaseAgent {
 export const TravelConcierge = new ConciergeAgent();
 
 export class TravelOrchestrator {
-  static async handleUserQuery(userId, sessionId, query) {
+  static async handleUserQuery(userId, sessionId, query, tripContext = {}, frontendHistory = []) {
     // Save user query
     await AgentMemory.saveSessionMessage(userId, sessionId, 'user', query);
 
     // Retrieve Context
     const profileContext = await AgentMemory.getProfileContext(userId);
     const ragContext = await SemanticSearch.retrieveContext(query);
-    const history = await AgentMemory.getSessionHistory(userId, sessionId);
+    const memoryHistory = await AgentMemory.getSessionHistory(userId, sessionId);
     
-    const context = `Profile: ${profileContext}\nKnowledge: ${ragContext}`;
+    // Merge frontend history if memory history is empty (e.g. for new session but frontend has state)
+    const history = memoryHistory.length > 0 ? memoryHistory : frontendHistory;
+    
+    const context = `Profile: ${profileContext}\nKnowledge: ${ragContext}\nTrip Context: ${JSON.stringify(tripContext)}`;
 
     // Generate JSON Plan in a single pass (No double-prompting)
     const jsonPlan = await TravelConcierge.execute(query, context, travelPlanSchema, history);

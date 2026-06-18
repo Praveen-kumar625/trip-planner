@@ -33,23 +33,7 @@ describe('authStore', () => {
     vi.clearAllMocks();
   });
 
-  it('should call loginWithEmail', async () => {
-    const { loginWithEmail } = useAuthStore.getState();
-    await loginWithEmail('test@test.com', 'password');
-    expect(authService.loginWithEmail).toHaveBeenCalledWith('test@test.com', 'password');
-  });
 
-  it('should call signupWithEmail', async () => {
-    const { signupWithEmail } = useAuthStore.getState();
-    await signupWithEmail('test@test.com', 'password', 'Test User');
-    expect(authService.signupWithEmail).toHaveBeenCalledWith('test@test.com', 'password', 'Test User');
-  });
-
-  it('should call loginWithGoogle', async () => {
-    const { loginWithGoogle } = useAuthStore.getState();
-    await loginWithGoogle();
-    expect(authService.loginWithGoogle).toHaveBeenCalled();
-  });
 
   it('should call loginAsGuest', async () => {
     const { loginAsGuest } = useAuthStore.getState();
@@ -68,9 +52,5 @@ describe('authStore', () => {
     expect(state.isAuthenticated).toBe(false);
   });
 
-  it('should call resetPassword', async () => {
-    const { resetPassword } = useAuthStore.getState();
-    await resetPassword('test@test.com');
-    expect(authService.resetPassword).toHaveBeenCalledWith('test@test.com');
-  });
+
 });

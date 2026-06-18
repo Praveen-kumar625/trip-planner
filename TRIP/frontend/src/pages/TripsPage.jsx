@@ -152,7 +152,7 @@ export function TripsPage() {
                   { name: 'Amalfi Coast, Italy', image: 'https://images.unsplash.com/photo-1533090161767-e6ffed986c88?q=80&w=600&auto=format&fit=crop' },
                   { name: 'Bali, Indonesia', image: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?q=80&w=600&auto=format&fit=crop' }
                 ].map(dest => (
-                  <Link key={dest.name} to="/planner" className="group relative h-32 rounded-2xl overflow-hidden block">
+                  <Link key={dest.name} to="/ai-concierge" className="group relative h-32 rounded-2xl overflow-hidden block">
                     <img src={dest.image} alt={dest.name} className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                     <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/20 to-transparent" />
                     <div className="absolute bottom-4 left-4 text-white font-semibold flex items-center gap-2">
@@ -165,7 +165,7 @@ export function TripsPage() {
             </div>
 
             <Link 
-              to="/planner" 
+              to="/ai-concierge" 
               className="inline-flex items-center gap-3 bg-amber-600 hover:bg-amber-700 text-white px-8 py-4 rounded-2xl font-bold transition-all hover:scale-105 shadow-lg shadow-amber-600/30"
             >
               <Sparkles className="w-5 h-5" />

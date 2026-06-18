@@ -16,6 +16,9 @@ export class BaseAgent {
   async execute(prompt, context = '', responseSchema = null, history = []) {
     if (!model) {
       logger.warn(`[Agent ${this.name}] Gemini model not initialized.`);
+      if (responseSchema) {
+        throw new Error("AI features are disabled. Please configure GEMINI_API_KEY.");
+      }
       return { _mock: true, message: `Mock response from ${this.name}: "Received your prompt: ${prompt}"` };
     }
 
@@ -51,7 +54,7 @@ export class BaseAgent {
       if (responseSchema) {
         try {
           return JSON.parse(text);
-        } catch (e) {
+        } catch (err) {
           logger.error('Failed to parse JSON response:', text);
           throw new Error('Invalid JSON response from AI');
         }

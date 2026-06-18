@@ -82,8 +82,19 @@ export function DestinationHeroInput({ onDestinationSelect }) {
           {['Kyoto, Japan', 'Amalfi Coast, Italy', 'Bali, Indonesia'].map((place) => (
             <button 
               key={place}
+              onClick={() => {
+                const [city, country] = place.split(', ');
+                onDestinationSelect({
+                  name: city,
+                  city: city,
+                  country: country,
+                  formattedAddress: place,
+                  // We don't have lat/lng here, but providing dummy or omitting them allows the app to proceed
+                  latitude: 0,
+                  longitude: 0
+                });
+              }}
               className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors"
-              // In a real app, this would trigger the place selection directly
             >
               {place}
             </button>

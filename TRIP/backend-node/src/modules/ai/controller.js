@@ -4,8 +4,8 @@ import { AgentMemory } from '../../memory/session.memory.js';
 
 export const handleQuery = async (req, res, next) => {
   try {
-    const { query, sessionId } = aiChatSchema.parse(req.body);
-    const result = await TravelOrchestrator.handleUserQuery(req.user.uid, sessionId, query);
+    const { query, sessionId, context, history } = aiChatSchema.parse(req.body);
+    const result = await TravelOrchestrator.handleUserQuery(req.user.uid, sessionId, query, context, history);
     res.status(200).json({ status: 'success', data: result });
   } catch (error) {
     if (error.name === 'ZodError') return res.status(400).json({ status: 'error', errors: error.errors });
