@@ -24,7 +24,7 @@ export const createServer = () => {
   app.use(helmet());
   app.use(
     cors({
-      origin: env.FRONTEND_URL,
+      origin: true, // Allow all origins for the Vercel deployment
       credentials: true,
     })
   );
