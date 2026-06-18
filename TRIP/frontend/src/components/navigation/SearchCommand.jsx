@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, MapPin, Clock, ArrowRight, X } from 'lucide-react';
+import { Search, MapPin, Clock, ArrowRight, X, Sparkles } from 'lucide-react';
 
 const recentSearches = ['Goa, India', 'Weekend getaways near Mumbai', 'Budget trip under ₹30000'];
 const trending = ['Kashmir', 'Udaipur', 'Bali', 'Swiss Alps'];
