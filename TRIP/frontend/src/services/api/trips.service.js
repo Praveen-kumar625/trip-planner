@@ -1,20 +1,36 @@
 import { db } from '../../config/firebase';
 import { 
   collection, doc, getDoc, getDocs, addDoc, 
-  updateDoc, deleteDoc, query, where, orderBy, serverTimestamp 
+  updateDoc, deleteDoc, query, where, orderBy, serverTimestamp, limit, startAfter 
 } from 'firebase/firestore';
 
 const TRIPS_COLLECTION = 'trips';
 
 export const tripsService = {
   /**
-   * Get all trips for a specific user
+   * Get all trips for a specific user with pagination
    */
-  getAllTrips: async (userId) => {
+  getAllTrips: async (userId, limitCount = 10, pageParam = null) => {
     if (!userId) throw new Error("User ID is required to fetch trips");
     
     const tripsRef = collection(db, TRIPS_COLLECTION);
-    const q = query(tripsRef, where("userId", "==", userId), orderBy("createdAt", "desc"));
+    
+    let qArgs = [
+      where("userId", "==", userId), 
+      orderBy("createdAt", "desc"),
+      limit(limitCount)
+    ];
+
+    if (pageParam) {
+      // Get the document snapshot to start after
+      const docRef = doc(db, TRIPS_COLLECTION, pageParam);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        qArgs.push(startAfter(docSnap));
+      }
+    }
+    
+    const q = query(tripsRef, ...qArgs);
     
     const querySnapshot = await getDocs(q);
     const trips = [];
@@ -22,7 +38,10 @@ export const tripsService = {
       trips.push({ id: doc.id, ...doc.data() });
     });
     
-    return { data: trips };
+    const lastDocId = trips.length > 0 ? trips[trips.length - 1].id : null;
+    const hasMore = trips.length === limitCount;
+
+    return { data: trips, lastDocId, hasMore };
   },
   
   /**

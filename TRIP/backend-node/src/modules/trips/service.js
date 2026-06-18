@@ -20,8 +20,11 @@ export class TripService {
     return await TripRepository.create(null, tripData);
   }
 
-  static async getTrips(userId) {
-    return await TripRepository.getTripsByUser(userId);
+  static async getTrips(userId, pageSize = 10, startAfterDocId = null, archived = false) {
+    if (archived) {
+      return await TripRepository.getArchivedTripsByUser(userId, pageSize, startAfterDocId);
+    }
+    return await TripRepository.getTripsByUser(userId, pageSize, startAfterDocId);
   }
 
   static async getTripById(userId, tripId) {

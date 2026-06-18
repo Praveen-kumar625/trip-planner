@@ -1,5 +1,7 @@
-import { firestore } from '../config/firebase.js';
+import { firestore, firebaseAdmin } from '../config/firebase.js';
 import { logger } from '../utils/logger.js';
+
+const getTimestamp = () => firebaseAdmin.firestore.FieldValue.serverTimestamp();
 
 /**
  * Generic Base Repository for Firestore
@@ -26,15 +28,15 @@ export class BaseRepository {
       if (id) {
         await this.collection.doc(id).set({
           ...data,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
+          createdAt: getTimestamp(),
+          updatedAt: getTimestamp()
         });
         return { id, ...data };
       } else {
         const ref = await this.collection.add({
           ...data,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
+          createdAt: getTimestamp(),
+          updatedAt: getTimestamp()
         });
         return { id: ref.id, ...data };
       }
@@ -48,7 +50,7 @@ export class BaseRepository {
     try {
       await this.collection.doc(id).update({
         ...data,
-        updatedAt: new Date().toISOString()
+        updatedAt: getTimestamp()
       });
       return { id, ...data };
     } catch (error) {

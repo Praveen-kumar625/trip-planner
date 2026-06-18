@@ -15,7 +15,9 @@ const envSchema = z.object({
   OPENWEATHERMAP_API_KEY: z.string().optional(),
   EXCHANGE_RATE_API_KEY: z.string().optional(),
   AMADEUS_CLIENT_ID: z.string().optional(),
-  AMADEUS_CLIENT_SECRET: z.string().optional()
+  AMADEUS_CLIENT_SECRET: z.string().optional(),
+  UPSTASH_REDIS_REST_URL: z.string().optional(),
+  UPSTASH_REDIS_REST_TOKEN: z.string().optional()
 });
 
 const parsed = envSchema.safeParse(process.env);

@@ -16,8 +16,12 @@ export const createTrip = async (req, res, next) => {
 
 export const getTrips = async (req, res, next) => {
   try {
-    const trips = await TripService.getTrips(req.user.uid);
-    res.status(200).json({ status: 'success', data: trips });
+    const pageSize = req.query.limit ? parseInt(req.query.limit, 10) : 10;
+    const startAfterDocId = req.query.cursor || null;
+    const archived = req.query.archived === 'true';
+
+    const result = await TripService.getTrips(req.user.uid, pageSize, startAfterDocId, archived);
+    res.status(200).json({ status: 'success', data: result.trips, pagination: { nextCursor: result.lastDocId, hasMore: result.hasMore } });
   } catch (error) {
     next(error);
   }

@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, MapPin, Calendar, Users, IndianRupee } from 'lucide-react';
 import { useTripStore } from '@/store/tripStore';
+import { ItineraryTimeline } from '@/features/itinerary/components/ItineraryTimeline';
 
 export function TripPage() {
   const { id } = useParams();
@@ -63,13 +64,37 @@ export function TripPage() {
       <div className="max-w-4xl mx-auto p-4 md:p-8">
         <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 md:p-8">
           <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">Generated Itinerary</h2>
-          {currentTrip.itinerary ? (
-            <div className="prose dark:prose-invert max-w-none whitespace-pre-wrap text-slate-700 dark:text-slate-300 leading-relaxed">
-              {currentTrip.itinerary}
-            </div>
-          ) : (
-            <p className="text-slate-500 dark:text-slate-400 italic">No itinerary details available for this trip.</p>
-          )}
+          {(() => {
+            if (!currentTrip.itinerary) {
+              return <p className="text-slate-500 dark:text-slate-400 italic">No itinerary details available for this trip.</p>;
+            }
+
+            try {
+              // Try to parse the itinerary string as JSON. It might be a full AI structured output or just an array.
+              let parsed = JSON.parse(currentTrip.itinerary);
+              
+              // If it's a full structured output from Phase 2, the itinerary is inside `parsed.itinerary`
+              let itineraryData = Array.isArray(parsed) ? parsed : parsed.itinerary;
+              
+              if (itineraryData && Array.isArray(itineraryData)) {
+                return <ItineraryTimeline itineraryData={itineraryData} />;
+              }
+              
+              // Fallback if structure is unexpected
+              return (
+                <div className="prose dark:prose-invert max-w-none whitespace-pre-wrap text-slate-700 dark:text-slate-300 leading-relaxed">
+                  {currentTrip.itinerary}
+                </div>
+              );
+            } catch (e) {
+              // If it's not valid JSON (e.g. from an older text-based prompt), render as text
+              return (
+                <div className="prose dark:prose-invert max-w-none whitespace-pre-wrap text-slate-700 dark:text-slate-300 leading-relaxed">
+                  {currentTrip.itinerary}
+                </div>
+              );
+            }
+          })()}
         </div>
       </div>
     </div>

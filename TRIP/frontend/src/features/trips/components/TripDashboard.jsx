@@ -1,16 +1,16 @@
-import { useEffect } from 'react';
+import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus } from 'lucide-react';
-import { useTripStore } from '../../../store/tripStore';
 import { TripCard } from './TripCard';
+import { useTrips } from '../hooks/useTrips';
 
 export const TripDashboard = () => {
-  const { trips, isLoading, fetchTrips } = useTripStore();
   const navigate = useNavigate();
+  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useTrips(6);
 
-  useEffect(() => {
-    fetchTrips();
-  }, [fetchTrips]);
+  const trips = useMemo(() => {
+    return data?.pages.flatMap(page => page.data) || [];
+  }, [data]);
 
   if (isLoading && trips.length === 0) {
     return (
@@ -53,15 +53,28 @@ export const TripDashboard = () => {
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {trips.map((trip) => (
-            <TripCard 
-              key={trip.id} 
-              trip={trip} 
-              onClick={(id) => navigate(`/trips/${id}`)}
-            />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {trips.map((trip) => (
+              <TripCard 
+                key={trip.id} 
+                trip={trip} 
+                onClick={(id) => navigate(`/trips/${id}`)}
+              />
+            ))}
+          </div>
+          {hasNextPage && (
+            <div className="mt-8 flex justify-center">
+              <button
+                onClick={() => fetchNextPage()}
+                disabled={isFetchingNextPage}
+                className="px-6 py-2 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors font-medium disabled:opacity-50"
+              >
+                {isFetchingNextPage ? 'Loading...' : 'Load More'}
+              </button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

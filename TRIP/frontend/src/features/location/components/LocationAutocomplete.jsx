@@ -13,7 +13,7 @@ import { useGooglePlaces } from '@/hooks/useGooglePlaces';
  *  - placeholder
  *  - className
  */
-export function LocationAutocomplete({ onPlaceSelect, value = '', placeholder = 'Search for a city or destination...', className = '' }) {
+export function LocationAutocomplete({ onPlaceSelect, value = '', placeholder = 'Search for a city or destination...', className = '', inputClassName = '' }) {
   const { isLoaded, loadError, onAutocompleteLoad, getPlaceDetails } = useGooglePlaces();
   const inputRef = useRef(null);
   const [inputValue, setInputValue] = useState(value);
@@ -99,7 +99,7 @@ export function LocationAutocomplete({ onPlaceSelect, value = '', placeholder = 
             onBlur={handleBlur}
             placeholder={placeholder}
             autoComplete="off"
-            className={`w-full pl-12 pr-12 py-4 bg-white border rounded-2xl text-base text-neutral-900 placeholder:text-neutral-400 outline-none transition-all duration-200 focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 ${
+            className={inputClassName || `w-full pl-12 pr-12 py-4 bg-white border rounded-2xl text-base text-neutral-900 placeholder:text-neutral-400 outline-none transition-all duration-200 focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 ${
               error
                 ? 'border-red-300 focus:ring-red-500/30 focus:border-red-500'
                 : hasSelected

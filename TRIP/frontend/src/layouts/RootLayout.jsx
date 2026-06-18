@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import TopNavigation from '@/components/navigation/TopNavigation';
 import BottomNavigation from '@/components/navigation/BottomNavigation';
 import Breadcrumbs from '@/components/navigation/Breadcrumbs';
-import { AiConcierge } from '@/features/ai/components/AiConcierge';
+
 import { useAuthStore } from '@/store/authStore';
 
 export default function RootLayout() {
@@ -40,7 +40,6 @@ export default function RootLayout() {
       <BottomNavigation />
       
       {/* Global AI Floating Widget */}
-      <AiConcierge />
     </div>
   );
 }

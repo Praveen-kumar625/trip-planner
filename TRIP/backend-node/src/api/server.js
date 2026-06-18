@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
-import rateLimit from 'express-rate-limit';
+import { upstashRateLimiter, upstashAiRateLimiter } from '../middleware/rate-limit.middleware.js';
 import { env } from '../config/env.js';
 import { errorHandler } from '../middleware/error.middleware.js';
 
@@ -24,25 +24,13 @@ export const createServer = () => {
   app.use(helmet());
   app.use(
     cors({
-      origin: true, // Allow all origins for the Vercel deployment
+      origin: [env.FRONTEND_URL, 'https://trip-planner-rosy-three.vercel.app', 'http://localhost:5173'], // Allow explicit origins for the Vercel deployment
       credentials: true,
     })
   );
 
   // General Rate Limiting
-  const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // limit each IP to 100 requests per windowMs
-    message: 'Too many requests, please try again later.',
-  });
-  app.use(limiter);
-
-  // Strict AI Rate Limiting
-  const aiLimiter = rateLimit({
-    windowMs: 60 * 1000, // 1 minute
-    max: 10, // Max 10 messages per minute per IP
-    message: 'AI Rate limit exceeded. Please wait a moment before sending more messages.',
-  });
+  app.use(upstashRateLimiter);
 
   // Body Parsing
   app.use(express.json());
@@ -61,7 +49,7 @@ export const createServer = () => {
   app.use('/api/v1/preferences', preferenceRoutes);
   app.use('/api/v1/maps', mapRoutes);
   app.use('/api/v1/destinations', destinationRoutes);
-  app.use('/api/v1/ai', aiLimiter, aiRoutes);
+  app.use('/api/v1/ai', upstashAiRateLimiter, aiRoutes);
   app.use('/api/v1/analytics', analyticsRoutes);
   app.use('/api/v1/notifications', notificationRoutes);
 

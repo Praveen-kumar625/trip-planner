@@ -1,16 +1,19 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Sparkles, Send, Bot, Plus, RotateCcw } from 'lucide-react';
+import { Sparkles, Send, Bot, Plus } from 'lucide-react';
 import { useAiStore } from '@/store/aiStore';
 import { aiService } from '@/services/api/ai.service';
-import { TripGeneratorForm } from '@/features/trips/components/TripGeneratorForm';
 import { useTripGeneratorStore } from '@/hooks/useTripGenerator';
+import { DestinationHeroInput } from '@/features/trips/components/DestinationHeroInput';
+import { ProgressivePreferenceForm } from '@/features/trips/components/ProgressivePreferenceForm';
+import { AiResearchOverlay } from '@/features/trips/components/AiResearchOverlay';
 
 export function PlannerPage() {
   const { messages, isThinking, addMessage, updateLastMessage, setThinking, clearChat } = useAiStore();
   const [input, setInput] = useState('');
   const [showWizard, setShowWizard] = useState(true);
   const messagesEndRef = useRef(null);
-  const resetWizard = useTripGeneratorStore((s) => s.reset);
+  const store = useTripGeneratorStore();
+  const resetWizard = store.reset;
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -106,24 +109,26 @@ export function PlannerPage() {
     setShowWizard(true);
   };
 
+  // If AI is thinking on the very first prompt, show the premium research overlay
+  if (isThinking && messages.length === 2 && messages[1].content === '') {
+    return <AiResearchOverlay destinationName={store.destination?.city || store.destination?.formattedAddress} />;
+  }
+
   // Wizard mode
   if (showWizard && messages.length === 0) {
-    return (
-      <div className="flex flex-col min-h-[calc(100vh-4rem)] md:min-h-[calc(100vh-5rem)] max-w-5xl mx-auto w-full p-4 md:p-8">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <h1 className="text-xl font-bold text-neutral-900">Plan a New Trip</h1>
-              <p className="text-sm text-neutral-500 font-medium">Powered by AI intelligence</p>
-            </div>
-          </div>
+    if (!store.destination) {
+      return (
+        <div className="w-full min-h-[calc(100vh-4rem)] md:min-h-[calc(100vh-5rem)]">
+          <DestinationHeroInput onDestinationSelect={(place) => store.setDestination(place)} />
         </div>
-        <TripGeneratorForm
-          onComplete={handleWizardComplete}
-          onClose={() => setShowWizard(false)}
+      );
+    }
+
+    return (
+      <div className="w-full min-h-[calc(100vh-4rem)] md:min-h-[calc(100vh-5rem)]">
+        <ProgressivePreferenceForm 
+          onComplete={handleWizardComplete} 
+          onBack={() => store.setDestination(null)} 
         />
       </div>
     );
