@@ -16,8 +16,8 @@ export const router = createBrowserRouter([
       {
         path: 'planner',
         lazy: async () => {
-          const { PlannerPage } = await import('@/pages/PlannerPage');
-          return { Component: PlannerPage };
+          const { TripsPage } = await import('@/pages/TripsPage');
+          return { Component: TripsPage };
         },
       },
       {
@@ -30,22 +30,22 @@ export const router = createBrowserRouter([
       {
         path: 'budget',
         lazy: async () => {
-          const { PlannerPage } = await import('@/pages/PlannerPage'); // Placeholder for budget
-          return { Component: PlannerPage };
+          const { BudgetPage } = await import('@/pages/BudgetPage');
+          return { Component: BudgetPage };
         },
       },
       {
         path: 'ai-concierge',
         lazy: async () => {
-          const { PlannerPage } = await import('@/pages/PlannerPage'); // Placeholder
+          const { PlannerPage } = await import('@/pages/PlannerPage'); // This is the AI chat
           return { Component: PlannerPage };
         },
       },
       {
         path: 'maps',
         lazy: async () => {
-          const { PlannerPage } = await import('@/pages/PlannerPage'); // Placeholder
-          return { Component: PlannerPage };
+          const { MapsPage } = await import('@/pages/MapsPage');
+          return { Component: MapsPage };
         },
       },
       {
