@@ -6,8 +6,7 @@ import {
   Mountain, Gem, TreePine, UtensilsCrossed, Landmark, Music, CarFront, Waves,
 } from 'lucide-react';
 import { useTripGeneratorStore } from '@/hooks/useTripGenerator';
-import { LocationAutocomplete } from '@/features/location/components/LocationAutocomplete';
-import { LocationPreviewCard } from '@/features/location/components/LocationPreviewCard';
+import { DestinationSearch } from '@/components/destination';
 import { BudgetSelector, formatINR } from '@/features/budget/components/BudgetSelector';
 
 const STEP_META = [
@@ -205,13 +204,13 @@ function StepDestination({ store }) {
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold text-neutral-900 mb-2">Where do you want to go?</h2>
-        <p className="text-neutral-500 font-medium">Search for a city or destination to start planning.</p>
+        <p className="text-neutral-500 font-medium">Search cities, countries, landmarks, or airports.</p>
       </div>
-      <LocationAutocomplete
+      <DestinationSearch
         onPlaceSelect={(place) => store.setDestination(place)}
         value={store.destination?.formattedAddress || ''}
+        showCard={true}
       />
-      {store.destination && <LocationPreviewCard location={store.destination} />}
     </div>
   );
 }
