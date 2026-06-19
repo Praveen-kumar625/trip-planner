@@ -13,12 +13,10 @@ const apiClient = axios.create({
   }
 });
 
-// Request Interceptor: Inject Firebase JWT Token
 apiClient.interceptors.request.use(
   async (config) => {
     const user = auth.currentUser;
     if (user) {
-      // Get the fresh JWT from Firebase
       const token = await user.getIdToken();
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -27,20 +25,17 @@ apiClient.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response Interceptor: Normalize Errors and Toast
 apiClient.interceptors.response.use(
   (response) => response.data,
   async (error) => {
     const originalRequest = error.config;
     
-    // Prevent infinite loops on retry
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       
       try {
         const user = auth.currentUser;
         if (user) {
-          // Force refresh the token
           const newToken = await user.getIdToken(true);
           originalRequest.headers.Authorization = `Bearer ${newToken}`;
           return apiClient(originalRequest);
@@ -56,7 +51,6 @@ apiClient.interceptors.response.use(
       }
     }
 
-    // Standardize and display API errors
     if (error.response) {
       const { status, data } = error.response;
       

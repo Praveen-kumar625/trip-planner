@@ -10,8 +10,6 @@ export const aiService = {
     return apiClient.post('/ai/chat', payload);
   },
   
-  // Method to get a native SSE stream reader with exponential backoff and retry
-  // Modified to handle the current non-streaming /ai/chat endpoint while maintaining the callback interface
   streamChat: async (payload, onMessage, onError, onComplete, retries = 3, delay = 1000) => {
     try {
       if (!navigator.onLine) {
@@ -26,7 +24,6 @@ export const aiService = {
       
       const responseData = response.data.data;
       
-      // Pass the structured json back
       if (responseData && responseData.response) {
         onMessage({ data: responseData.response });
       } else {

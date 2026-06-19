@@ -19,7 +19,6 @@ export const NotificationBell = () => {
     };
 
     fetchNotifications();
-    // In a real production app with SSE/WebSockets, we'd open a connection here
     const interval = setInterval(fetchNotifications, 60000); // Fallback polling
     return () => clearInterval(interval);
   }, []);

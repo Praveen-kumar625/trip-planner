@@ -15,7 +15,6 @@ export default function Breadcrumbs() {
   const location = useLocation();
   const pathnames = location.pathname.split('/').filter((x) => x);
 
-  // Don't show breadcrumbs on home page
   if (pathnames.length === 0) return null;
 
   return (

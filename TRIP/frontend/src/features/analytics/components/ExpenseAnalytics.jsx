@@ -4,7 +4,6 @@ import { IndianRupee, TrendingDown, TrendingUp } from 'lucide-react';
 export const ExpenseAnalytics = () => {
   const { expenses, budget } = useFinanceStore();
 
-  // Group expenses by category
   const expensesByCategory = expenses.reduce((acc, curr) => {
     acc[curr.category] = (acc[curr.category] || 0) + curr.amount;
     return acc;
@@ -13,7 +12,6 @@ export const ExpenseAnalytics = () => {
   const totalSpent = Object.values(expensesByCategory).reduce((a, b) => a + b, 0);
   const categories = Object.keys(expensesByCategory).sort((a, b) => expensesByCategory[b] - expensesByCategory[a]);
 
-  // Colors for categories
   const categoryColors = {
     Flights: 'bg-blue-500',
     Accommodation: 'bg-amber-500',

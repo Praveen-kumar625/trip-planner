@@ -53,7 +53,6 @@ export function LocationAutocomplete({ onPlaceSelect, value = '', placeholder = 
     inputRef.current?.focus();
   };
 
-  // Google Maps API failed to load
   if (loadError) {
     return (
       <div className={`relative ${className}`}>
@@ -67,7 +66,6 @@ export function LocationAutocomplete({ onPlaceSelect, value = '', placeholder = 
     );
   }
 
-  // Still loading
   if (!isLoaded) {
     return (
       <div className={`relative ${className}`}>

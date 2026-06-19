@@ -23,7 +23,6 @@ export function PlannerPage() {
     scrollToBottom();
   }, [messages, isThinking]);
 
-  // Show wizard when there are no messages (fresh state)
   useEffect(() => {
     if (messages.length === 0) {
       setShowWizard(true);
@@ -33,7 +32,6 @@ export function PlannerPage() {
   const handleWizardComplete = async (payload, prompt) => {
     setShowWizard(false);
 
-    // Add the structured prompt as a user message
     const userMessage = { role: 'user', content: prompt };
     addMessage(userMessage);
     setThinking(true);
@@ -119,12 +117,10 @@ export function PlannerPage() {
     setShowWizard(true);
   };
 
-  // If AI is thinking on the very first prompt, show the premium research overlay
   if (isThinking && messages.length === 2 && messages[1].content === '') {
     return <AiResearchOverlay destinationName={store.destination?.city || store.destination?.formattedAddress} />;
   }
 
-  // Wizard mode
   if (showWizard && messages.length === 0) {
     if (!store.destination) {
       return (
@@ -144,7 +140,6 @@ export function PlannerPage() {
     );
   }
 
-  // Chat mode (after wizard submission or ongoing conversation)
   return (
     <div className="flex flex-col h-[calc(100vh-4rem)] md:h-[calc(100vh-5rem)] max-w-5xl mx-auto w-full bg-slate-50 dark:bg-slate-950 p-0 md:p-6">
       <div className="flex-1 bg-white dark:bg-slate-900 md:rounded-2xl md:shadow-xl flex flex-col border border-slate-200 dark:border-slate-800 overflow-hidden">

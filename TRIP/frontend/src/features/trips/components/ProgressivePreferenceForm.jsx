@@ -173,7 +173,6 @@ export function ProgressivePreferenceForm({ onComplete, onBack }) {
                                 key={type.id}
                                 onClick={() => {
                                   store.setTravelerType(type.id);
-                                  // Auto-advance after small delay
                                   setTimeout(() => advance('travelers'), 400);
                                 }}
                                 className={`p-4 rounded-2xl border-2 flex flex-col items-center justify-center gap-2 transition-all ${

@@ -22,7 +22,6 @@ export const tripsService = {
     ];
 
     if (pageParam) {
-      // Get the document snapshot to start after
       const docRef = doc(db, TRIPS_COLLECTION, pageParam);
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
@@ -79,7 +78,6 @@ export const tripsService = {
       data: { 
         id: docRef.id, 
         ...newTripData,
-        // Mock the timestamp for immediate UI update before server response
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       } 

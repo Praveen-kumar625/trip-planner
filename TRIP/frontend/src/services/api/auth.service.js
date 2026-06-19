@@ -51,9 +51,7 @@ export const authService = {
 
   signupWithEmail: async (email, password, displayName) => {
     const cred = await createUserWithEmailAndPassword(auth, email, password);
-    // Send verification
     await sendEmailVerification(cred.user);
-    // Firebase doesn't take displayName in createUser, so we pass it manually to firestore
     cred.user.displayName = displayName;
     await authService.syncUserToFirestore(cred.user);
     return cred.user;

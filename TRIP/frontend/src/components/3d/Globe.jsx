@@ -6,7 +6,6 @@ import * as THREE from 'three';
 function Earth() {
   const meshRef = useRef();
   
-  // Rotate slowly
   useFrame(() => {
     if (meshRef.current) {
       meshRef.current.rotation.y += 0.002;

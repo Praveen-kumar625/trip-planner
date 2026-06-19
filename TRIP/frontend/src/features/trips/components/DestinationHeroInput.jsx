@@ -17,7 +17,6 @@ export function DestinationHeroInput({ onDestinationSelect }) {
   const [isFocused, setIsFocused] = useState(false);
   const { isLoaded } = useGooglePlaces();
 
-  // Handle popular destination clicks with geocoding
   const { fetchPlaceById } = useGooglePlaces();
   const POPULAR_DESTINATIONS = [
     { name: 'Kyoto', display: 'Kyoto, Japan' },
@@ -27,7 +26,6 @@ export function DestinationHeroInput({ onDestinationSelect }) {
 
   const handlePopularClick = useCallback(
     async (dest) => {
-      // Provide immediate feedback with partial data
       const [city, country] = dest.display.split(', ');
       onDestinationSelect({
         name: city,

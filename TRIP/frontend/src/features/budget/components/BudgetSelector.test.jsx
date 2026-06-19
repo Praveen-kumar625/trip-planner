@@ -11,7 +11,6 @@ describe('BudgetSelector', () => {
 
   it('renders all 5 preset tiers plus custom', () => {
     const { getAllByRole } = render(<BudgetSelector onBudgetSelect={onBudgetSelect} />);
-    // 5 tiers + 1 custom = 6 buttons
     const buttons = getAllByRole('button');
     expect(buttons.length).toBe(6);
   });
@@ -44,7 +43,6 @@ describe('BudgetSelector', () => {
     const { getByText, getByRole } = render(<BudgetSelector onBudgetSelect={onBudgetSelect} />);
     fireEvent.click(getByText('Custom'));
 
-    // Slider should appear
     const slider = getByRole('slider');
     expect(slider).toBeInTheDocument();
   });

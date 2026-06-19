@@ -18,7 +18,6 @@ export const useAuthStore = create((set, get) => ({
     onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         try {
-          // Fetch user profile from firestore
           const userRef = doc(db, 'users', firebaseUser.uid);
           const userSnap = await getDoc(userRef);
           const isGuest = firebaseUser.isAnonymous;
@@ -31,7 +30,6 @@ export const useAuthStore = create((set, get) => ({
               isLoading: false 
             });
           } else {
-            // Fallback if sync failed earlier
             const syncedUser = await authService.syncUserToFirestore(firebaseUser, isGuest);
             set({ 
               user: syncedUser, 
@@ -45,7 +43,6 @@ export const useAuthStore = create((set, get) => ({
           set({ user: null, isAuthenticated: false, isGuest: false, isLoading: false });
         }
       } else {
-        // No user found, sign in anonymously automatically
         try {
           const syncedUser = await authService.loginAsGuest();
           set({ 

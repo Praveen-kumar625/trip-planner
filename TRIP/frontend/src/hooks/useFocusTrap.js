@@ -33,7 +33,6 @@ export function useFocusTrap(isActive) {
 
     container.addEventListener('keydown', handleTab);
     
-    // Save previous focus
     const previousFocus = document.activeElement;
     firstElement?.focus();
 

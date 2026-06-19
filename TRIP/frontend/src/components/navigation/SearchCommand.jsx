@@ -12,14 +12,12 @@ export default function SearchCommand({ isOpen, onClose }) {
   const { isLoaded, searchPlaces, fetchPlaceById, predictions, isSearching } = useGooglePlaces();
   const [debounceTimer, setDebounceTimer] = useState(null);
 
-  // Prevent background scrolling when open
   useEffect(() => {
     if (isOpen) document.body.style.overflow = 'hidden';
     else document.body.style.overflow = 'unset';
     return () => { document.body.style.overflow = 'unset'; };
   }, [isOpen]);
 
-  // Debounced search
   const handleQueryChange = useCallback((value) => {
     setQuery(value);
     if (debounceTimer) clearTimeout(debounceTimer);
@@ -32,19 +30,15 @@ export default function SearchCommand({ isOpen, onClose }) {
     }
   }, [isLoaded, searchPlaces, debounceTimer]);
 
-  // Handle selecting a Google Places prediction
   const handleSelectPrediction = useCallback(async (prediction) => {
     const placeData = await fetchPlaceById(prediction.place_id);
     if (placeData) {
-      // Navigate to planner with destination pre-loaded
-      // Store destination in sessionStorage for the PlannerPage to pick up
       sessionStorage.setItem('trip_destination', JSON.stringify(placeData));
       onClose();
       navigate('/ai-concierge');
     }
   }, [fetchPlaceById, navigate, onClose]);
 
-  // Handle clicking a recent search
   const handleRecentClick = useCallback((text) => {
     setQuery(text);
     if (isLoaded) {

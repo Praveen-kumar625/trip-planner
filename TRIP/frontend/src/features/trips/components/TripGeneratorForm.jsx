@@ -57,7 +57,6 @@ export function TripGeneratorForm({ onComplete, onClose }) {
     if (!store.isStepValid()) return;
     setDirection(1);
     if (store.step === store.totalSteps) {
-      // Final step: generate and submit
       const payload = store.generatePayload();
       const prompt = store.generatePrompt();
       onComplete?.(payload, prompt);

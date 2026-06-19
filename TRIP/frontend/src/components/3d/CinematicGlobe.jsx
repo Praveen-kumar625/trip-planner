@@ -3,11 +3,9 @@ import { useFrame } from '@react-three/fiber';
 import { Sphere, useTexture, OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 
-// An abstract, wireframe/points representation of India for performance and aesthetics.
 export function CinematicGlobe() {
   const groupRef = useRef();
   
-  // Rotate slowly
   useFrame(() => {
     if (groupRef.current) {
       groupRef.current.rotation.y += 0.001;

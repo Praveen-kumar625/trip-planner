@@ -24,10 +24,8 @@ describe('apiClient', () => {
       getIdToken: vi.fn().mockResolvedValue('test-jwt-token')
     };
     
-    // Create a mock config
     const config = { headers: {} };
     
-    // Run the request interceptor manually for testing
     const resultConfig = await apiClient.interceptors.request.handlers[0].fulfilled(config);
     
     expect(resultConfig.headers.Authorization).toBe('Bearer test-jwt-token');

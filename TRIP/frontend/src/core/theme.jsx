@@ -1,6 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 
-// Pre-defined luxury Material You palettes for Indian destinations
 export const DESTINATION_THEMES = {
   default: {
     primary: '#1E1B4B', // Deep Royal amber
@@ -42,7 +41,6 @@ export function ThemeProvider({ children }) {
     const theme = DESTINATION_THEMES[themeName] || DESTINATION_THEMES.default;
     const root = document.documentElement;
     
-    // Convert hex to CSS variables for Tailwind v4 consumption
     root.style.setProperty('--md-sys-color-primary', theme.primary);
     root.style.setProperty('--md-sys-color-secondary', theme.secondary);
     root.style.setProperty('--md-sys-color-accent', theme.accent);

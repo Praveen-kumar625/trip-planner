@@ -15,7 +15,6 @@ export function AiResearchOverlay({ destinationName }) {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
 
   useEffect(() => {
-    // Cycle through steps every 2.5 seconds, but stay on the last step if it takes longer
     const interval = setInterval(() => {
       setCurrentStepIndex((prev) => (prev < RESEARCH_STEPS.length - 1 ? prev + 1 : prev));
     }, 2500);

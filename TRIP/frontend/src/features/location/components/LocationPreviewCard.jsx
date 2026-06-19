@@ -35,7 +35,6 @@ export function LocationPreviewCard({ location, className = '' }) {
   const [expanded, setExpanded] = useState(true);
   const mapRef = useRef(null);
 
-  // Fetch weather when location changes
   useEffect(() => {
     if (!location?.latitude || !location?.longitude) return;
 
@@ -43,7 +42,6 @@ export function LocationPreviewCard({ location, className = '' }) {
       setWeatherLoading(true);
       setWeatherError(false);
       try {
-        // Using wttr.in — no API key needed, free, reliable
         const res = await fetch(
           `https://wttr.in/${location.latitude},${location.longitude}?format=j1`
         );

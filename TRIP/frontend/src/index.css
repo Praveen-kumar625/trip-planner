@@ -1,32 +1,48 @@
 @import "tailwindcss";
 
+@theme {
+  --color-primary-50: #fef2f2;
+  --color-primary-100: #fee2e2;
+  --color-primary-200: #fecaca;
+  --color-primary-300: #fca5a5;
+  --color-primary-400: #f87171;
+  --color-primary-500: #ef4444;
+  --color-primary-600: #dc2626;
+  --color-primary-700: #b91c1c;
+
+  --color-accent-400: #fbbf24;
+  --color-accent-500: #f59e0b;
+  
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-serif: 'Playfair Display', ui-serif, Georgia, serif;
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    /* Elegant smooth scrollbar for webkit */
   }
 
   ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
   }
   ::-webkit-scrollbar-track {
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.1);
+    background: rgba(0, 0, 0, 0.15);
     border-radius: 10px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 0, 0, 0.2);
+    background: rgba(0, 0, 0, 0.3);
   }
 
   :root {
-    /* Premium Modern Light Theme */
-    --background: 0 0% 100%; /* White */
-    --foreground: 222 47% 11%; /* Deep Indigo/Black */
+    /* Premium Modern Travel Theme */
+    --background: 0 0% 100%; /* Pure White */
+    --foreground: 222 47% 11%; /* Deep Slate / Midnight */
 
     --card: 0 0% 100%;
     --card-foreground: 222 47% 11%;
@@ -34,11 +50,10 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
 
-    /* Primary: Saffron Gold - Taj Hotels inspired */
-    --primary: 43 96% 56%; 
+    /* Brand Accent: Premium Coral / Airbnb Red-ish */
+    --primary: 0 84% 60%;
     --primary-foreground: 0 0% 100%;
 
-    /* Secondary: Elegant Neutral */
     --secondary: 210 40% 96.1%; 
     --secondary-foreground: 222 47% 11%;
 
@@ -53,20 +68,33 @@
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 43 96% 56%;
+    --ring: 0 84% 60%;
 
-    --radius: 1rem;
+    --radius: 1.5rem; /* Larger border radius for premium modern feel */
   }
-}
 
-@layer base {
+  .dark {
+    --background: 222 47% 5%; /* Very deep blue-black */
+    --foreground: 210 40% 98%;
+    
+    --card: 222 47% 8%;
+    --card-foreground: 210 40% 98%;
+    
+    --popover: 222 47% 8%;
+    --popover-foreground: 210 40% 98%;
+    
+    --border: 215 28% 17%;
+    --input: 215 28% 17%;
+  }
+
   * {
     border-color: hsl(var(--border));
   }
+  
   body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-family: var(--font-sans);
     /* Subtle grain texture overlay for a magazine print feel */
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.02'/%3E%3C/svg%3E");
   }
@@ -90,18 +118,26 @@
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
   }
   .shadow-premium-hover {
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.02);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12), 0 1px 3px rgba(0, 0, 0, 0.04);
   }
   
   /* Premium Glassmorphism (Apple-esque) */
   .glass-premium {
     background: rgba(255, 255, 255, 0.7);
-    -webkit-backdrop-filter: saturate(180%) blur(20px);
-    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(24px);
+    backdrop-filter: saturate(180%) blur(24px);
     border: 1px solid rgba(255, 255, 255, 0.5);
   }
+  
+  .glass-dark {
+    background: rgba(15, 23, 42, 0.6);
+    -webkit-backdrop-filter: saturate(180%) blur(24px);
+    backdrop-filter: saturate(180%) blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
   .dark .glass-premium {
-    background: rgba(15, 23, 42, 0.7);
+    background: rgba(15, 23, 42, 0.6);
     border: 1px solid rgba(255, 255, 255, 0.1);
   }
 
@@ -110,7 +146,7 @@
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    background-image: linear-gradient(135deg, hsl(43, 96%, 56%) 0%, hsl(20, 90%, 50%) 100%);
+    background-image: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(20, 90%, 50%) 100%);
   }
 
   .text-gradient-midnight {
@@ -125,6 +161,15 @@
     background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%);
     background-size: 200% 100%;
     animation: shimmer 2s infinite;
+  }
+  
+  /* Hide scrollbar but keep functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none; /* Chrome, Safari and Opera */
   }
 }
 

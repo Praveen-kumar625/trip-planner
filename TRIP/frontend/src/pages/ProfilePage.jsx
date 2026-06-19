@@ -28,7 +28,6 @@ export function ProfilePage() {
     memberSince: '',
   });
 
-  // Fetch profile from Firestore
   useEffect(() => {
     const fetchProfile = async () => {
       if (!user?.uid) { setLoading(false); return; }

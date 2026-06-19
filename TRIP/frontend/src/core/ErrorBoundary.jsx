@@ -13,7 +13,6 @@ export class ErrorBoundary extends React.Component {
 
   componentDidCatch(error, errorInfo) {
     console.error('ErrorBoundary caught an error:', error, errorInfo);
-    // In production, we would log this to Sentry or Datadog here
   }
 
   render() {

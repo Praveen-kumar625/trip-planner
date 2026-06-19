@@ -1,7 +1,6 @@
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
 
-// Mock i18next
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key) => key,
@@ -16,7 +15,6 @@ vi.mock('react-i18next', () => ({
   },
 }));
 
-// Mock axios
 vi.mock('axios', () => ({
   default: {
     create: () => ({

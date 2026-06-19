@@ -52,15 +52,12 @@ export function DestinationSearch({
   const [hasInteracted, setHasInteracted] = useState(false);
   const wrapperRef = useRef(null);
 
-  // Sync controlled value prop on mount
   useEffect(() => {
     if (value && !searchValue) {
       handleInput(value);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Open dropdown when suggestions arrive
   useEffect(() => {
     if (hasSuggestions) {
       setIsOpen(true);
@@ -68,7 +65,6 @@ export function DestinationSearch({
     }
   }, [hasSuggestions]);
 
-  // Forward selection to parent
   useEffect(() => {
     if (selectedPlace) {
       onPlaceSelect?.(selectedPlace);
@@ -76,7 +72,6 @@ export function DestinationSearch({
     }
   }, [selectedPlace, onPlaceSelect]);
 
-  // Close dropdown on outside click
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
@@ -124,7 +119,6 @@ export function DestinationSearch({
   const onKeyDown = useCallback(
     (e) => {
       if (!isOpen || !hasSuggestions) {
-        // Open on ArrowDown if there are suggestions but dropdown is closed
         if (e.key === 'ArrowDown' && hasSuggestions) {
           setIsOpen(true);
           setActiveIndex(0);
@@ -170,12 +164,10 @@ export function DestinationSearch({
     [isOpen, hasSuggestions, suggestions, activeIndex, onSuggestionSelect, handleDismiss]
   );
 
-  // Determine the visual state of the input
   const hasSelection = !!selectedPlace;
   const showDropdown = isOpen && searchValue.length > 0 && !hasSelection;
   const showEmpty = showDropdown && hasInteracted && !hasSuggestions && !suggestionsLoading && searchValue.length >= 2;
 
-  // Not ready — Google Maps script not yet loaded
   if (!ready) {
     return (
       <div className={`relative ${className}`}>
