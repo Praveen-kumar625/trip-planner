@@ -59,9 +59,6 @@ export function useGooglePlaces() {
     };
   }, []);
 
-  /**
-   * Programmatic search using AutocompleteService for SearchCommand integration.
-   */
   const searchPlaces = useCallback(
     async (query) => {
       if (!isLoaded || !query.trim()) {
@@ -71,25 +68,52 @@ export function useGooglePlaces() {
 
       setIsSearching(true);
       try {
-        const service = new window.google.maps.places.AutocompleteService();
-        const result = await new Promise((resolve, reject) => {
-          service.getPlacePredictions(
-            {
-              input: query,
-              types: ['(cities)'],
-            },
-            (results, status) => {
-              if (status === window.google.maps.places.PlacesServiceStatus.OK) {
-                resolve(results || []);
-              } else {
-                resolve([]);
+        if (window.google?.maps?.places?.AutocompleteSuggestion) {
+          // Use modern Places API (New) for new customers
+          const { suggestions } = await window.google.maps.places.AutocompleteSuggestion.fetchAutocompleteSuggestions({
+            input: query,
+            // (cities) equivalent in new API
+            includedPrimaryTypes: ['locality', 'administrative_area_level_3'],
+          });
+          
+          const result = (suggestions || []).map(s => {
+            const p = s.placePrediction;
+            if (!p) return null;
+            return {
+              place_id: p.placeId,
+              description: p.text?.text || '',
+              structured_formatting: {
+                main_text: p.structuredFormat?.mainText?.text || p.text?.text || '',
+                secondary_text: p.structuredFormat?.secondaryText?.text || '',
               }
-            }
-          );
-        });
-        setPredictions(result);
-        return result;
-      } catch {
+            };
+          }).filter(Boolean);
+          
+          setPredictions(result);
+          return result;
+        } else {
+          // Fallback to legacy API
+          const service = new window.google.maps.places.AutocompleteService();
+          const result = await new Promise((resolve) => {
+            service.getPlacePredictions(
+              {
+                input: query,
+                types: ['(cities)'],
+              },
+              (results, status) => {
+                if (status === window.google.maps.places.PlacesServiceStatus.OK) {
+                  resolve(results || []);
+                } else {
+                  resolve([]);
+                }
+              }
+            );
+          });
+          setPredictions(result);
+          return result;
+        }
+      } catch (error) {
+        console.error("Error fetching places:", error);
         setPredictions([]);
         return [];
       } finally {
