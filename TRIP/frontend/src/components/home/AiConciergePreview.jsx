@@ -8,8 +8,8 @@ const DESTINATIONS = {
   "Bali": "https://images.unsplash.com/photo-1537996194471-e657df975ab4?q=80&w=2070&auto=format&fit=crop",
   "Kyoto": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=2070&auto=format&fit=crop",
   "Iceland": "https://images.unsplash.com/photo-1476610182048-b716b8518aae?q=80&w=2070&auto=format&fit=crop",
-  "Amalfi": "https://images.unsplash.com/photo-1533682805518-48d1f5b8cb3a?q=80&w=2070&auto=format&fit=crop",
-  "Zermatt": "https://images.unsplash.com/photo-1531366936336-62fc674baa3e?q=80&w=2070&auto=format&fit=crop",
+  "Amalfi": "https://images.unsplash.com/photo-1516483638261-f40af5ebbdc5?q=80&w=2070&auto=format&fit=crop",
+  "Zermatt": "https://images.unsplash.com/photo-1526772662000-3f88f10405ff?q=80&w=2070&auto=format&fit=crop",
 };
 
 const STYLES = ["Romantic", "Adventurous", "Luxurious", "Relaxing"];
