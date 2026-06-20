@@ -40,7 +40,7 @@ export class BaseAgent {
         : '';
 
       const result = await ai.models.generateContent({
-        model: 'gemini-3.5-flash',
+        model: 'gemini-2.0-flash',
         contents: [{ role: 'user', parts: [{ text: fullPrompt + historyText }] }],
         config
       });
@@ -113,7 +113,7 @@ export class BaseAgent {
       }
 
       const resultStream = await ai.models.generateContentStream({
-        model: 'gemini-3.5-flash',
+        model: 'gemini-2.0-flash',
         contents,
         config
       });
