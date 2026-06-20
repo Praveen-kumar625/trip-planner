@@ -68,6 +68,7 @@ export const tripsService = {
     const tripsRef = collection(db, TRIPS_COLLECTION);
     const newTripData = {
       ...tripData,
+      isPublic: tripData.isPublic || false,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp()
     };
@@ -159,5 +160,91 @@ export const tripsService = {
     });
     
     return { success: true };
+  },
+
+  /**
+   * Toggle Trip Privacy
+   */
+  toggleTripPrivacy: async (id, isPublic) => {
+    if (!id) throw new Error("Trip ID is required");
+    
+    const tripRef = doc(db, TRIPS_COLLECTION, id);
+    await updateDoc(tripRef, { 
+      isPublic: isPublic,
+      updatedAt: serverTimestamp() 
+    });
+    
+    return { success: true, isPublic };
+  },
+
+  /**
+   * Get all public trips (Community Feed)
+   */
+  getPublicTrips: async (limitCount = 10, pageParam = null) => {
+    const tripsRef = collection(db, TRIPS_COLLECTION);
+    
+    let qArgs = [
+      where("isPublic", "==", true), 
+      orderBy("createdAt", "desc"),
+      limit(limitCount)
+    ];
+
+    if (pageParam) {
+      const docRef = doc(db, TRIPS_COLLECTION, pageParam);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        qArgs.push(startAfter(docSnap));
+      }
+    }
+    
+    const q = query(tripsRef, ...qArgs);
+    const querySnapshot = await getDocs(q);
+    
+    const trips = [];
+    querySnapshot.forEach((doc) => {
+      trips.push({ id: doc.id, ...doc.data() });
+    });
+    
+    const lastDocId = trips.length > 0 ? trips[trips.length - 1].id : null;
+    const hasMore = trips.length === limitCount;
+
+    return { data: trips, lastDocId, hasMore };
+  },
+
+  /**
+   * Get a specific user's public trips
+   */
+  getUserPublicTrips: async (userId, limitCount = 10, pageParam = null) => {
+    if (!userId) throw new Error("User ID is required");
+    
+    const tripsRef = collection(db, TRIPS_COLLECTION);
+    
+    let qArgs = [
+      where("userId", "==", userId),
+      where("isPublic", "==", true), 
+      orderBy("createdAt", "desc"),
+      limit(limitCount)
+    ];
+
+    if (pageParam) {
+      const docRef = doc(db, TRIPS_COLLECTION, pageParam);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        qArgs.push(startAfter(docSnap));
+      }
+    }
+    
+    const q = query(tripsRef, ...qArgs);
+    const querySnapshot = await getDocs(q);
+    
+    const trips = [];
+    querySnapshot.forEach((doc) => {
+      trips.push({ id: doc.id, ...doc.data() });
+    });
+    
+    const lastDocId = trips.length > 0 ? trips[trips.length - 1].id : null;
+    const hasMore = trips.length === limitCount;
+
+    return { data: trips, lastDocId, hasMore };
   }
 };

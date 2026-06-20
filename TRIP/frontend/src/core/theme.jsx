@@ -1,31 +1,31 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 
 export const DESTINATION_THEMES = {
   default: {
-    primary: '#1E1B4B', // Deep Royal amber
-    secondary: '#065F46', // Emerald Green
-    accent: '#D97706', // Saffron Gold
+    primary: '#1E1B4B',
+    secondary: '#065F46',
+    accent: '#D97706',
     surface: '#F8FAFC',
     background: '#020617',
   },
   rajasthan: {
-    primary: '#D4AF37', // Gold
-    secondary: '#8B4513', // Sienna
-    accent: '#B22222', // Firebrick
-    surface: '#FFF8DC', // Cornsilk
+    primary: '#D4AF37',
+    secondary: '#8B4513',
+    accent: '#B22222',
+    surface: '#FFF8DC',
     background: '#2C1E16',
   },
   kerala: {
-    primary: '#2E8B57', // Sea Green
-    secondary: '#006400', // Dark Green
-    accent: '#FFD700', // Gold
-    surface: '#F0FFF0', // Honeydew
+    primary: '#2E8B57',
+    secondary: '#006400',
+    accent: '#FFD700',
+    surface: '#F0FFF0',
     background: '#0B2414',
   },
   goa: {
-    primary: '#0284C7', // Ocean Blue
-    secondary: '#0D9488', // Teal
-    accent: '#F59E0B', // Amber/Sunset
+    primary: '#0284C7',
+    secondary: '#0D9488',
+    accent: '#F59E0B',
     surface: '#F0F9FF',
     background: '#082F49',
   }
@@ -33,9 +33,22 @@ export const DESTINATION_THEMES = {
 
 const ThemeContext = createContext();
 
+const STORAGE_KEY = 'wandersync-theme-mode';
+
+function getInitialMode() {
+  if (typeof window === 'undefined') return false;
+  const stored = localStorage.getItem(STORAGE_KEY);
+  if (stored !== null) return stored === 'dark';
+  return window.matchMedia('(prefers-color-scheme: dark)').matches;
+}
+
 export function ThemeProvider({ children }) {
   const [themeName, setThemeName] = useState('default');
-  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(getInitialMode);
+
+  const toggleDarkMode = useCallback(() => {
+    setIsDarkMode(prev => !prev);
+  }, []);
 
   useEffect(() => {
     const theme = DESTINATION_THEMES[themeName] || DESTINATION_THEMES.default;
@@ -52,10 +65,22 @@ export function ThemeProvider({ children }) {
     } else {
       root.classList.remove('dark');
     }
+    localStorage.setItem(STORAGE_KEY, isDarkMode ? 'dark' : 'light');
   }, [themeName, isDarkMode]);
 
+  // Listen for system preference changes
+  useEffect(() => {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored !== null) return; // user has explicit preference
+
+    const mq = window.matchMedia('(prefers-color-scheme: dark)');
+    const handler = (e) => setIsDarkMode(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+
   return (
-    <ThemeContext.Provider value={{ themeName, setThemeName, isDarkMode, setIsDarkMode }}>
+    <ThemeContext.Provider value={{ themeName, setThemeName, isDarkMode, setIsDarkMode, toggleDarkMode }}>
       {children}
     </ThemeContext.Provider>
   );

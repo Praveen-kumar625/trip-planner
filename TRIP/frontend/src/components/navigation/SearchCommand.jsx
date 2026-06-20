@@ -49,14 +49,14 @@ export default function SearchCommand({ isOpen, onClose }) {
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center pt-[10vh] px-4 md:px-0">
+        <div className="fixed inset-0 z-50 flex items-start justify-center pt-[15vh] px-4 md:px-0">
           {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="absolute inset-0 bg-neutral-900/60 backdrop-blur-sm"
+            className="absolute inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-md"
           />
 
           {/* Search Modal */}
@@ -65,33 +65,33 @@ export default function SearchCommand({ isOpen, onClose }) {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: -20 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh]"
+            className="relative w-full max-w-2xl bg-white dark:bg-slate-950 rounded-3xl shadow-premium-lg border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col max-h-[70vh]"
           >
             {/* Input Header */}
-            <div className="flex items-center gap-3 p-4 border-b border-neutral-100">
-              <Search className="w-6 h-6 text-primary-500 ml-2" />
+            <div className="flex items-center gap-4 p-6 border-b border-slate-100 dark:border-slate-800/50">
+              <Search className="w-6 h-6 text-primary-500" />
               <input
                 type="text"
                 autoFocus
-                placeholder="Where do you want to go?"
+                placeholder="Where to next?"
                 value={query}
                 onChange={(e) => handleQueryChange(e.target.value)}
-                className="flex-1 bg-transparent border-none outline-none text-lg text-neutral-900 placeholder:text-neutral-400 py-3"
+                className="flex-1 bg-transparent border-none outline-none text-2xl md:text-3xl font-serif text-slate-900 dark:text-white placeholder:text-slate-300 dark:placeholder:text-slate-600 py-2"
               />
-              {isSearching && <Loader2 className="w-5 h-5 text-neutral-400 animate-spin" />}
+              {isSearching && <Loader2 className="w-5 h-5 text-slate-400 animate-spin" />}
               <button
                 onClick={onClose}
-                className="p-2 text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 rounded-full transition-colors mr-1"
+                className="p-2 text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Results Area */}
-            <div className="overflow-y-auto p-4 md:p-6 space-y-8 flex-1">
+            <div className="overflow-y-auto p-6 space-y-8 flex-1">
               {query.length >= 2 && predictions.length > 0 ? (
                 <div>
-                  <h3 className="text-sm font-semibold text-neutral-400 uppercase tracking-wider mb-4 px-2">
+                  <h3 className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-4 px-2">
                     Destinations
                   </h3>
                   <div className="space-y-1">
@@ -99,38 +99,38 @@ export default function SearchCommand({ isOpen, onClose }) {
                       <button
                         key={prediction.place_id}
                         onClick={() => handleSelectPrediction(prediction)}
-                        className="w-full flex items-center justify-between p-3 hover:bg-neutral-50 rounded-xl transition-colors group text-left"
+                        className="w-full flex items-center justify-between p-4 hover:bg-slate-50 dark:hover:bg-slate-900/50 rounded-2xl transition-colors group text-left"
                       >
                         <div className="flex items-center gap-4">
-                          <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center">
-                            <MapPin className="w-4 h-4 text-amber-500" />
+                          <div className="w-10 h-10 rounded-xl bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center">
+                            <MapPin className="w-5 h-5 text-primary-500" />
                           </div>
                           <div>
-                            <span className="text-neutral-900 font-medium group-hover:text-neutral-900">
+                            <span className="text-slate-900 dark:text-white font-serif text-lg group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
                               {prediction.structured_formatting?.main_text || prediction.description}
                             </span>
                             {prediction.structured_formatting?.secondary_text && (
-                              <p className="text-sm text-neutral-400">
+                              <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
                                 {prediction.structured_formatting.secondary_text}
                               </p>
                             )}
                           </div>
                         </div>
-                        <ArrowRight className="w-4 h-4 text-neutral-300 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <ArrowRight className="w-5 h-5 text-slate-300 dark:text-slate-600 opacity-0 group-hover:opacity-100 group-hover:text-primary-500 transition-all -translate-x-2 group-hover:translate-x-0" />
                       </button>
                     ))}
                   </div>
                 </div>
               ) : query.length >= 2 && !isSearching ? (
-                <div className="py-12 text-center text-neutral-500">
-                  <MapPin className="w-8 h-8 text-neutral-300 mx-auto mb-4" />
+                <div className="py-16 text-center text-slate-500 dark:text-slate-400">
+                  <MapPin className="w-8 h-8 text-slate-300 dark:text-slate-600 mx-auto mb-4" />
                   <p>No destinations found for "{query}"</p>
                 </div>
               ) : query.length === 0 ? (
                 <>
                   {/* Recent Searches */}
                   <div>
-                    <h3 className="text-sm font-semibold text-neutral-400 uppercase tracking-wider mb-4 px-2">
+                    <h3 className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-4 px-2">
                       Recent Searches
                     </h3>
                     <div className="space-y-1">
@@ -138,38 +138,38 @@ export default function SearchCommand({ isOpen, onClose }) {
                         <button
                           key={i}
                           onClick={() => handleRecentClick(item)}
-                          className="w-full flex items-center justify-between p-3 hover:bg-neutral-50 rounded-xl transition-colors group text-left"
+                          className="w-full flex items-center justify-between p-3 hover:bg-slate-50 dark:hover:bg-slate-900/50 rounded-xl transition-colors group text-left"
                         >
                           <div className="flex items-center gap-4">
-                            <Clock className="w-4 h-4 text-neutral-400" />
-                            <span className="text-neutral-700 group-hover:text-neutral-900">{item}</span>
+                            <Clock className="w-4 h-4 text-slate-400 dark:text-slate-500" />
+                            <span className="text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white">{item}</span>
                           </div>
-                          <ArrowRight className="w-4 h-4 text-neutral-300 opacity-0 group-hover:opacity-100 transition-opacity" />
+                          <ArrowRight className="w-4 h-4 text-slate-300 dark:text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity" />
                         </button>
                       ))}
                     </div>
                   </div>
 
                   {/* Quick Actions */}
-                  <div>
-                    <h3 className="text-sm font-semibold text-neutral-400 uppercase tracking-wider mb-4 px-2">
-                      Quick Actions
+                  <div className="pt-4">
+                    <h3 className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-4 px-2">
+                      AI Concierge
                     </h3>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-2 px-2">
                       <button
                         onClick={() => { onClose(); navigate('/ai-concierge'); }}
-                        className="flex items-center gap-2 px-4 py-2 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-full text-sm font-medium transition-colors border border-amber-200"
+                        className="flex items-center gap-2 px-5 py-2.5 bg-primary-50 dark:bg-primary-900/20 hover:bg-primary-100 dark:hover:bg-primary-900/40 text-primary-700 dark:text-primary-400 rounded-full text-sm font-bold tracking-wide transition-colors border border-primary-100 dark:border-primary-900/50"
                       >
-                        <Sparkles className="w-3.5 h-3.5" />
-                        Plan a Trip with AI
+                        <Sparkles className="w-4 h-4" />
+                        Plan a Custom Trip
                       </button>
                     </div>
                   </div>
                 </>
               ) : query.length >= 1 && isSearching ? (
-                <div className="py-12 text-center text-neutral-500">
-                  <Loader2 className="w-8 h-8 text-neutral-300 mx-auto mb-4 animate-spin" />
-                  <p>Searching destinations...</p>
+                <div className="py-16 text-center text-slate-500 dark:text-slate-400">
+                  <Loader2 className="w-8 h-8 text-slate-300 dark:text-slate-600 mx-auto mb-4 animate-spin" />
+                  <p>Searching for luxury destinations...</p>
                 </div>
               ) : null}
             </div>

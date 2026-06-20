@@ -1,7 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Sparkles, Send, Bot, Plus } from 'lucide-react';
+import { Sparkles, Send, Bot, Plus, Mic } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { useAiStore } from '@/store/aiStore';
 import { aiService } from '@/services/api/ai.service';
+import { useVoice } from '@/hooks/useVoice';
 import { useTripGeneratorStore } from '@/hooks/useTripGenerator';
 import { DestinationHeroInput } from '@/features/trips/components/DestinationHeroInput';
 import { ProgressivePreferenceForm } from '@/features/trips/components/ProgressivePreferenceForm';
@@ -14,6 +17,32 @@ export function PlannerPage() {
   const messagesEndRef = useRef(null);
   const store = useTripGeneratorStore();
   const resetWizard = store.reset;
+
+  const {
+    isListening,
+    interimTranscript,
+    finalTranscript,
+    setFinalTranscript,
+    error,
+    startListening,
+    stopListening,
+    isSupported
+  } = useVoice();
+
+  useEffect(() => {
+    if (finalTranscript) {
+      setInput((prev) => prev + (prev ? ' ' : '') + finalTranscript);
+      setFinalTranscript('');
+    }
+  }, [finalTranscript, setFinalTranscript]);
+
+  const toggleRecording = () => {
+    if (isListening) {
+      stopListening();
+    } else {
+      startListening();
+    }
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -42,16 +71,10 @@ export function PlannerPage() {
         { message: prompt, tripContext: payload, history: [] },
         (data) => {
           if (data.type === 'token') {
-            updateLastMessage(data.text);
-          } else if (data.data) {
-            if (typeof data.data === 'object') {
-              setLastStructuredResponse(data.data);
-              updateLastMessage("✨ I have meticulously researched and prepared your luxury travel itinerary. You can save this trip to your profile or ask me any follow-up questions.");
-            } else {
-              updateLastMessage(data.data);
-            }
-          } else if (data.content) {
             updateLastMessage(data.content);
+          } else if (data.type === 'structured') {
+            setLastStructuredResponse(data.data);
+            updateLastMessage("\n\n✨ *I have meticulously researched and prepared your luxury travel itinerary. You can save this trip to your profile or ask me any follow-up questions.*");
           }
         },
         (error) => {
@@ -84,16 +107,10 @@ export function PlannerPage() {
         { message: userMessage.content, history: messages },
         (data) => {
           if (data.type === 'token') {
-            updateLastMessage(data.text);
-          } else if (data.data) {
-            if (typeof data.data === 'object') {
-              setLastStructuredResponse(data.data);
-              updateLastMessage("✨ I have updated your travel itinerary. You can save this trip to your profile or ask me any follow-up questions.");
-            } else {
-              updateLastMessage(data.data);
-            }
-          } else if (data.content) {
             updateLastMessage(data.content);
+          } else if (data.type === 'structured') {
+            setLastStructuredResponse(data.data);
+            updateLastMessage("\n\n✨ *I have updated your travel itinerary based on your preferences. You can save this trip to your profile or ask me any follow-up questions.*");
           }
         },
         (error) => {
@@ -144,14 +161,14 @@ export function PlannerPage() {
     <div className="flex flex-col h-[calc(100vh-4rem)] md:h-[calc(100vh-5rem)] max-w-5xl mx-auto w-full bg-slate-50 dark:bg-slate-950 p-0 md:p-6">
       <div className="flex-1 bg-white dark:bg-slate-900 md:rounded-2xl md:shadow-xl flex flex-col border border-slate-200 dark:border-slate-800 overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 md:p-6 border-b border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900">
-          <div className="flex items-center">
-            <div className="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center mr-4">
-              <Bot className="w-6 h-6 text-amber-600 dark:text-amber-400" />
+        <div className="flex items-center justify-between p-5 md:p-8 border-b border-slate-100 dark:border-slate-800/50 bg-white/50 dark:bg-slate-900/50 backdrop-blur-xl">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-full border border-primary-200 dark:border-primary-900/50 bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center">
+              <Bot className="w-5 h-5 text-primary-600 dark:text-primary-400" />
             </div>
             <div>
-              <h1 className="text-xl font-semibold text-slate-900 dark:text-white">AI Trip Concierge</h1>
-              <p className="text-sm text-slate-500 dark:text-slate-400">Your personal intelligent travel planner</p>
+              <h1 className="text-2xl font-serif font-bold text-slate-900 dark:text-white tracking-tight">WanderSync Advisor</h1>
+              <p className="text-xs font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 mt-1">Your Personal Concierge</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -168,6 +185,7 @@ export function PlannerPage() {
                     await createTrip({ 
                       ...payload, 
                       userId: user.uid,
+                      authorName: user.displayName || 'Traveler',
                       itinerary: aiStoreState.lastStructuredResponse 
                         ? JSON.stringify(aiStoreState.lastStructuredResponse) 
                         : messages.map(m => m.content).join('\n\n') // Fallback to chat context
@@ -178,7 +196,7 @@ export function PlannerPage() {
                     console.error(e);
                   }
                 }}
-                className="flex items-center gap-2 px-4 py-2 bg-amber-50 text-amber-700 rounded-xl font-semibold text-sm hover:bg-amber-100 transition-colors border border-amber-200"
+                className="flex items-center gap-2 px-5 py-2.5 bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-300 rounded-full font-bold text-xs uppercase tracking-widest hover:bg-primary-100 dark:hover:bg-primary-900/40 transition-colors border border-primary-200 dark:border-primary-800"
               >
                 <Sparkles className="w-4 h-4" />
                 Save Trip
@@ -186,10 +204,10 @@ export function PlannerPage() {
             )}
             <button
               onClick={handleNewTrip}
-              className="flex items-center gap-2 px-4 py-2 bg-amber-50 text-amber-700 rounded-xl font-semibold text-sm hover:bg-amber-100 transition-colors border border-amber-200"
+              className="flex items-center gap-2 px-5 py-2.5 bg-transparent text-slate-600 dark:text-slate-300 rounded-full font-bold text-xs uppercase tracking-widest hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors border border-slate-200 dark:border-slate-700"
             >
               <Plus className="w-4 h-4" />
-              New Trip
+              New
             </button>
           </div>
         </div>
@@ -198,22 +216,28 @@ export function PlannerPage() {
         <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6">
           {messages.map((msg, idx) => (
             <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-[85%] md:max-w-[75%] p-4 rounded-2xl ${
+              <div className={`max-w-[85%] md:max-w-[75%] px-6 py-5 rounded-[2rem] text-[15px] leading-relaxed prose prose-slate max-w-none shadow-sm ${
                 msg.role === 'user'
-                  ? 'bg-amber-600 text-white rounded-br-sm'
-                  : 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-bl-sm'
+                  ? 'bg-slate-900 text-white rounded-br-sm dark:bg-slate-100 dark:text-slate-900 prose-invert dark:prose-slate'
+                  : 'bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-bl-sm dark:prose-invert'
               }`}>
-                <div className="whitespace-pre-wrap leading-relaxed">{msg.content}</div>
+                {msg.role === 'user' ? (
+                  msg.content
+                ) : (
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {msg.content}
+                  </ReactMarkdown>
+                )}
               </div>
             </div>
           ))}
 
           {isThinking && (
             <div className="flex justify-start">
-              <div className="bg-slate-100 dark:bg-slate-800 p-4 rounded-2xl rounded-bl-sm flex space-x-2 items-center">
-                <div className="w-2.5 h-2.5 bg-amber-400 rounded-full animate-bounce" />
-                <div className="w-2.5 h-2.5 bg-amber-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
-                <div className="w-2.5 h-2.5 bg-amber-400 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }} />
+              <div className="bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 px-6 py-5 rounded-[2rem] rounded-bl-sm flex space-x-2 items-center shadow-sm">
+                <div className="w-2 h-2 bg-primary-400 rounded-full animate-bounce" />
+                <div className="w-2 h-2 bg-primary-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+                <div className="w-2 h-2 bg-primary-400 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }} />
               </div>
             </div>
           )}
@@ -221,7 +245,18 @@ export function PlannerPage() {
         </div>
 
         {/* Input Area */}
-        <div className="p-4 md:p-6 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800">
+        <div className="p-4 md:p-6 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 relative">
+          {error && (
+            <div className="mb-3 text-sm text-red-500 bg-red-50 dark:bg-red-900/20 px-3 py-2 rounded-lg border border-red-200 dark:border-red-800">
+              {error}
+            </div>
+          )}
+          {interimTranscript && (
+            <div className="mb-3 text-sm text-slate-500 dark:text-slate-400 italic flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+              {interimTranscript}...
+            </div>
+          )}
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -233,15 +268,28 @@ export function PlannerPage() {
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask a follow-up question..."
-              className="flex-1 px-5 py-4 bg-slate-100 dark:bg-slate-800 border-none rounded-xl focus:ring-2 focus:ring-amber-500 dark:text-white outline-none shadow-inner"
+              placeholder="Ask your concierge..."
+              className="flex-1 px-6 py-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-full focus:ring-2 focus:ring-primary-500/50 dark:text-white outline-none shadow-inner transition-shadow font-medium"
             />
+            <button
+              type="button"
+              onClick={toggleRecording}
+              disabled={!isSupported}
+              className={`p-4 rounded-full flex items-center justify-center transition-all ${
+                isListening
+                  ? 'bg-red-50 text-red-500 dark:bg-red-500/20 ring-2 ring-red-500/30'
+                  : 'bg-transparent text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
+              } ${!isSupported ? 'opacity-50 cursor-not-allowed' : ''}`}
+              aria-label="Toggle voice input"
+            >
+              <Mic className={`w-5 h-5 ${isListening ? 'animate-pulse' : ''}`} />
+            </button>
             <button
               type="submit"
               disabled={!input.trim() || isThinking}
-              className="p-4 bg-amber-600 text-white rounded-xl hover:bg-amber-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-md"
+              className="p-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-full hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 transition-all shadow-md"
             >
-              <Send className="w-6 h-6" />
+              <Send className="w-5 h-5" />
             </button>
           </form>
         </div>

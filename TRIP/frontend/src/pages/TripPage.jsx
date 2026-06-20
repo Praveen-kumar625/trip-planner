@@ -1,19 +1,50 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, MapPin, Calendar, Users, IndianRupee } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { useTripStore } from '@/store/tripStore';
-import { ItineraryTimeline } from '@/features/itinerary/components/ItineraryTimeline';
-import { ProgressiveImage } from '@/components/ui/Image';
+import { useAuthStore } from '@/store/authStore';
+import { tripsService } from '@/services/api/trips.service';
+import { TripHero } from '@/features/trips/components/TripHero';
+import { CinematicTimeline } from '@/features/trips/components/CinematicTimeline';
+import { TripWealthDashboard } from '@/features/trips/components/TripWealthDashboard';
+import { AiConciergeLayer } from '@/features/trips/components/AiConciergeLayer';
 
 export function TripPage() {
   const { id } = useParams();
-  const { currentTrip, fetchTripById, isLoading } = useTripStore();
+  const { currentTrip, fetchTripById, isLoading, updateTrip } = useTripStore();
+  const { user } = useAuthStore();
+  const [copied, setCopied] = useState(false);
+  const [isToggling, setIsToggling] = useState(false);
 
   useEffect(() => {
     if (id) {
       fetchTripById(id);
     }
   }, [id, fetchTripById]);
+
+  const isOwner = user?.uid === currentTrip?.userId;
+
+  const handleShare = async () => {
+    const url = window.location.href;
+    await navigator.clipboard.writeText(url);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleTogglePrivacy = async () => {
+    if (!isOwner) return;
+    setIsToggling(true);
+    try {
+      const newStatus = !currentTrip.isPublic;
+      await tripsService.toggleTripPrivacy(currentTrip.id, newStatus);
+      // Update local state by calling fetch again or direct manipulation
+      fetchTripById(currentTrip.id);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsToggling(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -36,65 +67,59 @@ export function TripPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-20">
-      {/* Header Banner */}
-      <div className="relative h-64 md:h-[40vh] min-h-[300px] w-full overflow-hidden rounded-b-[2.5rem] shadow-lg mb-8">
-        <ProgressiveImage 
-          src={currentTrip.image || 'https://images.unsplash.com/photo-1488085061387-422e29b40080?q=80&w=1200&auto=format&fit=crop'} 
-          alt={currentTrip.destination?.city || 'Trip'} 
-          priority={true}
-          className="group-hover:scale-105 transition-transform duration-[2s]"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 to-transparent flex flex-col justify-end p-6 md:p-12">
-          <div className="max-w-4xl mx-auto w-full">
-            <Link to="/planner" className="inline-flex items-center gap-2 text-white/80 hover:text-white mb-4 transition-colors text-sm font-medium">
-              <ArrowLeft className="w-4 h-4" /> Back to Trips
-            </Link>
-            <h1 className="text-3xl md:text-5xl font-bold text-white mb-2">
-              {currentTrip.destination?.city ? `${currentTrip.destination.city}, ${currentTrip.destination.country}` : 'Trip Destination'}
-            </h1>
-            <div className="flex flex-wrap gap-4 text-white/90 text-sm">
-              <span className="flex items-center gap-1.5"><Calendar className="w-4 h-4" /> {currentTrip.startDate} - {currentTrip.endDate}</span>
-              <span className="flex items-center gap-1.5"><Users className="w-4 h-4" /> {currentTrip.travelers} Travelers</span>
-              {currentTrip.budget && <span className="flex items-center gap-1.5"><IndianRupee className="w-4 h-4" /> {currentTrip.budget.toLocaleString('en-IN')}</span>}
-            </div>
-          </div>
-        </div>
+    <div className="min-h-screen bg-slate-50 dark:bg-black pb-32">
+      
+      {/* 1. The Hero Experience */}
+      <TripHero 
+        currentTrip={currentTrip}
+        isOwner={isOwner}
+        handleShare={handleShare}
+        handleTogglePrivacy={handleTogglePrivacy}
+        isToggling={isToggling}
+        copied={copied}
+      />
+
+      {/* 2. The Living Canvas */}
+      <div className="max-w-7xl mx-auto px-4 md:px-8 mt-24 relative z-20">
+        
+        {(() => {
+          if (!currentTrip.itinerary) {
+            return <p className="text-slate-500 dark:text-slate-400 italic">No future memories generated yet.</p>;
+          }
+
+          try {
+            let parsed = JSON.parse(currentTrip.itinerary);
+            let itineraryData = Array.isArray(parsed) ? parsed : parsed.itinerary;
+            let tripSummary = parsed.tripSummary;
+            
+            return (
+              <div className="space-y-12">
+                {/* Cinematic Chapters */}
+                {itineraryData && Array.isArray(itineraryData) && (
+                  <CinematicTimeline itineraryData={itineraryData} />
+                )}
+
+                {/* Trip Wealth & Intelligence */}
+                {tripSummary && (
+                  <TripWealthDashboard tripSummary={tripSummary} budget={currentTrip.budget} />
+                )}
+              </div>
+            );
+            
+          } catch (e) {
+            return (
+              <div className="prose dark:prose-invert max-w-none whitespace-pre-wrap text-slate-700 dark:text-slate-300 leading-relaxed">
+                {currentTrip.itinerary}
+              </div>
+            );
+          }
+        })()}
+        
       </div>
 
-      {/* Itinerary Content */}
-      <div className="max-w-4xl mx-auto p-4 md:p-8">
-        <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 md:p-8">
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">Generated Itinerary</h2>
-          {(() => {
-            if (!currentTrip.itinerary) {
-              return <p className="text-slate-500 dark:text-slate-400 italic">No itinerary details available for this trip.</p>;
-            }
+      {/* 3. The Concierge Layer */}
+      <AiConciergeLayer />
 
-            try {
-              let parsed = JSON.parse(currentTrip.itinerary);
-              
-              let itineraryData = Array.isArray(parsed) ? parsed : parsed.itinerary;
-              
-              if (itineraryData && Array.isArray(itineraryData)) {
-                return <ItineraryTimeline itineraryData={itineraryData} />;
-              }
-              
-              return (
-                <div className="prose dark:prose-invert max-w-none whitespace-pre-wrap text-slate-700 dark:text-slate-300 leading-relaxed">
-                  {currentTrip.itinerary}
-                </div>
-              );
-            } catch (e) {
-              return (
-                <div className="prose dark:prose-invert max-w-none whitespace-pre-wrap text-slate-700 dark:text-slate-300 leading-relaxed">
-                  {currentTrip.itinerary}
-                </div>
-              );
-            }
-          })()}
-        </div>
-      </div>
     </div>
   );
 }

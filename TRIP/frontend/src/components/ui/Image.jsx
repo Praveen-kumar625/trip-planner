@@ -49,6 +49,12 @@ export function ProgressiveImage({
 
   const optimizeSrc = (originalSrc) => {
     if (!originalSrc) return '';
+    
+    // Fix for deprecated source.unsplash.com URLs that AI might have generated previously
+    if (originalSrc.includes('source.unsplash.com')) {
+      return 'https://images.unsplash.com/photo-1488085061387-422e29b40080?q=80&w=1200&auto=format&fit=crop';
+    }
+
     if (originalSrc.includes('unsplash.com') && !originalSrc.includes('q=')) {
       return `${originalSrc}&q=80&fm=webp&auto=format`;
     }
@@ -81,7 +87,6 @@ export function ProgressiveImage({
       {isError && (
         <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-slate-100 dark:bg-slate-800 text-slate-400">
           {fallbackIcon}
-          <span className="text-xs font-medium mt-2">Failed to load</span>
         </div>
       )}
 

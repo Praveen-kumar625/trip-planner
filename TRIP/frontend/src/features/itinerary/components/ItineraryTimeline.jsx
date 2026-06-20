@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Sun, Sunset, Moon, Coffee, Navigation, Clock, MapPin } from 'lucide-react';
+import { Link, useParams } from 'react-router-dom';
 import { ProgressiveImage } from '@/components/ui/Image';
 
 const MOCK_IMAGES = [
@@ -15,11 +16,11 @@ export function ItineraryTimeline({ itineraryData }) {
   }
 
   return (
-    <div className="relative border-l-2 border-slate-200 dark:border-slate-800 ml-4 md:ml-8 space-y-12 pb-12">
+    <div className="relative border-l border-primary-200 dark:border-primary-900/30 ml-4 md:ml-8 space-y-16 pb-12">
       {itineraryData.map((dayPlan, idx) => (
-        <div key={idx} className="relative pl-8 md:pl-12">
+        <div key={idx} className="relative pl-8 md:pl-16">
           
-          <div className="absolute -left-[17px] top-0 w-8 h-8 rounded-full bg-primary-500 flex items-center justify-center shadow-[0_0_0_4px_white] dark:shadow-[0_0_0_4px_rgb(15,23,42)] text-white font-bold text-sm z-10">
+          <div className="absolute -left-[13px] top-2 w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center shadow-[0_0_0_8px_white] dark:shadow-[0_0_0_8px_#0A0A0A] text-primary-600 dark:text-primary-400 font-serif text-xs font-bold z-10 border border-primary-300 dark:border-primary-700">
             {dayPlan.day || idx + 1}
           </div>
 
@@ -29,8 +30,9 @@ export function ItineraryTimeline({ itineraryData }) {
             viewport={{ once: true, margin: "-50px" }}
             transition={{ duration: 0.5, delay: 0.1 }}
           >
-            <h3 className="text-3xl font-bold text-slate-900 dark:text-white mb-8 font-serif tracking-tight">
-              Day {dayPlan.day || idx + 1} <span className="text-slate-400 font-sans text-lg font-medium ml-2">— Exploration</span>
+            <h3 className="text-4xl md:text-5xl font-serif font-bold text-slate-900 dark:text-white mb-10 tracking-tight flex items-baseline gap-4">
+              <span className="text-primary-500 dark:text-primary-400 italic">Day {dayPlan.day || idx + 1}</span>
+              <span className="text-slate-300 dark:text-slate-700 font-sans text-xl font-light tracking-wide uppercase">— Exploration</span>
             </h3>
 
             <div className="space-y-6">
@@ -41,7 +43,7 @@ export function ItineraryTimeline({ itineraryData }) {
                   title="Morning Activities" 
                   description={dayPlan.morning} 
                   image={MOCK_IMAGES[0]}
-                  colorClass="text-amber-500 bg-amber-50 dark:bg-amber-500/10"
+                  colorClass="text-primary-600 bg-primary-50 dark:bg-primary-900/20"
                 />
               )}
               
@@ -52,7 +54,7 @@ export function ItineraryTimeline({ itineraryData }) {
                   title="Afternoon Discoveries" 
                   description={dayPlan.afternoon} 
                   image={MOCK_IMAGES[1]}
-                  colorClass="text-orange-500 bg-orange-50 dark:bg-orange-500/10"
+                  colorClass="text-primary-600 bg-primary-50 dark:bg-primary-900/20"
                 />
               )}
               
@@ -63,37 +65,37 @@ export function ItineraryTimeline({ itineraryData }) {
                   title="Evening Leisure" 
                   description={dayPlan.evening} 
                   image={MOCK_IMAGES[2]}
-                  colorClass="text-indigo-500 bg-indigo-50 dark:bg-indigo-500/10"
+                  colorClass="text-primary-600 bg-primary-50 dark:bg-primary-900/20"
                 />
               )}
             </div>
 
-            <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6 border-t border-slate-100 dark:border-slate-800">
+            <div className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-6 pt-8 border-t border-slate-100 dark:border-slate-800/50">
               {dayPlan.foodBreaks && (
-                <div className="glass-premium dark:glass-dark p-4 rounded-2xl flex items-start gap-3">
-                  <Coffee className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
-                  <div>
-                    <span className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Dining</span>
-                    <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{dayPlan.foodBreaks}</span>
+                <div className="flex flex-col gap-2">
+                  <div className="w-8 h-8 rounded-full bg-slate-50 dark:bg-slate-900 flex items-center justify-center border border-slate-100 dark:border-slate-800">
+                    <Coffee className="w-4 h-4 text-primary-500" />
                   </div>
+                  <span className="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Dining</span>
+                  <span className="text-sm font-medium text-slate-900 dark:text-slate-300">{dayPlan.foodBreaks}</span>
                 </div>
               )}
               {dayPlan.travelTime && (
-                <div className="glass-premium dark:glass-dark p-4 rounded-2xl flex items-start gap-3">
-                  <Navigation className="w-5 h-5 text-sky-500 shrink-0 mt-0.5" />
-                  <div>
-                    <span className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Transit</span>
-                    <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{dayPlan.travelTime}</span>
+                <div className="flex flex-col gap-2">
+                  <div className="w-8 h-8 rounded-full bg-slate-50 dark:bg-slate-900 flex items-center justify-center border border-slate-100 dark:border-slate-800">
+                    <Navigation className="w-4 h-4 text-primary-500" />
                   </div>
+                  <span className="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Transit</span>
+                  <span className="text-sm font-medium text-slate-900 dark:text-slate-300">{dayPlan.travelTime}</span>
                 </div>
               )}
               {dayPlan.restTime && (
-                <div className="glass-premium dark:glass-dark p-4 rounded-2xl flex items-start gap-3">
-                  <Clock className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
-                  <div>
-                    <span className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Leisure</span>
-                    <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{dayPlan.restTime}</span>
+                <div className="flex flex-col gap-2">
+                  <div className="w-8 h-8 rounded-full bg-slate-50 dark:bg-slate-900 flex items-center justify-center border border-slate-100 dark:border-slate-800">
+                    <Clock className="w-4 h-4 text-primary-500" />
                   </div>
+                  <span className="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Leisure</span>
+                  <span className="text-sm font-medium text-slate-900 dark:text-slate-300">{dayPlan.restTime}</span>
                 </div>
               )}
             </div>
@@ -105,33 +107,33 @@ export function ItineraryTimeline({ itineraryData }) {
 }
 
 function TimelineEvent({ icon: Icon, time, title, description, image, colorClass }) {
+  const { id } = useParams();
+
   return (
-    <div className="group relative bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-3 shadow-sm hover:shadow-premium transition-all duration-300 flex flex-col md:flex-row gap-5 overflow-hidden">
+    <div className="group relative flex flex-col md:flex-row gap-6 md:gap-10 items-start overflow-hidden py-4">
       
-      <div className="w-full md:w-48 shrink-0 h-48 md:h-auto rounded-2xl overflow-hidden relative">
-        <ProgressiveImage src={image} className="group-hover:scale-105 transition-transform duration-700" />
-        <div className="absolute top-3 left-3 px-2.5 py-1 glass-premium rounded-full text-xs font-bold flex items-center gap-1.5 shadow-sm">
+      <div className="w-full md:w-56 shrink-0 aspect-[4/5] md:aspect-square rounded-[2rem] overflow-hidden relative shadow-premium">
+        <ProgressiveImage src={image} className="group-hover:scale-105 transition-transform duration-1000 ease-out" />
+        <div className="absolute top-4 left-4 px-3 py-1.5 glass-dark rounded-full text-[10px] font-bold text-white uppercase tracking-widest flex items-center gap-2 shadow-sm">
           <Icon className="w-3.5 h-3.5" />
           {time}
         </div>
       </div>
       
-      <div className="py-2 pr-4 flex-1">
-        <div className="flex items-center gap-2 mb-2">
-          <div className={`w-8 h-8 rounded-full flex items-center justify-center ${colorClass}`}>
-            <Icon className="w-4 h-4" />
-          </div>
-          <h4 className="font-bold text-lg text-slate-900 dark:text-white">{title}</h4>
-        </div>
+      <div className="py-2 flex-1 pt-2 md:pt-4">
+        <h4 className="font-serif font-bold text-2xl md:text-3xl text-slate-900 dark:text-white mb-4 leading-tight">{title}</h4>
         
-        <p className="text-slate-600 dark:text-slate-400 text-sm md:text-base leading-relaxed">
+        <p className="text-slate-600 dark:text-slate-400 text-base leading-relaxed mb-6 font-medium max-w-xl">
           {description}
         </p>
         
-        <div className="mt-4 flex flex-wrap gap-2">
-          <span className="inline-flex items-center gap-1 px-3 py-1 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-full text-xs font-semibold border border-slate-100 dark:border-slate-700 hover:bg-slate-100 transition-colors cursor-pointer">
-            <MapPin className="w-3 h-3" /> View on map
-          </span>
+        <div className="flex flex-wrap gap-2">
+          <Link 
+            to={id ? `/maps?tripId=${id}` : `/maps`}
+            className="inline-flex items-center gap-1.5 px-4 py-2 bg-transparent text-primary-600 dark:text-primary-400 rounded-full text-xs font-bold uppercase tracking-widest border border-primary-200 dark:border-primary-900/50 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all cursor-pointer"
+          >
+            <MapPin className="w-3.5 h-3.5" /> Locate
+          </Link>
         </div>
       </div>
     </div>

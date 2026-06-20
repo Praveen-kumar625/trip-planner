@@ -1,11 +1,10 @@
 import apiClient from './apiClient';
+import { auth } from '../../config/firebase';
+
+const rawBase = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const baseURL = rawBase.endsWith('/api/v1') ? rawBase : `${rawBase}/api/v1`;
 
 export const aiService = {
-  /**
-   * We will handle standard requests here.
-   * For streaming requests (SSE), we will use native fetch or EventSource in the components,
-   * but we can wrap the fetch logic here for standard structured queries.
-   */
   chat: async (payload) => {
     return apiClient.post('/ai/chat', payload);
   },
@@ -16,25 +15,66 @@ export const aiService = {
         throw new Error('No internet connection. Please check your network and try again.');
       }
 
-      const response = await aiService.chat({
-        query: payload.message,
-        sessionId: payload.sessionId || 'default',
-        context: payload.tripContext || {}
+      const user = auth.currentUser;
+      const token = user ? await user.getIdToken() : '';
+
+      const response = await fetch(`${baseURL}/ai/stream`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({
+          query: payload.message,
+          sessionId: payload.sessionId || 'default',
+          context: payload.tripContext || {},
+          history: payload.history || []
+        })
       });
+
+      if (!response.ok) {
+        throw new Error(`API Error: ${response.status}`);
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder('utf-8');
       
-      const responseData = response.data.data;
-      
-      if (responseData && responseData.response) {
-        onMessage({ data: responseData.response });
-      } else {
-        onMessage({ data: "Received empty response from the Concierge." });
+      let done = false;
+      let buffer = '';
+
+      while (!done) {
+        const { value, done: readerDone } = await reader.read();
+        done = readerDone;
+        if (value) {
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop(); // keep incomplete line in buffer
+
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              const dataStr = line.replace('data: ', '').trim();
+              if (dataStr === '[DONE]') {
+                done = true;
+                break;
+              }
+              if (!dataStr) continue;
+
+              try {
+                const parsed = JSON.parse(dataStr);
+                onMessage(parsed);
+              } catch (e) {
+                console.error("Failed to parse SSE line:", line, e);
+              }
+            }
+          }
+        }
       }
       
       onComplete && onComplete();
 
     } catch (error) {
       if (retries > 0 && error.message !== 'No internet connection. Please check your network and try again.') {
-        console.warn(`Request failed. Retrying in ${delay}ms...`, error);
+        console.warn(`Stream request failed. Retrying in ${delay}ms...`, error);
         setTimeout(() => aiService.streamChat(payload, onMessage, onError, onComplete, retries - 1, delay * 2), delay);
       } else {
         onError && onError(error);

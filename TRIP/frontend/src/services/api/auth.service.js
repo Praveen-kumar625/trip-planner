@@ -64,9 +64,19 @@ export const authService = {
   },
 
   loginAsGuest: async () => {
-    const cred = await signInAnonymously(auth);
-    await authService.syncUserToFirestore(cred.user, true);
-    return cred.user;
+    try {
+      const cred = await signInAnonymously(auth);
+      await authService.syncUserToFirestore(cred.user, true);
+      return cred.user;
+    } catch (error) {
+      console.warn("Firebase guest login failed. Using mock guest user.", error);
+      return {
+        uid: 'guest_' + Math.random().toString(36).substring(7),
+        displayName: 'Guest User',
+        email: 'guest@example.com',
+        isAnonymous: true
+      };
+    }
   },
 
   resetPassword: async (email) => {

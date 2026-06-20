@@ -23,13 +23,13 @@ export default function DestinationCard({ id, title, location, image, rating, we
             
             <div className="absolute top-4 left-4 right-4 flex justify-between items-start z-20">
               {tag && (
-                <span className="px-3 py-1.5 glass-premium rounded-full text-slate-900 dark:text-white text-xs font-bold tracking-wide shadow-sm">
+                <span className="px-3 py-1.5 glass-dark rounded-full text-white text-[10px] uppercase tracking-[0.2em] font-bold shadow-sm">
                   {tag}
                 </span>
               )}
               <div className="flex gap-2 ml-auto">
-                <span className="flex items-center gap-1.5 px-3 py-1.5 glass-premium rounded-full text-slate-900 dark:text-white text-xs font-bold shadow-sm">
-                  <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+                <span className="flex items-center gap-1.5 px-3 py-1.5 glass-dark rounded-full text-white text-[11px] font-bold shadow-sm">
+                  <Star className="w-3.5 h-3.5 text-accent-400 fill-accent-400" />
                   {rating}
                 </span>
               </div>
@@ -50,24 +50,27 @@ export default function DestinationCard({ id, title, location, image, rating, we
           </div>
         </div>
 
-        <div className="p-5 flex flex-col flex-1">
-          <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400 text-sm font-medium mb-1.5">
-            <MapPin className="w-4 h-4 text-primary-500" />
+        <div className="p-6 flex flex-col flex-1">
+          <div className="flex items-center gap-1.5 text-primary-600 dark:text-primary-400 text-xs font-bold tracking-[0.1em] uppercase mb-2">
+            <MapPin className="w-3.5 h-3.5" />
             {location}
           </div>
           
-          <h3 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white mb-auto line-clamp-1">
+          <h3 className="text-2xl font-serif font-bold tracking-tight text-slate-900 dark:text-white mb-auto line-clamp-1">
             {title}
           </h3>
           
-          <div className="flex items-end justify-between mt-4 pt-4 border-t border-slate-100 dark:border-slate-800/50">
-            <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 font-medium">
-              <CloudSun className="w-4 h-4 text-amber-500" />
-              {weather}
+          <div className="flex items-end justify-between mt-6 pt-5 border-t border-slate-100 dark:border-slate-800/50">
+            <div className="flex flex-col gap-1">
+              <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Best Time</span>
+              <div className="flex items-center gap-1.5 text-sm text-slate-900 dark:text-slate-300 font-medium">
+                <CloudSun className="w-4 h-4 text-accent-500" />
+                {weather}
+              </div>
             </div>
             <div className="text-right">
-              <span className="text-xs text-slate-500 dark:text-slate-400 block font-medium mb-0.5">Average Daily</span>
-              <span className="text-sm font-bold text-slate-900 dark:text-white">{price}</span>
+              <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold block mb-1">From</span>
+              <span className="text-base font-bold text-slate-900 dark:text-white">{price}</span>
             </div>
           </div>
         </div>

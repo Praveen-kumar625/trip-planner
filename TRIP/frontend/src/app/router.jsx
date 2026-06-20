@@ -23,8 +23,8 @@ export const router = createBrowserRouter([
       {
         path: 'explore',
         lazy: async () => {
-          const { LandingPage } = await import('@/pages/LandingPage'); // Placeholder for explore
-          return { Component: LandingPage };
+          const { ExplorePage } = await import('@/pages/ExplorePage');
+          return { Component: ExplorePage };
         },
       },
       {
@@ -60,6 +60,20 @@ export const router = createBrowserRouter([
         lazy: async () => {
           const { ProfilePage } = await import('@/pages/ProfilePage');
           return { Component: ProfilePage };
+        },
+      },
+      {
+        path: 'community',
+        lazy: async () => {
+          const { CommunityPage } = await import('@/pages/CommunityPage');
+          return { Component: CommunityPage };
+        },
+      },
+      {
+        path: 'u/:userId',
+        lazy: async () => {
+          const { PublicProfilePage } = await import('@/pages/PublicProfilePage');
+          return { Component: PublicProfilePage };
         },
       },
       {

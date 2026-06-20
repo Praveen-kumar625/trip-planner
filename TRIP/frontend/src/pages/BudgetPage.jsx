@@ -1,24 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Wallet, TrendingUp, TrendingDown, DollarSign, PieChart as PieChartIcon } from 'lucide-react';
+import { Wallet, TrendingUp, TrendingDown, IndianRupee, PieChart as PieChartIcon } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 
 const expenseData = [
-  { name: 'Accommodation', value: 1200, color: '#3b82f6' },
-  { name: 'Flights', value: 800, color: '#8b5cf6' },
-  { name: 'Food', value: 450, color: '#10b981' },
-  { name: 'Activities', value: 300, color: '#f59e0b' },
-  { name: 'Transport', value: 150, color: '#ef4444' },
+  { name: 'Accommodation', value: 72000, color: '#3b82f6' },
+  { name: 'Flights', value: 48000, color: '#8b5cf6' },
+  { name: 'Food', value: 27000, color: '#10b981' },
+  { name: 'Activities', value: 18000, color: '#f59e0b' },
+  { name: 'Transport', value: 9000, color: '#ef4444' },
 ];
 
 const dailyData = [
-  { day: 'Day 1', amount: 120 },
-  { day: 'Day 2', amount: 80 },
-  { day: 'Day 3', amount: 250 },
-  { day: 'Day 4', amount: 90 },
-  { day: 'Day 5', amount: 150 },
-  { day: 'Day 6', amount: 70 },
-  { day: 'Day 7', amount: 200 },
+  { day: 'Day 1', amount: 7200 },
+  { day: 'Day 2', amount: 4800 },
+  { day: 'Day 3', amount: 15000 },
+  { day: 'Day 4', amount: 5400 },
+  { day: 'Day 5', amount: 9000 },
+  { day: 'Day 6', amount: 4200 },
+  { day: 'Day 7', amount: 12000 },
 ];
 
 export function BudgetPage() {
@@ -68,7 +68,7 @@ export function BudgetPage() {
                 <div className="flex justify-between items-start">
                   <div>
                     <p className="text-sm font-medium text-neutral-500">Total Budget</p>
-                    <h3 className="text-3xl font-bold text-neutral-900 dark:text-white mt-1">$5,000</h3>
+                    <h3 className="text-3xl font-bold text-neutral-900 dark:text-white mt-1">₹3,00,000</h3>
                   </div>
                   <div className="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center">
                     <Wallet className="w-5 h-5 text-blue-600 dark:text-blue-400" />
@@ -83,10 +83,10 @@ export function BudgetPage() {
                 <div className="flex justify-between items-start">
                   <div>
                     <p className="text-sm font-medium text-neutral-500">Spent So Far</p>
-                    <h3 className="text-3xl font-bold text-neutral-900 dark:text-white mt-1">$2,900</h3>
+                    <h3 className="text-3xl font-bold text-neutral-900 dark:text-white mt-1">₹1,74,000</h3>
                   </div>
                   <div className="w-10 h-10 rounded-full bg-orange-50 dark:bg-orange-900/30 flex items-center justify-center">
-                    <DollarSign className="w-5 h-5 text-orange-600 dark:text-orange-400" />
+                    <IndianRupee className="w-5 h-5 text-orange-600 dark:text-orange-400" />
                   </div>
                 </div>
                 <div className="mt-4 flex items-center text-sm">
@@ -102,7 +102,7 @@ export function BudgetPage() {
                 <div className="flex justify-between items-start">
                   <div>
                     <p className="text-sm font-medium text-neutral-500">Remaining</p>
-                    <h3 className="text-3xl font-bold text-neutral-900 dark:text-white mt-1">$2,100</h3>
+                    <h3 className="text-3xl font-bold text-neutral-900 dark:text-white mt-1">₹1,26,000</h3>
                   </div>
                   <div className="w-10 h-10 rounded-full bg-green-50 dark:bg-green-900/30 flex items-center justify-center">
                     <PieChartIcon className="w-5 h-5 text-green-600 dark:text-green-400" />
@@ -110,7 +110,7 @@ export function BudgetPage() {
                 </div>
                 <div className="mt-4 flex items-center text-sm">
                   <span className="text-green-500 font-medium flex items-center"><TrendingDown className="w-4 h-4 mr-1" /> Excellent</span>
-                  <span className="text-neutral-500 ml-2">~$300/day available</span>
+                  <span className="text-neutral-500 ml-2">~₹18,000/day available</span>
                 </div>
               </div>
             </div>
@@ -140,7 +140,7 @@ export function BudgetPage() {
                       <Tooltip 
                         contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                         itemStyle={{ color: '#171717', fontWeight: 600 }}
-                        formatter={(value) => [`$${value}`, 'Amount']}
+                        formatter={(value) => [`₹${value.toLocaleString('en-IN')}`, 'Amount']}
                       />
                     </PieChart>
                   </ResponsiveContainer>
@@ -151,7 +151,7 @@ export function BudgetPage() {
                       <div className="w-3 h-3 rounded-full" style={{ backgroundColor: category.color }} />
                       <div>
                         <p className="text-xs text-neutral-500">{category.name}</p>
-                        <p className="text-sm font-semibold text-neutral-900 dark:text-white">${category.value}</p>
+                        <p className="text-sm font-semibold text-neutral-900 dark:text-white">₹{category.value.toLocaleString('en-IN')}</p>
                       </div>
                     </div>
                   ))}
@@ -166,11 +166,11 @@ export function BudgetPage() {
                     <BarChart data={dailyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                       <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e5e5" />
                       <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#737373' }} dy={10} />
-                      <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#737373' }} tickFormatter={(value) => `$${value}`} />
+                      <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#737373' }} tickFormatter={(value) => `₹${value.toLocaleString('en-IN')}`} />
                       <Tooltip 
                         cursor={{ fill: 'rgba(0,0,0,0.05)' }}
                         contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                        formatter={(value) => [`$${value}`, 'Spent']}
+                        formatter={(value) => [`₹${value.toLocaleString('en-IN')}`, 'Spent']}
                       />
                       <Bar dataKey="amount" fill="#3b82f6" radius={[4, 4, 0, 0]} barSize={32} />
                     </BarChart>

@@ -1,49 +1,114 @@
-import { Calendar, MapPin, Users } from 'lucide-react';
+import React from 'react';
+import { Calendar, MapPin, Users, ArrowRight, Clock } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { ProgressiveImage } from '@/components/ui/Image';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Link } from 'react-router-dom';
 
 export const TripCard = ({ trip, onClick }) => {
-  const startDate = new Date(trip.startDate).toLocaleDateString();
-  const endDate = new Date(trip.endDate).toLocaleDateString();
+  const startDate = new Date(trip.startDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  const endDate = new Date(trip.endDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+  
+  const daysUntil = Math.ceil((new Date(trip.startDate) - new Date()) / (1000 * 60 * 60 * 24));
+  const isUpcoming = daysUntil > 0;
+
+  const getCoverImage = () => {
+    if (trip.coverImage) return trip.coverImage;
+    if (trip.image) return trip.image;
+    if (trip.itinerary) {
+      try {
+        const parsed = typeof trip.itinerary === 'string' ? JSON.parse(trip.itinerary) : trip.itinerary;
+        const url = parsed?.destinationOverview?.imageUrl || parsed?.tripSummary?.imageUrl;
+        if (url && url !== 'undefined' && url !== 'null') return url;
+      } catch (e) {
+        // ignore
+      }
+    }
+    return null;
+  };
+
+  const imageSrc = getCoverImage();
+
+  const handleCardClick = (e) => {
+    // Prevent link navigation if they click a specific action button (if added later)
+    if (onClick) onClick(trip.id);
+  };
 
   return (
-    <motion.div 
-      whileHover={{ y: -5, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
-      className="bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-lg cursor-pointer border border-slate-100 dark:border-slate-700 transition-all"
-      onClick={() => onClick(trip.id)}
+    <GlassCard 
+      variant="solid"
+      className="group relative flex flex-col h-full cursor-pointer"
+      onClick={handleCardClick}
     >
-      <div className="h-48 bg-slate-200 dark:bg-slate-700 relative overflow-hidden">
-        {trip.coverImage ? (
-          <img src={trip.coverImage} alt={trip.title} className="w-full h-full object-cover" />
-        ) : (
-          <div className="absolute inset-0 bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center">
-            <MapPin className="w-12 h-12 text-white opacity-50" />
+      <div className="relative w-full aspect-[16/10] overflow-hidden p-3 pb-0">
+        <div className="relative w-full h-full rounded-[1rem] overflow-hidden">
+          {imageSrc ? (
+            <ProgressiveImage 
+              src={imageSrc} 
+              alt={trip.title || 'Trip'} 
+              aspectRatio="aspect-none h-full w-full"
+              className="group-hover:scale-105 transition-transform duration-700 ease-out"
+            />
+          ) : (
+            <div className="absolute inset-0 bg-gradient-to-br from-primary-400 to-accent-500 flex items-center justify-center">
+              <MapPin className="w-12 h-12 text-white/50" />
+            </div>
+          )}
+          
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80" />
+          
+          <div className="absolute top-4 right-4 z-20">
+            <span className="px-3 py-1 bg-black/40 backdrop-blur-md rounded-full text-white text-[10px] font-bold tracking-[0.2em] uppercase border border-white/10 shadow-sm">
+              {trip.status ? trip.status : 'Planned'}
+            </span>
           </div>
-        )}
-        <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm dark:bg-slate-900/90 px-3 py-1 rounded-full text-xs font-semibold text-slate-800 dark:text-slate-200">
-          {trip.status || 'Planned'}
+
+          {isUpcoming && daysUntil <= 30 && (
+            <div className="absolute bottom-4 left-4 z-20 flex items-center gap-1.5 px-2.5 py-1 bg-white/20 backdrop-blur-md rounded-lg text-white text-xs font-semibold border border-white/20 shadow-sm">
+              <Clock className="w-3.5 h-3.5" />
+              In {daysUntil} days
+            </div>
+          )}
         </div>
       </div>
       
-      <div className="p-5">
-        <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2 line-clamp-1">{trip.title}</h3>
+      <div className="p-6 flex flex-col flex-1">
+        <div className="flex items-center gap-2 text-primary-600 dark:text-primary-400 text-xs font-bold uppercase tracking-widest mb-3 line-clamp-1">
+          <MapPin className="w-3.5 h-3.5 shrink-0" />
+          {trip.destinations?.map(d => d.name).join(', ') || trip.destination?.city || 'Various Destinations'}
+        </div>
         
-        <div className="space-y-2 mt-4">
-          <div className="flex items-center text-sm text-slate-500 dark:text-slate-400">
-            <MapPin className="w-4 h-4 mr-2" />
-            <span className="line-clamp-1">{trip.destinations?.map(d => d.name).join(', ') || 'Various Destinations'}</span>
+        <h3 className="text-2xl font-serif font-bold tracking-tight text-slate-900 dark:text-white mb-2 line-clamp-2 leading-snug">
+          {trip.title || `${trip.destination?.city} Getaway`}
+        </h3>
+
+        {trip.authorName && (
+          <div className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-4">
+            by <Link to={`/u/${trip.userId}`} onClick={(e) => e.stopPropagation()} className="text-primary-600 dark:text-primary-400 hover:underline">{trip.authorName}</Link>
+          </div>
+        )}
+        
+        <div className="space-y-3 mt-auto pb-5 border-b border-slate-100 dark:border-slate-800/50">
+          <div className="flex items-center text-sm text-slate-600 dark:text-slate-400 font-medium">
+            <Calendar className="w-4 h-4 mr-3 text-slate-400 dark:text-slate-500" />
+            <span>{startDate} <span className="mx-1 text-slate-300 dark:text-slate-600">—</span> {endDate}</span>
           </div>
           
-          <div className="flex items-center text-sm text-slate-500 dark:text-slate-400">
-            <Calendar className="w-4 h-4 mr-2" />
-            <span>{startDate} - {endDate}</span>
+          <div className="flex items-center text-sm text-slate-600 dark:text-slate-400 font-medium">
+            <Users className="w-4 h-4 mr-3 text-slate-400 dark:text-slate-500" />
+            <span>{trip.travelers?.length || trip.travelers || 1} {trip.travelers === 1 ? 'Traveler' : 'Travelers'}</span>
           </div>
-          
-          <div className="flex items-center text-sm text-slate-500 dark:text-slate-400">
-            <Users className="w-4 h-4 mr-2" />
-            <span>{trip.travelers?.length || 1} Travelers</span>
+        </div>
+
+        <div className="mt-5 flex items-center justify-between">
+          <span className="text-slate-900 dark:text-white font-bold text-xs tracking-widest uppercase group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            View Itinerary
+          </span>
+          <div className="w-8 h-8 rounded-full border border-slate-200 dark:border-slate-700 flex items-center justify-center group-hover:border-primary-500 group-hover:bg-primary-50 dark:group-hover:bg-primary-900/20 transition-all duration-300">
+            <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-primary-600 dark:group-hover:text-primary-400 group-hover:translate-x-0.5 transition-transform" />
           </div>
         </div>
       </div>
-    </motion.div>
+    </GlassCard>
   );
 };

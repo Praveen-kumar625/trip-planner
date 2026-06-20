@@ -1,18 +1,32 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 @theme {
-  --color-primary-50: #fef2f2;
-  --color-primary-100: #fee2e2;
-  --color-primary-200: #fecaca;
-  --color-primary-300: #fca5a5;
-  --color-primary-400: #f87171;
-  --color-primary-500: #ef4444;
-  --color-primary-600: #dc2626;
-  --color-primary-700: #b91c1c;
+  /* ─── Luxury Travel Brand Palette ─── */
+  /* Bronze / Gold / Sand */
+  --color-primary-50: #FDFBF7;
+  --color-primary-100: #F8F2E6;
+  --color-primary-200: #E7D8C9;
+  --color-primary-300: #D8C2A3;
+  --color-primary-400: #C6A969;
+  --color-primary-500: #B08D57;
+  --color-primary-600: #967443;
+  --color-primary-700: #785A33;
+  --color-primary-800: #5C4528;
+  --color-primary-900: #42321D;
+  --color-primary-950: #261C10;
 
-  --color-accent-400: #fbbf24;
-  --color-accent-500: #f59e0b;
-  
+  /* Accent (Muted Gold) */
+  --color-accent-50: #FDFBF7;
+  --color-accent-100: #F8F2E6;
+  --color-accent-200: #F2E5C9;
+  --color-accent-300: #EBD4A1;
+  --color-accent-400: #E0C172;
+  --color-accent-500: #D4AF37;
+  --color-accent-600: #B89626;
+  --color-accent-700: #94771C;
+
+  /* Typography */
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
   --font-serif: 'Playfair Display', ui-serif, Georgia, serif;
 }
@@ -38,59 +52,84 @@
   ::-webkit-scrollbar-thumb:hover {
     background: rgba(0, 0, 0, 0.3);
   }
+  .dark ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+  }
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
 
   :root {
-    /* Premium Modern Travel Theme */
-    --background: 0 0% 100%; /* Pure White */
-    --foreground: 222 47% 11%; /* Deep Slate / Midnight */
+    /* Luxury Travel Theme - Light */
+    --background: 46 22% 96%; /* #F8F7F4 */
+    --foreground: 0 0% 4%;    /* #0A0A0A */
 
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 0 0% 4%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover-foreground: 0 0% 4%;
 
-    /* Brand Accent: Premium Coral / Airbnb Red-ish */
-    --primary: 0 84% 60%;
+    /* Brand Accent: Bronze */
+    --primary: 38 34% 52%; /* #B08D57 */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 96.1%; 
-    --secondary-foreground: 222 47% 11%;
+    --secondary: 45 6% 90%; /* Light grey/sand */
+    --secondary-foreground: 0 0% 4%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 45 6% 90%;
+    --muted-foreground: 240 5% 65%; /* #A1A1AA */
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222 47% 11%;
+    --accent: 42 41% 59%; /* #C6A969 */
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --border: 45 6% 85%;
+    --input: 45 6% 85%;
+    --ring: 38 34% 52%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 0 84% 60%;
+    --radius: 1rem;
 
-    --radius: 1.5rem; /* Larger border radius for premium modern feel */
+    /* Surface layers */
+    --surface-raised: 0 0% 100%;
+    --surface-overlay: 0 0% 100%;
+    --surface-sunken: 46 22% 94%;
   }
 
   .dark {
-    --background: 222 47% 5%; /* Very deep blue-black */
-    --foreground: 210 40% 98%;
-    
-    --card: 222 47% 8%;
-    --card-foreground: 210 40% 98%;
-    
-    --popover: 222 47% 8%;
-    --popover-foreground: 210 40% 98%;
-    
-    --border: 215 28% 17%;
-    --input: 215 28% 17%;
+    --background: 0 0% 4%;    /* #0A0A0A */
+    --foreground: 0 0% 92%;   /* #EAEAEA */
+
+    --card: 0 0% 7%;          /* #111111 */
+    --card-foreground: 0 0% 92%;
+
+    --popover: 0 0% 7%;
+    --popover-foreground: 0 0% 92%;
+
+    --primary: 38 34% 52%;    /* #B08D57 */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 0 0% 11%;    
+    --secondary-foreground: 0 0% 92%;
+
+    --muted: 0 0% 11%;
+    --muted-foreground: 240 5% 65%; /* #A1A1AA */
+
+    --accent: 42 41% 59%;     /* #C6A969 */
+    --accent-foreground: 0 0% 100%;
+
+    --border: 0 0% 15%;
+    --input: 0 0% 15%;
+    --ring: 38 34% 52%;
+
+    --surface-raised: 0 0% 9%;
+    --surface-overlay: 0 0% 11%;
+    --surface-sunken: 0 0% 2%;
   }
 
   * {
     border-color: hsl(var(--border));
   }
-  
+
   body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
@@ -112,70 +151,243 @@
   .pt-safe {
     padding-top: env(safe-area-inset-top);
   }
-  
-  /* Subtle, elegant premium shadows */
+
+  /* ─── Premium Shadows ─── */
   .shadow-premium {
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.02);
   }
   .shadow-premium-hover {
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12), 0 1px 3px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.02);
   }
-  
-  /* Premium Glassmorphism (Apple-esque) */
-  .glass-premium {
-    background: rgba(255, 255, 255, 0.7);
-    -webkit-backdrop-filter: saturate(180%) blur(24px);
-    backdrop-filter: saturate(180%) blur(24px);
-    border: 1px solid rgba(255, 255, 255, 0.5);
+  .shadow-premium-lg {
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.08), 0 0 1px rgba(0, 0, 0, 0.04);
   }
-  
-  .glass-dark {
-    background: rgba(15, 23, 42, 0.6);
-    -webkit-backdrop-filter: saturate(180%) blur(24px);
-    backdrop-filter: saturate(180%) blur(24px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  }
-  
-  .dark .glass-premium {
-    background: rgba(15, 23, 42, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+  .shadow-glow-amber {
+    box-shadow: 0 0 40px rgba(176, 141, 87, 0.15), 0 0 80px rgba(176, 141, 87, 0.05);
   }
 
-  /* Luxury Text Gradients */
+  /* ─── Premium Glassmorphism ─── */
+  .glass-premium {
+    background: rgba(255, 255, 255, 0.72);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    backdrop-filter: saturate(180%) blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+  }
+
+  .glass-dark {
+    background: rgba(15, 23, 42, 0.65);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    backdrop-filter: saturate(180%) blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .dark .glass-premium {
+    background: rgba(15, 23, 42, 0.65);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .glass-frosted {
+    background: rgba(255, 255, 255, 0.5);
+    -webkit-backdrop-filter: blur(40px);
+    backdrop-filter: blur(40px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .dark .glass-frosted {
+    background: rgba(15, 23, 42, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  /* ─── Text Gradients ─── */
   .text-gradient-luxury {
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    background-image: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(20, 90%, 50%) 100%);
+    background-image: linear-gradient(135deg, #C6A969 0%, #B08D57 100%);
   }
 
   .text-gradient-midnight {
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    background-image: linear-gradient(135deg, hsl(222, 47%, 11%) 0%, hsl(230, 40%, 30%) 100%);
+    background-image: linear-gradient(135deg, #0A0A0A 0%, #333333 100%);
   }
 
-  /* Shimmer effect for loaders and buttons */
+  .dark .text-gradient-midnight {
+    background-image: linear-gradient(135deg, #EAEAEA 0%, #A1A1AA 100%);
+  }
+
+  /* ─── Shimmer & Loading Animations ─── */
   .animate-shimmer {
     background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%);
     background-size: 200% 100%;
     animation: shimmer 2s infinite;
   }
-  
-  /* Hide scrollbar but keep functionality */
+
+  .animate-pulse-slow {
+    animation: pulse-slow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .animate-fade-up {
+    animation: fadeUp 0.6s ease-out forwards;
+  }
+
+  .animate-scale-in {
+    animation: scaleIn 0.3s ease-out forwards;
+  }
+
+  /* ─── Scrollbar ─── */
   .scrollbar-hide {
-    -ms-overflow-style: none;  /* IE and Edge */
-    /* scrollbar-width: none; Firefox - Causes warning in IDE for older browsers */
+    -ms-overflow-style: none;
   }
   .scrollbar-hide::-webkit-scrollbar {
-    display: none; /* Chrome, Safari and Opera */
+    display: none;
+  }
+
+  /* ─── Card Variants ─── */
+  .card-elevated {
+    background: hsl(var(--card));
+    border-radius: var(--radius);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.03);
+    border: 1px solid hsl(var(--border));
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+  }
+  .card-elevated:hover {
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.03);
+    transform: translateY(-2px);
+  }
+
+  .card-interactive {
+    background: hsl(var(--card));
+    border-radius: var(--radius);
+    border: 1px solid hsl(var(--border));
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+  }
+  .card-interactive:hover {
+    border-color: hsl(var(--primary));
+    box-shadow: 0 0 0 1px hsl(var(--primary) / 0.1), 0 8px 24px rgba(0, 0, 0, 0.06);
+  }
+
+  /* ─── Responsive Typography Scale ─── */
+  .text-display-xl {
+    font-size: clamp(2.5rem, 5vw + 1rem, 5rem);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+  }
+  .text-display-lg {
+    font-size: clamp(2rem, 4vw + 0.5rem, 3.75rem);
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+  }
+  .text-display-md {
+    font-size: clamp(1.5rem, 3vw + 0.25rem, 2.5rem);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+  }
+  .text-display-sm {
+    font-size: clamp(1.25rem, 2vw + 0.25rem, 1.875rem);
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+  }
+
+  /* ─── Premium Button Styles ─── */
+  .btn-premium {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.875rem 2rem;
+    border-radius: 9999px;
+    font-weight: 500;
+    font-size: 0.9375rem;
+    letter-spacing: 0.02em;
+    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-premium::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 50%);
+    pointer-events: none;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, #C6A969 0%, #B08D57 100%);
+    color: white;
+    box-shadow: 0 4px 14px rgba(176, 141, 87, 0.25);
+  }
+  .btn-primary:hover {
+    box-shadow: 0 8px 24px rgba(176, 141, 87, 0.35);
+    transform: translateY(-2px);
+  }
+  .btn-secondary {
+    background: hsl(var(--card));
+    color: hsl(var(--foreground));
+    border: 1px solid hsl(var(--border));
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  }
+  .btn-secondary:hover {
+    border-color: hsl(var(--primary) / 0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  }
+  .btn-ghost {
+    background: transparent;
+    color: hsl(var(--foreground));
+  }
+  .btn-ghost:hover {
+    background: hsl(var(--muted));
+  }
+
+  /* ─── Divider styles ─── */
+  .divider-gradient {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, hsl(var(--border)), transparent);
   }
 }
 
+/* ─── Keyframes ─── */
 @keyframes shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
+}
+
+@keyframes pulse-slow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 /* Image reveal animations */
@@ -186,4 +398,22 @@
 
 @keyframes reveal {
   to { clip-path: inset(0 0 0 0); }
+}
+
+/* ─── Skeleton Loader ─── */
+@keyframes skeleton-loading {
+  0% { background-position: -200px 0; }
+  100% { background-position: calc(200px + 100%) 0; }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    hsl(var(--muted)) 0%,
+    hsl(var(--muted-foreground) / 0.06) 50%,
+    hsl(var(--muted)) 100%
+  );
+  background-size: 200px 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+  border-radius: var(--radius);
 }
