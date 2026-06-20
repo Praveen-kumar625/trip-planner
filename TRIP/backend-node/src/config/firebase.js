@@ -23,6 +23,22 @@ if (!admin.apps.length) {
   }
 }
 
-export const firestore = admin.firestore();
-export const auth = admin.auth();
+export const firestore = admin.apps.length ? admin.firestore() : new Proxy({}, {
+  get(target, prop) {
+    if (!admin.apps.length) throw new Error("Firebase Admin not initialized. Check FIREBASE_PRIVATE_KEY.");
+    const fs = admin.firestore();
+    const value = fs[prop];
+    return typeof value === 'function' ? value.bind(fs) : value;
+  }
+});
+
+export const auth = admin.apps.length ? admin.auth() : new Proxy({}, {
+  get(target, prop) {
+    if (!admin.apps.length) throw new Error("Firebase Admin not initialized. Check FIREBASE_PRIVATE_KEY.");
+    const a = admin.auth();
+    const value = a[prop];
+    return typeof value === 'function' ? value.bind(a) : value;
+  }
+});
+
 export const firebaseAdmin = admin;
