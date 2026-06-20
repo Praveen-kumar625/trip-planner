@@ -20,7 +20,7 @@ const MEMORIES = [
     id: 'amalfi',
     title: 'The Golden Coast',
     subtitle: 'AMALFI, ITALY',
-    image: 'https://images.unsplash.com/photo-1516483638261-f40af5ebbdc5?q=80&w=2070&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?q=80&w=2070&auto=format&fit=crop',
     mood: 'Romantic • Sun-drenched • Decadent',
     aiInsight: 'Secures sunset dining reservations 6 months faster than standard concierges.',
     budget: 'Luxury (₹2.5L+)',
