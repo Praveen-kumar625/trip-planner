@@ -9,6 +9,18 @@ export const useAiStore = create((set) => ({
   toggleOpen: () => set((state) => ({ isOpen: !state.isOpen })),
   setOpen: (isOpen) => set({ isOpen }),
   setLastStructuredResponse: (data) => set({ lastStructuredResponse: data }),
+  updateModule: (moduleName, data) => set((state) => ({
+    lastStructuredResponse: {
+      ...state.lastStructuredResponse,
+      modules: {
+        ...(state.lastStructuredResponse?.modules || {}),
+        [moduleName]: {
+          status: 'COMPLETED',
+          data
+        }
+      }
+    }
+  })),
   
   addMessage: (message) => set((state) => ({ 
     messages: [...state.messages, message] 

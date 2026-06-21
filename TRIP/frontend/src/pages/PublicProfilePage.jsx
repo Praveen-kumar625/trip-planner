@@ -3,8 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { MapPin, Globe, Sparkles, User, ArrowLeft } from 'lucide-react';
 import { TripCard } from '@/features/trips/components/TripCard';
 import { useUserPublicTrips } from '@/features/trips/hooks/useCommunityTrips';
-import { db } from '@/config/firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { supabase } from '@/config/supabase';
 
 export function PublicProfilePage() {
   const { userId } = useParams();
@@ -17,9 +16,9 @@ export function PublicProfilePage() {
     const fetchUser = async () => {
       setIsFetchingUser(true);
       try {
-        const userDoc = await getDoc(doc(db, 'users', userId));
-        if (userDoc.exists()) {
-          setProfileUser({ id: userDoc.id, ...userDoc.data() });
+        const { data: userDoc, error } = await supabase.from('users').select('*').eq('id', userId).single();
+        if (userDoc && !error) {
+          setProfileUser({ id: userDoc.id, ...userDoc });
         } else {
           setProfileUser(null);
         }
@@ -38,18 +37,18 @@ export function PublicProfilePage() {
 
   if (isFetchingUser) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary-500"></div>
+      <div className="min-h-screen bg-[#080D17] flex items-center justify-center">
+        <div className="w-8 h-8 border-3 border-primary-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   if (!profileUser) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-950 text-center px-4">
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Traveler Not Found</h2>
-        <p className="text-slate-500 dark:text-slate-400 mb-6">This profile doesn't exist or has been removed.</p>
-        <Link to="/community" className="flex items-center gap-2 text-primary-600 font-medium hover:text-primary-700">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#080D17] text-center px-4 selection:bg-primary-500 selection:text-white">
+        <h2 className="text-3xl font-display font-light text-white mb-2 tracking-wide">Traveler Not Found</h2>
+        <p className="text-white/50 font-serif italic mb-8">This profile doesn't exist or has been removed.</p>
+        <Link to="/community" className="flex items-center gap-2 px-6 py-3 glass-premium text-white rounded-2xl font-bold text-sm hover:bg-white/10 transition-colors border border-white/20 tracking-wider uppercase">
           <ArrowLeft className="w-4 h-4" /> Back to Community
         </Link>
       </div>
@@ -57,34 +56,34 @@ export function PublicProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-20">
-      <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 pt-16 pb-12 px-4 md:px-8 mb-8 relative overflow-hidden">
-        {/* Background Accent */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-primary-500/5 dark:bg-primary-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-        
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center md:items-end gap-8 relative z-10">
-          <div className="w-24 h-24 md:w-32 md:h-32 rounded-3xl bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center text-white text-3xl md:text-5xl font-bold shadow-xl shadow-primary-500/25 border-4 border-white dark:border-slate-900 shrink-0">
+    <div className="min-h-screen bg-[#080D17] pb-24 selection:bg-primary-500 selection:text-white">
+      <div className="relative bg-gradient-to-br from-primary-900/40 via-[#080D17] to-[#080D17] pt-24 pb-16 border-b border-white/5">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMtOS45NDEgMC0xOCA4LjA1OS0xOCAxOHM4LjA1OSAxOCAxOCAxOCAxOC04LjA1OSAxOC0xOC04LjA1OS0xOC0xOC0xOHptMCAyYzguODM3IDAgMTYgNy4xNjMgMTYgMTZzLTcuMTYzIDE2LTE2IDE2LTE2LTcuMTYzLTE2LTE2IDcuMTYzLTE2IDE2LTE2eiIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjAyKSIvPjwvZz48L3N2Zz4=')] opacity-20" />
+        <div className="absolute top-0 right-0 w-[40rem] h-[40rem] bg-primary-500/10 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto px-4 md:px-8 relative z-10 flex flex-col md:flex-row items-center md:items-end gap-8">
+          <div className="w-28 h-28 md:w-36 md:h-36 rounded-[2rem] bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-black text-4xl md:text-5xl font-display font-bold shadow-[0_0_40px_rgba(255,184,0,0.2)] border-4 border-[#080D17] shrink-0">
             {initials}
           </div>
           <div className="text-center md:text-left flex-1">
-            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-2">
+            <h1 className="text-4xl md:text-5xl font-display font-light text-white mb-3 tracking-wide">
               {profileUser.displayName || 'Anonymous Traveler'}
             </h1>
-            <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-sm text-slate-500 dark:text-slate-400">
+            <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-xs font-bold uppercase tracking-widest text-white/50">
               {profileUser.travelStyles && profileUser.travelStyles.length > 0 ? (
-                <div className="flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-primary-500" />
+                <div className="flex items-center gap-2 text-primary-400">
+                  <Sparkles className="w-4 h-4" />
                   {profileUser.travelStyles.join(' • ')}
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
-                  <Globe className="w-4 h-4" />
+                  <Globe className="w-4 h-4 text-white/30" />
                   Global Explorer
                 </div>
               )}
             </div>
             {profileUser.bio && (
-              <p className="mt-4 text-slate-600 dark:text-slate-300 max-w-2xl">
+              <p className="mt-5 text-white/70 font-serif italic max-w-2xl leading-relaxed text-sm md:text-base">
                 {profileUser.bio}
               </p>
             )}
@@ -92,22 +91,24 @@ export function PublicProfilePage() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 md:px-8">
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">Public Trips</h2>
-        
+      <div className="max-w-7xl mx-auto px-4 md:px-8 mt-12">
+        <h2 className="text-2xl font-display font-light text-white mb-8 tracking-wide">Public Trips</h2>
+
         {isLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {[1, 2, 3].map(i => (
-              <div key={i} className="bg-slate-200 dark:bg-slate-800 rounded-2xl h-80 animate-pulse" />
+              <div key={i} className="glass-dark rounded-[2rem] border border-white/5 h-[340px] animate-pulse" />
             ))}
           </div>
         ) : (
           <>
             {(!data?.pages || data.pages[0].data.length === 0) ? (
-              <div className="text-center py-16 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800">
-                <MapPin className="w-12 h-12 mx-auto text-slate-300 dark:text-slate-600 mb-4" />
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">No Public Trips</h3>
-                <p className="text-slate-500 dark:text-slate-400">
+              <div className="text-center py-20 glass-dark rounded-[2.5rem] border border-white/10 shadow-premium">
+                <div className="w-20 h-20 mx-auto bg-white/5 rounded-3xl flex items-center justify-center mb-6 border border-white/10 shadow-inner">
+                  <MapPin className="w-8 h-8 text-primary-500/50" />
+                </div>
+                <h3 className="text-2xl font-display font-light text-white mb-3 tracking-wide">No Public Trips</h3>
+                <p className="text-white/50 font-serif italic">
                   {profileUser.displayName || 'This traveler'} hasn't shared any trips publicly yet.
                 </p>
               </div>
@@ -115,8 +116,10 @@ export function PublicProfilePage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {data.pages.map((page) => (
                   page.data.map((trip) => (
-                    <Link key={trip.id} to={`/trip/${trip.id}`} className="block">
-                      <TripCard trip={trip} />
+                    <Link key={trip.id} to={`/trip/${trip.id}`} className="block group">
+                      <div className="transition-transform duration-500 ease-out group-hover:-translate-y-2 group-hover:scale-[1.02]">
+                         <TripCard trip={trip} />
+                      </div>
                     </Link>
                   ))
                 ))}
@@ -124,11 +127,11 @@ export function PublicProfilePage() {
             )}
 
             {hasNextPage && (
-              <div className="mt-12 flex justify-center">
+              <div className="mt-16 flex justify-center">
                 <button
                   onClick={() => fetchNextPage()}
                   disabled={isFetchingNextPage}
-                  className="px-8 py-3.5 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-800 rounded-xl font-bold transition-all shadow-sm disabled:opacity-50"
+                  className="px-8 py-4 glass-premium text-white rounded-2xl font-bold text-sm hover:bg-white/10 transition-colors border border-white/20 tracking-wider uppercase disabled:opacity-50"
                 >
                   {isFetchingNextPage ? 'Loading...' : 'Load More'}
                 </button>

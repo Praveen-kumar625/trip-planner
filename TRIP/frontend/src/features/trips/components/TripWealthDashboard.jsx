@@ -54,14 +54,14 @@ export function TripWealthDashboard({ tripSummary, budget }) {
   };
 
   return (
-    <div className="mt-32 mb-20 relative">
+    <div className="mt-32 mb-20 relative selection:bg-primary-500 selection:text-white">
       {/* 1. Possibility Header */}
       <div className="text-center mb-20">
         <motion.span 
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-900 dark:bg-white/10 text-white border border-slate-800 dark:border-white/20 text-xs font-bold uppercase tracking-[0.2em] mb-8 shadow-xl shadow-amber-500/10"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white border border-white/20 text-xs font-bold uppercase tracking-[0.2em] mb-8 shadow-xl shadow-amber-500/10 backdrop-blur-md"
         >
           <Sparkles className="w-4 h-4 text-amber-400" />
           {getMood()}
@@ -72,9 +72,9 @@ export function TripWealthDashboard({ tripSummary, budget }) {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: 0.1 }}
-          className="text-4xl md:text-6xl lg:text-7xl font-serif font-bold text-slate-900 dark:text-white leading-tight max-w-5xl mx-auto"
+          className="text-4xl md:text-6xl lg:text-7xl font-serif font-bold text-white leading-tight max-w-5xl mx-auto"
         >
-          Your Journey Capital unlocks <span className="text-amber-500 bg-amber-500/10 px-4 py-1 rounded-3xl whitespace-nowrap">{experiencesUnlocked} unforgettable experiences.</span>
+          Your Journey Capital unlocks <span className="text-amber-500 bg-amber-500/10 px-4 py-1 rounded-[2rem] whitespace-nowrap border border-amber-500/20">{experiencesUnlocked} unforgettable experiences.</span>
         </motion.h2>
       </div>
 
@@ -88,7 +88,7 @@ export function TripWealthDashboard({ tripSummary, budget }) {
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="bg-gradient-to-br from-slate-900 to-black rounded-[2.5rem] p-8 md:p-10 border border-slate-800 text-white shadow-2xl relative overflow-hidden"
+            className="glass-dark rounded-[2.5rem] p-8 md:p-10 border border-white/10 text-white shadow-premium relative overflow-hidden"
           >
             <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
             
@@ -123,7 +123,7 @@ export function TripWealthDashboard({ tripSummary, budget }) {
                   <span className="text-xs font-bold uppercase tracking-[0.2em] text-white">What If Engine™</span>
                 </div>
                 
-                <p className="text-sm text-white/60 mb-6">Explore how adjusting your Journey Capital transforms your experience possibilities.</p>
+                <p className="text-sm text-white/60 mb-6 font-medium">Explore how adjusting your Journey Capital transforms your experience possibilities.</p>
                 
                 <input 
                   type="range" 
@@ -135,7 +135,7 @@ export function TripWealthDashboard({ tripSummary, budget }) {
                 />
                 <div className="flex justify-between items-center mt-4">
                   <span className="text-[10px] font-bold uppercase tracking-widest text-white/40">Optimize</span>
-                  <div className="flex items-center gap-1 bg-white/5 px-4 py-2 rounded-xl">
+                  <div className="flex items-center gap-1 bg-white/5 px-4 py-2 rounded-xl border border-white/10 shadow-inner">
                     <IndianRupee className="w-4 h-4 text-amber-400" />
                     <span className="text-xl font-bold tracking-tight text-white">{adjustedBudget.toLocaleString('en-IN')}</span>
                   </div>
@@ -157,11 +157,11 @@ export function TripWealthDashboard({ tripSummary, budget }) {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="bg-white dark:bg-slate-900/50 rounded-[2.5rem] p-8 border border-slate-100 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none"
+              className="glass-dark rounded-[2.5rem] p-8 border border-white/10 shadow-premium"
             >
               <div className="flex items-center gap-2 mb-8">
                 <Target className="w-5 h-5 text-indigo-500" />
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Trip Quality Index™</span>
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/40">Trip Quality Index™</span>
               </div>
               
               <div className="space-y-6">
@@ -173,16 +173,16 @@ export function TripWealthDashboard({ tripSummary, budget }) {
                   { label: "Uniqueness", value: tqi.uniqueness, color: "bg-purple-500" }
                 ].map((stat, i) => (
                   <div key={i}>
-                    <div className="flex justify-between text-sm mb-2 font-bold">
-                      <span className="text-slate-700 dark:text-slate-300">{stat.label}</span>
-                      <span className="text-slate-900 dark:text-white">{Math.round(stat.value)}</span>
+                    <div className="flex justify-between text-sm mb-2 font-bold tracking-wide">
+                      <span className="text-white/60">{stat.label}</span>
+                      <span className="text-white">{Math.round(stat.value)}</span>
                     </div>
-                    <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                    <div className="h-2 w-full bg-white/10 rounded-full overflow-hidden shadow-inner">
                       <motion.div 
                         initial={{ width: 0 }}
                         animate={{ width: `${stat.value}%` }}
                         transition={{ duration: 0.5, ease: "easeOut" }}
-                        className={`h-full rounded-full ${stat.color}`}
+                        className={`h-full rounded-full ${stat.color} shadow-[0_0_10px_currentColor]`}
                       />
                     </div>
                   </div>
@@ -196,46 +196,46 @@ export function TripWealthDashboard({ tripSummary, budget }) {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="bg-white dark:bg-slate-900/50 rounded-[2.5rem] p-8 border border-slate-100 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none flex flex-col"
+              className="glass-dark rounded-[2.5rem] p-8 border border-white/10 shadow-premium flex flex-col"
             >
               <div className="flex items-center gap-2 mb-8">
                 <Eye className="w-5 h-5 text-rose-500" />
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Future Memory Value</span>
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/40">Future Memory Value</span>
               </div>
-              <h4 className="text-2xl font-serif font-bold text-slate-900 dark:text-white leading-snug mb-8">
+              <h4 className="text-2xl font-serif font-bold text-white leading-snug mb-8">
                 What your capital creates:
               </h4>
               <ul className="space-y-5 flex-grow">
                 <li className="flex items-start gap-3">
                   <Star className="w-5 h-5 text-amber-500 shrink-0" />
-                  <span className="text-sm font-medium text-slate-600 dark:text-slate-300 leading-relaxed">A private sunset experience overlooking the city.</span>
+                  <span className="text-sm font-medium text-white/80 leading-relaxed">A private sunset experience overlooking the city.</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <Star className="w-5 h-5 text-amber-500 shrink-0" />
-                  <span className="text-sm font-medium text-slate-600 dark:text-slate-300 leading-relaxed">Unrestricted access to premium local gastronomy.</span>
+                  <span className="text-sm font-medium text-white/80 leading-relaxed">Unrestricted access to premium local gastronomy.</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <Star className="w-5 h-5 text-amber-500 shrink-0" />
-                  <span className="text-sm font-medium text-slate-600 dark:text-slate-300 leading-relaxed">Seamless, stress-free transfers throughout the journey.</span>
+                  <span className="text-sm font-medium text-white/80 leading-relaxed">Seamless, stress-free transfers throughout the journey.</span>
                 </li>
                 {sliderValue > 5 && (
                   <motion.li 
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="flex items-start gap-3 bg-amber-50 dark:bg-amber-500/10 p-3 rounded-xl border border-amber-100 dark:border-amber-500/20"
+                    className="flex items-start gap-3 bg-amber-500/10 p-4 rounded-2xl border border-amber-500/20 shadow-inner"
                   >
-                    <Sparkles className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0" />
-                    <span className="text-sm font-bold text-amber-800 dark:text-amber-300 leading-relaxed">Five-star luxury accommodation unlocked.</span>
+                    <Sparkles className="w-5 h-5 text-amber-400 shrink-0" />
+                    <span className="text-sm font-bold text-amber-300 leading-relaxed">Five-star luxury accommodation unlocked.</span>
                   </motion.li>
                 )}
                 {sliderValue > 12 && (
                   <motion.li 
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="flex items-start gap-3 bg-indigo-50 dark:bg-indigo-500/10 p-3 rounded-xl border border-indigo-100 dark:border-indigo-500/20"
+                    className="flex items-start gap-3 bg-indigo-500/10 p-4 rounded-2xl border border-indigo-500/20 shadow-inner"
                   >
-                    <Diamond className="w-5 h-5 text-indigo-600 dark:text-indigo-400 shrink-0" />
-                    <span className="text-sm font-bold text-indigo-800 dark:text-indigo-300 leading-relaxed">Exclusive helicopter transit between locations.</span>
+                    <Diamond className="w-5 h-5 text-indigo-400 shrink-0" />
+                    <span className="text-sm font-bold text-indigo-300 leading-relaxed">Exclusive helicopter transit between locations.</span>
                   </motion.li>
                 )}
               </ul>
@@ -248,17 +248,17 @@ export function TripWealthDashboard({ tripSummary, budget }) {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            className="bg-amber-50 dark:bg-amber-900/10 rounded-[2.5rem] p-8 md:p-10 border border-amber-200 dark:border-amber-900/30 relative overflow-hidden"
+            className="bg-amber-900/10 rounded-[2.5rem] p-8 md:p-10 border border-amber-900/30 shadow-premium relative overflow-hidden"
           >
             <div className="absolute top-0 right-0 w-64 h-64 bg-amber-400/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
             
             <div className="relative z-10">
               <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
                 <div className="flex items-center gap-2">
-                  <Key className="w-5 h-5 text-amber-600 dark:text-amber-400" />
-                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-amber-700 dark:text-amber-500">Secret Opportunities Layer™</span>
+                  <Key className="w-5 h-5 text-amber-400" />
+                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-amber-500">Secret Opportunities Layer™</span>
                 </div>
-                <span className="text-xs font-bold bg-amber-200/50 dark:bg-amber-800/50 text-amber-800 dark:text-amber-300 px-3 py-1.5 rounded-full border border-amber-300/50 dark:border-amber-700/50 shadow-sm">
+                <span className="text-[10px] font-bold uppercase tracking-widest bg-amber-800/50 text-amber-300 px-4 py-2 rounded-full border border-amber-700/50 shadow-inner">
                   AI Concierge Found Value
                 </span>
               </div>
@@ -266,13 +266,13 @@ export function TripWealthDashboard({ tripSummary, budget }) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div 
                   onClick={() => handleStrategyClick('thursday')}
-                  className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-md p-6 rounded-2xl border border-amber-100 dark:border-amber-800/30 group cursor-pointer hover:bg-white dark:hover:bg-slate-900/90 hover:shadow-xl hover:shadow-amber-500/5 transition-all duration-300"
+                  className="glass-dark p-6 rounded-2xl border border-amber-800/30 group cursor-pointer hover:bg-white/5 hover:border-amber-500/30 hover:shadow-xl hover:shadow-amber-500/10 transition-all duration-300"
                 >
-                  <h4 className="font-serif font-bold text-xl text-slate-900 dark:text-white mb-3">The Thursday Shift</h4>
-                  <p className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-6 leading-relaxed">
+                  <h4 className="font-serif font-bold text-xl text-white mb-3">The Thursday Shift</h4>
+                  <p className="text-sm font-medium text-white/60 mb-6 leading-relaxed">
                     Shifting your arrival by 1 day to Thursday upgrades your accommodation to Five-Star without increasing capital.
                   </p>
-                  <span className="text-xs font-bold uppercase tracking-widest text-amber-600 dark:text-amber-400 flex items-center gap-2">
+                  <span className="text-xs font-bold uppercase tracking-widest text-amber-400 flex items-center gap-2 group-hover:text-amber-300 transition-colors">
                     {activeStrategy === 'thursday' ? 'Strategy Applied ✓' : (
                       <>Apply Strategy <ArrowUpRight className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" /></>
                     )}
@@ -281,13 +281,13 @@ export function TripWealthDashboard({ tripSummary, budget }) {
 
                 <div 
                   onClick={() => handleStrategyClick('aviation')}
-                  className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-md p-6 rounded-2xl border border-amber-100 dark:border-amber-800/30 group cursor-pointer hover:bg-white dark:hover:bg-slate-900/90 hover:shadow-xl hover:shadow-amber-500/5 transition-all duration-300"
+                  className="glass-dark p-6 rounded-2xl border border-amber-800/30 group cursor-pointer hover:bg-white/5 hover:border-amber-500/30 hover:shadow-xl hover:shadow-amber-500/10 transition-all duration-300"
                 >
-                  <h4 className="font-serif font-bold text-xl text-slate-900 dark:text-white mb-3">Private Aviation</h4>
-                  <p className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-6 leading-relaxed">
+                  <h4 className="font-serif font-bold text-xl text-white mb-3">Private Aviation</h4>
+                  <p className="text-sm font-medium text-white/60 mb-6 leading-relaxed">
                     A short-hop private flight is currently pricing identically to commercial business class for your selected route.
                   </p>
-                  <span className="text-xs font-bold uppercase tracking-widest text-amber-600 dark:text-amber-400 flex items-center gap-2">
+                  <span className="text-xs font-bold uppercase tracking-widest text-amber-400 flex items-center gap-2 group-hover:text-amber-300 transition-colors">
                     {activeStrategy === 'aviation' ? 'Exploring Options...' : (
                       <>Explore Option <ArrowUpRight className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" /></>
                     )}

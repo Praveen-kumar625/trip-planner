@@ -1,18 +1,20 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 vi.unmock('axios'); // Remove global mock
-import apiClient from './apiClient';
-import { auth } from '../../config/firebase';
+import apiClient from '@/services/api/apiClient';
+import { supabase } from '@/config/supabase';
 
-vi.mock('../../config/firebase', () => ({
-  auth: {
-    currentUser: null
+vi.mock('../../config/supabase', () => ({
+  supabase: {
+    auth: {
+      getSession: vi.fn()
+    }
   }
 }));
 
 describe('apiClient', () => {
   beforeEach(() => {
     vi.resetAllMocks();
-    auth.currentUser = null;
+    supabase.auth.getSession.mockResolvedValue({ data: { session: null } });
   });
 
   it('should be created with base URL', () => {
@@ -20,9 +22,9 @@ describe('apiClient', () => {
   });
 
   it('should inject token into headers if available', async () => {
-    auth.currentUser = {
-      getIdToken: vi.fn().mockResolvedValue('test-jwt-token')
-    };
+    supabase.auth.getSession.mockResolvedValue({
+      data: { session: { access_token: 'test-jwt-token' } }
+    });
     
     const config = { headers: {} };
     
@@ -32,7 +34,7 @@ describe('apiClient', () => {
   });
 
   it('should not inject token if not available', async () => {
-    auth.currentUser = null;
+    supabase.auth.getSession.mockResolvedValue({ data: { session: null } });
     
     const config = { headers: {} };
     const resultConfig = await apiClient.interceptors.request.handlers[0].fulfilled(config);

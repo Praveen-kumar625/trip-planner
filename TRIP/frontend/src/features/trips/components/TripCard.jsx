@@ -73,39 +73,39 @@ export const TripCard = ({ trip, onClick }) => {
       </div>
       
       <div className="p-6 flex flex-col flex-1">
-        <div className="flex items-center gap-2 text-primary-600 dark:text-primary-400 text-xs font-bold uppercase tracking-widest mb-3 line-clamp-1">
+        <div className="flex items-center gap-2 text-primary-400 text-xs font-bold uppercase tracking-widest mb-3 line-clamp-1">
           <MapPin className="w-3.5 h-3.5 shrink-0" />
           {trip.destinations?.map(d => d.name).join(', ') || trip.destination?.city || 'Various Destinations'}
         </div>
         
-        <h3 className="text-2xl font-serif font-bold tracking-tight text-slate-900 dark:text-white mb-2 line-clamp-2 leading-snug">
+        <h3 className="text-2xl font-serif font-bold tracking-tight text-white mb-2 line-clamp-2 leading-snug">
           {trip.title || `${trip.destination?.city} Getaway`}
         </h3>
 
         {trip.authorName && (
-          <div className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-4">
-            by <Link to={`/u/${trip.userId}`} onClick={(e) => e.stopPropagation()} className="text-primary-600 dark:text-primary-400 hover:underline">{trip.authorName}</Link>
+          <div className="text-sm font-medium text-white/50 mb-4">
+            by <Link to={`/u/${trip.userId}`} onClick={(e) => e.stopPropagation()} className="text-primary-400 hover:underline">{trip.authorName}</Link>
           </div>
         )}
         
-        <div className="space-y-3 mt-auto pb-5 border-b border-slate-100 dark:border-slate-800/50">
-          <div className="flex items-center text-sm text-slate-600 dark:text-slate-400 font-medium">
-            <Calendar className="w-4 h-4 mr-3 text-slate-400 dark:text-slate-500" />
-            <span>{startDate} <span className="mx-1 text-slate-300 dark:text-slate-600">—</span> {endDate}</span>
+        <div className="space-y-3 mt-auto pb-5 border-b border-white/10">
+          <div className="flex items-center text-sm text-white/70 font-medium">
+            <Calendar className="w-4 h-4 mr-3 text-white/40" />
+            <span>{startDate} <span className="mx-1 text-white/30">—</span> {endDate}</span>
           </div>
           
-          <div className="flex items-center text-sm text-slate-600 dark:text-slate-400 font-medium">
-            <Users className="w-4 h-4 mr-3 text-slate-400 dark:text-slate-500" />
+          <div className="flex items-center text-sm text-white/70 font-medium">
+            <Users className="w-4 h-4 mr-3 text-white/40" />
             <span>{trip.travelers?.length || trip.travelers || 1} {trip.travelers === 1 ? 'Traveler' : 'Travelers'}</span>
           </div>
         </div>
 
         <div className="mt-5 flex items-center justify-between">
-          <span className="text-slate-900 dark:text-white font-bold text-xs tracking-widest uppercase group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+          <span className="text-white font-bold text-xs tracking-widest uppercase group-hover:text-primary-400 transition-colors">
             View Itinerary
           </span>
-          <div className="w-8 h-8 rounded-full border border-slate-200 dark:border-slate-700 flex items-center justify-center group-hover:border-primary-500 group-hover:bg-primary-50 dark:group-hover:bg-primary-900/20 transition-all duration-300">
-            <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-primary-600 dark:group-hover:text-primary-400 group-hover:translate-x-0.5 transition-transform" />
+          <div className="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center group-hover:border-primary-500 group-hover:bg-primary-900/20 transition-all duration-300">
+            <ArrowRight className="w-4 h-4 text-white/40 group-hover:text-primary-400 group-hover:translate-x-0.5 transition-transform" />
           </div>
         </div>
       </div>

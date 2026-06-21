@@ -79,9 +79,53 @@ export const router = createBrowserRouter([
       {
         path: 'trip/:id',
         lazy: async () => {
-          const { TripPage } = await import('@/pages/TripPage');
-          return { Component: TripPage };
+          const { TripDashboardShell } = await import('@/pages/TripDashboardShell');
+          return { Component: TripDashboardShell };
         },
+        children: [
+          {
+            index: true,
+            lazy: async () => {
+              const { TripPage } = await import('@/pages/TripPage');
+              return { Component: TripPage };
+            }
+          },
+          {
+            path: 'budget',
+            lazy: async () => {
+              const { BudgetModule } = await import('@/pages/TripModules');
+              return { Component: BudgetModule };
+            }
+          },
+          {
+            path: 'routes',
+            lazy: async () => {
+              const { RoutesModule } = await import('@/pages/TripModules');
+              return { Component: RoutesModule };
+            }
+          },
+          {
+            path: 'hotels',
+            lazy: async () => {
+              const { HotelsModule } = await import('@/pages/TripModules');
+              return { Component: HotelsModule };
+            }
+          },
+          {
+            path: 'food',
+            lazy: async () => {
+              const { FoodModule } = await import('@/pages/TripModules');
+              return { Component: FoodModule };
+            }
+          },
+          {
+            path: 'maps',
+            lazy: async () => {
+              const { MapsModule } = await import('@/pages/TripModules');
+              return { Component: MapsModule };
+            }
+          }
+        ]
       },
       {
         path: '*',

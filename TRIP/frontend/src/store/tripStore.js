@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { tripsService } from '../services/api/trips.service';
+import { tripsService } from '@/services/api/trips.service';
+import { normalizeTripData } from '@/utils/TripDataNormalizer';
 
 export const useTripStore = create((set, get) => ({
   trips: [],
@@ -12,7 +13,8 @@ export const useTripStore = create((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const response = await tripsService.getAllTrips(userId);
-      set({ trips: response.data, isLoading: false });
+      const normalizedTrips = (response.data || []).map(normalizeTripData);
+      set({ trips: normalizedTrips, isLoading: false });
     } catch (error) {
       set({ error: error.message, isLoading: false });
     }
@@ -22,7 +24,7 @@ export const useTripStore = create((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const response = await tripsService.getTripById(id);
-      set({ currentTrip: response.data, isLoading: false });
+      set({ currentTrip: normalizeTripData(response.data), isLoading: false });
     } catch (error) {
       set({ error: error.message, isLoading: false });
     }
@@ -33,7 +35,7 @@ export const useTripStore = create((set, get) => ({
     try {
       const response = await tripsService.createTrip(tripData);
       set((state) => ({ 
-        trips: [response.data, ...state.trips], // prepend new trip
+        trips: [normalizeTripData(response.data), ...state.trips], // prepend new trip
         isLoading: false 
       }));
       return response.data;

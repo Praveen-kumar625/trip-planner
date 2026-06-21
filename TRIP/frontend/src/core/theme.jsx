@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 
-export const DESTINATION_THEMES = {
+const DESTINATION_THEMES = {
   default: {
     primary: '#1E1B4B',
     secondary: '#065F46',

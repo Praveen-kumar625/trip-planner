@@ -1,35 +1,26 @@
-import { auth, db } from '@/config/firebase';
-import { 
-  signInWithEmailAndPassword, 
-  createUserWithEmailAndPassword, 
-  signInWithPopup, 
-  GoogleAuthProvider,
-  signInAnonymously,
-  signOut,
-  sendPasswordResetEmail,
-  sendEmailVerification
-} from 'firebase/auth';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
-
-const googleProvider = new GoogleAuthProvider();
+import { supabase } from '@/config/supabase';
 
 export const authService = {
   syncUserToFirestore: async (user, isGuest = false) => {
     if (!user) return null;
-    const userRef = doc(db, 'users', user.uid);
-    const userSnap = await getDoc(userRef);
+    
+    const { data: userSnap } = await supabase
+      .from('users')
+      .select('*')
+      .eq('uid', user.id)
+      .maybeSingle();
 
     const userData = {
-      uid: user.uid,
+      uid: user.id,
       email: user.email || '',
-      displayName: user.displayName || (isGuest ? 'Guest User' : ''),
-      photoURL: user.photoURL || '',
-      provider: isGuest ? 'anonymous' : user.providerData[0]?.providerId || 'password',
+      displayName: user.user_metadata?.displayName || (isGuest ? 'Guest User' : ''),
+      photoURL: user.user_metadata?.avatar_url || '',
+      provider: isGuest ? 'anonymous' : user.app_metadata?.provider || 'password',
       lastLogin: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
 
-    if (!userSnap.exists()) {
+    if (!userSnap) {
       Object.assign(userData, {
         bio: '',
         country: '',
@@ -39,39 +30,63 @@ export const authService = {
       });
     }
 
-    await setDoc(userRef, userData, { merge: true });
-    return userData;
+    const { error } = await supabase
+      .from('users')
+      .upsert(userData, { onConflict: 'uid' });
+
+    if (error) {
+      console.error('Error syncing user to Supabase:', error);
+    }
+    return { ...userSnap, ...userData };
   },
 
   loginWithEmail: async (email, password) => {
-    const cred = await signInWithEmailAndPassword(auth, email, password);
-    await authService.syncUserToFirestore(cred.user);
-    return cred.user;
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    await authService.syncUserToFirestore(data.user);
+    return data.user;
   },
 
   signupWithEmail: async (email, password, displayName) => {
-    const cred = await createUserWithEmailAndPassword(auth, email, password);
-    await sendEmailVerification(cred.user);
-    cred.user.displayName = displayName;
-    await authService.syncUserToFirestore(cred.user);
-    return cred.user;
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          displayName
+        }
+      }
+    });
+    if (error) throw error;
+    if (data.user) {
+      await authService.syncUserToFirestore(data.user);
+    }
+    return data.user;
   },
 
   loginWithGoogle: async () => {
-    const cred = await signInWithPopup(auth, googleProvider);
-    await authService.syncUserToFirestore(cred.user);
-    return cred.user;
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+    });
+    if (error) throw error;
+    // Note: With OAuth, the redirect handles the rest. 
+    // You may want to sync the user in the redirect callback instead.
+    return data;
   },
 
   loginAsGuest: async () => {
     try {
-      const cred = await signInAnonymously(auth);
-      await authService.syncUserToFirestore(cred.user, true);
-      return cred.user;
+      if (!import.meta.env.VITE_SUPABASE_URL) {
+        throw new Error("Supabase credentials missing in environment. Using mock user.");
+      }
+      const { data, error } = await supabase.auth.signInAnonymously();
+      if (error) throw error;
+      await authService.syncUserToFirestore(data.user, true);
+      return data.user;
     } catch (error) {
-      console.warn("Firebase guest login failed. Using mock guest user.", error);
+      console.warn("Supabase guest login bypassed or failed. Using mock guest user.", error.message || error);
       return {
-        uid: 'guest_' + Math.random().toString(36).substring(7),
+        id: 'guest_' + Math.random().toString(36).substring(7),
         displayName: 'Guest User',
         email: 'guest@example.com',
         isAnonymous: true
@@ -80,10 +95,12 @@ export const authService = {
   },
 
   resetPassword: async (email) => {
-    await sendPasswordResetEmail(auth, email);
+    const { error } = await supabase.auth.resetPasswordForEmail(email);
+    if (error) throw error;
   },
 
   logout: async () => {
-    await signOut(auth);
+    const { error } = await supabase.auth.signOut();
+    if (error) throw error;
   }
 };

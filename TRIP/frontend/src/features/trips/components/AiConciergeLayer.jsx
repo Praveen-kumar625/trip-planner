@@ -40,9 +40,9 @@ export function AiConciergeLayer() {
           
           <form 
             onSubmit={handleSubmit}
-            className="relative bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl border border-white/50 dark:border-white/10 rounded-full p-2 flex items-center shadow-2xl"
+            className="relative bg-white/5 backdrop-blur-2xl border border-white/10 rounded-full p-2 flex items-center shadow-2xl"
           >
-            <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0 ml-1">
+            <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center shrink-0 ml-1">
               <Sparkles className="w-4 h-4 text-amber-500" />
             </div>
             
@@ -53,7 +53,7 @@ export function AiConciergeLayer() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="flex-1 px-4 text-sm font-medium text-emerald-600 dark:text-emerald-400 font-serif italic"
+                  className="flex-1 px-4 text-sm font-medium text-emerald-400 font-serif italic"
                 >
                   "I've updated your itinerary perfectly."
                 </motion.div>
@@ -67,7 +67,7 @@ export function AiConciergeLayer() {
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="e.g., 'Make Day 3 more romantic' or 'Add hidden gems'"
-                  className="flex-1 bg-transparent border-none focus:outline-none px-4 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 text-sm font-medium"
+                  className="flex-1 bg-transparent border-none focus:outline-none px-4 text-white placeholder:text-white/40 text-sm font-medium"
                   disabled={isProcessing}
                 />
               )}
@@ -77,12 +77,12 @@ export function AiConciergeLayer() {
               type="submit"
               onClick={handleSubmit}
               disabled={isProcessing || !query.trim()}
-              className="w-10 h-10 rounded-full bg-slate-900 dark:bg-white flex items-center justify-center shrink-0 disabled:opacity-50 disabled:cursor-not-allowed transition-colors hover:bg-slate-800 dark:hover:bg-slate-200"
+              className="w-10 h-10 rounded-full bg-white flex items-center justify-center shrink-0 disabled:opacity-50 disabled:cursor-not-allowed transition-colors hover:bg-white/90"
             >
               {isProcessing ? (
-                <Loader2 className="w-4 h-4 text-white dark:text-black animate-spin" />
+                <Loader2 className="w-4 h-4 text-black animate-spin" />
               ) : (
-                <Send className="w-4 h-4 text-white dark:text-black ml-0.5" />
+                <Send className="w-4 h-4 text-black ml-0.5" />
               )}
             </button>
           </form>

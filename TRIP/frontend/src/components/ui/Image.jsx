@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Image as ImageIcon } from 'lucide-react';
-import { cn } from '../../utils/utils';
+import { cn } from '@/utils/utils';
 
 /**
  * Premium Image Component

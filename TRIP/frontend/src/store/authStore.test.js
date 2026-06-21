@@ -1,19 +1,13 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { useAuthStore } from './authStore';
-import { authService } from '../services/api/auth.service';
+import { useAuthStore } from '@/store/authStore';
+import { authService } from '@/services/api/auth.service';
 
-vi.mock('../config/firebase', () => ({
-  auth: {},
-  db: {}
-}));
-
-vi.mock('firebase/auth', () => ({
-  onAuthStateChanged: vi.fn()
-}));
-
-vi.mock('firebase/firestore', () => ({
-  doc: vi.fn(),
-  getDoc: vi.fn()
+vi.mock('../config/supabase', () => ({
+  supabase: {
+    auth: {
+      onAuthStateChange: vi.fn(() => ({ data: { subscription: { unsubscribe: vi.fn() } } }))
+    }
+  }
 }));
 
 vi.mock('../services/api/auth.service', () => ({

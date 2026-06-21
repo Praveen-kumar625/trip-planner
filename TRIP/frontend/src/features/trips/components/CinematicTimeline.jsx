@@ -39,14 +39,14 @@ const getEmotion = (idx) => {
 export function CinematicTimeline({ itineraryData }) {
   if (!itineraryData || !Array.isArray(itineraryData)) {
     return (
-      <div className="w-full h-64 flex items-center justify-center border border-slate-200 dark:border-slate-800 rounded-3xl bg-slate-50 dark:bg-slate-900/50">
-        <p className="text-slate-500 font-serif italic text-xl">The pages of this chapter are still unwritten...</p>
+      <div className="w-full h-64 flex items-center justify-center border border-white/10 rounded-[2.5rem] bg-white/5 shadow-inner">
+        <p className="text-white/50 font-serif italic text-xl tracking-wide">The pages of this chapter are still unwritten...</p>
       </div>
     );
   }
 
   return (
-    <div className="relative w-full space-y-32 pb-24">
+    <div className="relative w-full space-y-32 pb-24 selection:bg-primary-500 selection:text-white">
       {itineraryData.map((dayPlan, idx) => {
         const theme = getChapterTheme(idx, itineraryData.length);
         const emotion = getEmotion(idx);
@@ -62,20 +62,20 @@ export function CinematicTimeline({ itineraryData }) {
               className="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-8"
             >
               <div>
-                <span className="text-xs font-bold uppercase tracking-[0.3em] text-primary-500 dark:text-primary-400 mb-4 block">
+                <span className="text-xs font-bold uppercase tracking-[0.3em] text-primary-400 mb-4 block">
                   Chapter 0{idx + 1}
                 </span>
-                <h2 className="text-4xl md:text-6xl font-serif font-bold text-slate-900 dark:text-white leading-[1.1] tracking-tight max-w-2xl">
+                <h2 className="text-4xl md:text-6xl font-serif font-bold text-white leading-[1.1] tracking-tight max-w-2xl">
                   {theme}
                 </h2>
               </div>
               
-              <div className="flex items-center gap-4 border-l border-slate-200 dark:border-slate-800 pl-6">
-                <div className={`w-12 h-12 rounded-full ${emotion.bg} flex items-center justify-center`}>
+              <div className="flex items-center gap-4 border-l border-white/10 pl-6">
+                <div className={`w-12 h-12 rounded-full ${emotion.bg} flex items-center justify-center border border-${emotion.color.split('-')[1]}-500/20`}>
                   <emotion.icon className={`w-5 h-5 ${emotion.color}`} />
                 </div>
                 <div>
-                  <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Expected Emotion</span>
+                  <span className="block text-[10px] font-bold text-white/40 uppercase tracking-widest mb-1">Expected Emotion</span>
                   <span className={`font-serif italic font-medium ${emotion.color}`}>{emotion.label}</span>
                 </div>
               </div>
@@ -86,7 +86,7 @@ export function CinematicTimeline({ itineraryData }) {
               
               {/* Vertical Line for Desktop */}
               <div className="hidden md:block md:col-span-1 relative flex justify-center">
-                <div className="absolute top-0 bottom-0 w-px bg-gradient-to-b from-slate-200 via-slate-200 to-transparent dark:from-slate-800 dark:via-slate-800" />
+                <div className="absolute top-0 bottom-0 w-px bg-gradient-to-b from-white/10 via-white/10 to-transparent" />
               </div>
 
               <div className="md:col-span-11 space-y-24">
@@ -116,7 +116,7 @@ export function CinematicTimeline({ itineraryData }) {
                 )}
 
                 {/* Day Logistics Footer */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-12 border-t border-slate-100 dark:border-slate-800/50">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-12 border-t border-white/5">
                   {dayPlan.foodBreaks && <LogisticItem label="Dining Experience" value={dayPlan.foodBreaks} />}
                   {dayPlan.travelTime && <LogisticItem label="Journey Time" value={dayPlan.travelTime} />}
                   {dayPlan.restTime && <LogisticItem label="Pace & Rest" value={dayPlan.restTime} />}
@@ -148,30 +148,30 @@ function StoryMoment({ time, icon: Icon, content, image }) {
       transition={{ duration: 0.8 }}
       className="group relative flex flex-col xl:flex-row gap-8 xl:gap-16 items-center"
     >
-      <div className="w-full xl:w-1/2 aspect-[4/3] rounded-[2rem] overflow-hidden relative shadow-premium bg-slate-100 dark:bg-slate-900">
+      <div className="w-full xl:w-1/2 aspect-[4/3] rounded-[2rem] overflow-hidden relative shadow-premium bg-white/5 border border-white/10">
         <ProgressiveImage 
           src={image} 
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[1.5s] ease-out" 
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[1.5s] ease-out opacity-80 group-hover:opacity-100" 
         />
-        <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-700" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-80 group-hover:opacity-50 transition-opacity duration-700" />
         
         {/* Memory Tag */}
         <div className="absolute top-6 left-6 px-4 py-2 bg-black/40 backdrop-blur-xl rounded-full border border-white/20 text-xs font-bold text-white uppercase tracking-widest flex items-center gap-2 shadow-2xl">
-          <Icon className="w-4 h-4 text-amber-200" />
+          <Icon className="w-4 h-4 text-amber-300" />
           {time}
         </div>
       </div>
 
       <div className="w-full xl:w-1/2 flex flex-col justify-center">
-        <div className="w-12 h-px bg-primary-500 mb-8 hidden xl:block" />
-        <p className="text-slate-700 dark:text-slate-300 text-lg md:text-xl leading-relaxed font-serif mb-8">
+        <div className="w-12 h-px bg-primary-500 mb-8 hidden xl:block shadow-[0_0_10px_currentColor]" />
+        <p className="text-white/80 text-lg md:text-xl leading-relaxed font-serif mb-8 drop-shadow-sm">
           {content}
         </p>
         
         <div className="flex items-center gap-4">
           <Link 
             to={id ? `/maps?tripId=${id}` : `/maps`}
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-900 dark:bg-white text-white dark:text-black rounded-full text-xs font-bold uppercase tracking-widest hover:scale-105 transition-transform shadow-lg"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-white text-black rounded-full text-xs font-bold uppercase tracking-widest hover:scale-105 transition-transform shadow-premium hover:shadow-glow-white"
           >
             <MapPin className="w-4 h-4" /> 
             Explore Location
@@ -179,7 +179,7 @@ function StoryMoment({ time, icon: Icon, content, image }) {
           <button 
             onClick={handleReplace}
             disabled={isReplacing}
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-transparent text-slate-500 hover:text-slate-900 dark:hover:text-white rounded-full text-xs font-bold uppercase tracking-widest transition-colors disabled:opacity-50"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10 rounded-full text-xs font-bold uppercase tracking-widest transition-all disabled:opacity-50"
           >
             {isReplacing ? "Finding Alternatives..." : "Replace Experience"}
           </button>
@@ -192,8 +192,8 @@ function StoryMoment({ time, icon: Icon, content, image }) {
 function LogisticItem({ label, value }) {
   return (
     <div className="flex flex-col gap-2">
-      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{label}</span>
-      <span className="text-sm font-medium text-slate-900 dark:text-slate-300 leading-relaxed">{value}</span>
+      <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">{label}</span>
+      <span className="text-sm font-medium text-white/80 leading-relaxed">{value}</span>
     </div>
   );
 }

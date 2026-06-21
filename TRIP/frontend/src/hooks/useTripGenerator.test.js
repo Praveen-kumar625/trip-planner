@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { useTripGeneratorStore } from './useTripGenerator';
+import { useTripGeneratorStore } from '@/hooks/useTripGenerator';
 
 describe('useTripGeneratorStore', () => {
   beforeEach(() => {

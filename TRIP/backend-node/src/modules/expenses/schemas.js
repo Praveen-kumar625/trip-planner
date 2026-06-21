@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const expenseCategories = [
+const expenseCategories = [
   'Flights', 'Hotels', 'Food', 'Transport', 'Shopping', 
   'Activities', 'Insurance', 'Visa', 'Emergency', 'Miscellaneous'
 ];

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ProgressiveImage } from '../ui/Image';
-import { globalDestinations } from '../../data/globalDestinations';
+import { ProgressiveImage } from '@/components/ui/Image';
+import { globalDestinations } from '@/data/globalDestinations';
 import { MapPin, Calendar, Wallet } from 'lucide-react';
 import { Link } from 'react-router-dom';
 

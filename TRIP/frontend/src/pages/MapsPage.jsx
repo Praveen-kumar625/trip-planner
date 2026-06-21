@@ -106,54 +106,55 @@ export function MapsPage() {
   const mapZoom = tripId ? 12 : 3; // Closer zoom for specific trip, wide zoom for global
 
   return (
-    <div className="h-[calc(100vh-4rem)] flex flex-col md:flex-row bg-slate-50 dark:bg-slate-950 overflow-hidden relative z-0">
+    <div className="h-[calc(100vh-4rem)] flex flex-col md:flex-row bg-[#080D17] overflow-hidden relative z-0 selection:bg-primary-500 selection:text-white">
       
-      <div className="w-full md:w-[400px] bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col h-1/3 md:h-full z-10 shadow-premium shrink-0">
-        <div className="p-6 border-b border-slate-200 dark:border-slate-800">
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2 mb-6 font-serif">
-            <Compass className="w-6 h-6 text-primary-500" />
+      <div className="w-full md:w-[450px] glass-dark border-r border-white/10 flex flex-col h-1/3 md:h-full z-10 shadow-[0_0_50px_rgba(0,0,0,0.5)] shrink-0">
+        <div className="p-6 md:p-8 border-b border-white/10 bg-black/20">
+          <h2 className="text-3xl font-display font-light text-white flex items-center gap-3 mb-6 tracking-wide">
+            <Compass className="w-8 h-8 text-primary-400" />
             {tripId ? 'Trip Map' : 'Global Map'}
           </h2>
           <div className="relative">
-            <Search className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Search className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-white/40" />
             <input 
               type="text" 
               placeholder="Search destinations..." 
-              className="w-full bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white border-transparent rounded-2xl pl-11 pr-4 py-3.5 focus:ring-2 focus:ring-primary-500/50 outline-none transition-all font-medium placeholder:font-normal"
+              className="w-full bg-white/5 border border-white/10 text-white rounded-2xl pl-12 pr-4 py-4 focus:ring-1 focus:ring-primary-500/50 focus:border-primary-500/50 outline-none transition-all font-serif placeholder:font-serif placeholder:italic placeholder:text-white/40"
             />
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4 space-y-3 scrollbar-hide">
-          <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 px-2">Nearby Attractions</h3>
+        <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 scrollbar-hide">
+          <h3 className="text-xs font-bold text-white/40 uppercase tracking-widest mb-6 px-2">Nearby Attractions</h3>
           
           <AnimatePresence>
             {locations.map((loc, i) => (
               <motion.div 
                 key={loc.id} 
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.05 }}
                 onClick={() => {
                   setSelectedLocation(loc);
                   if (window.innerWidth < 768) setIsMobileSheetOpen(true);
                 }}
-                className={`group p-3 rounded-2xl cursor-pointer transition-all border ${
+                className={`group p-4 rounded-3xl cursor-pointer transition-all border ${
                   selectedLocation?.id === loc.id 
-                    ? 'bg-primary-50 border-primary-200 dark:bg-primary-500/10 dark:border-primary-500/20' 
-                    : 'bg-white border-transparent hover:bg-slate-50 dark:bg-slate-900 dark:hover:bg-slate-800'
-                } flex items-center gap-4`}
+                    ? 'glass-premium border-primary-500/30' 
+                    : 'glass-dark border-white/5 hover:border-white/20'
+                } flex items-center gap-5`}
               >
-                <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 relative">
+                <div className="w-20 h-20 rounded-2xl overflow-hidden shrink-0 relative shadow-inner">
                   <ProgressiveImage src={loc.image} aspectRatio="aspect-square" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h4 className="font-bold text-slate-900 dark:text-white truncate">{loc.name}</h4>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className="text-xs text-slate-500 font-medium">{loc.category}</span>
-                    <span className="text-xs text-slate-300">•</span>
-                    <span className="flex items-center text-xs font-bold text-slate-700 dark:text-slate-300">
-                      <Star className="w-3 h-3 text-amber-500 fill-amber-500 mr-1" />
+                  <h4 className="font-display text-lg text-white truncate tracking-wide">{loc.name}</h4>
+                  <div className="flex items-center gap-2 mt-1.5">
+                    <span className="text-xs text-white/50 font-bold uppercase tracking-wider">{loc.category}</span>
+                    <span className="text-xs text-white/20">•</span>
+                    <span className="flex items-center text-xs font-bold text-white/70">
+                      <Star className="w-3.5 h-3.5 text-primary-400 fill-primary-400 mr-1.5" />
                       {loc.rating}
                     </span>
                   </div>
@@ -166,11 +167,11 @@ export function MapsPage() {
 
       <div className="flex-1 h-2/3 md:h-full relative z-0">
         {isLoading ? (
-          <div className="w-full h-full flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-900">
+          <div className="w-full h-full flex flex-col items-center justify-center bg-[#080D17]">
             <motion.div animate={{ rotate: 360 }} transition={{ duration: 2, repeat: Infinity, ease: "linear" }}>
-              <Compass className="w-12 h-12 text-primary-200 dark:text-primary-900 mb-4" />
+              <Compass className="w-16 h-16 text-primary-500/20 mb-6" />
             </motion.div>
-            <p className="text-slate-500 font-medium animate-pulse">Loading premium map engine...</p>
+            <p className="text-white/40 font-serif italic text-lg animate-pulse">Loading premium map engine...</p>
           </div>
         ) : (
           <MapContainer 
@@ -180,10 +181,10 @@ export function MapsPage() {
             zoomControl={false}
           >
             <MapController center={mapCenter} />
-            {/* Using a sleek, dark-themed or luxury basemap */}
+            {/* Dark themed basemap for premium feel */}
             <TileLayer
               attribution='&copy; <a href="https://carto.com/">Carto</a>'
-              url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+              url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
             />
             <ZoomControl position="bottomright" />
             
@@ -202,16 +203,21 @@ export function MapsPage() {
               >
                 {/* Only show desktop popup if not on mobile */}
                 {window.innerWidth >= 768 && (
-                  <Popup className="custom-popup" closeButton={false}>
-                    <div className="w-48 overflow-hidden rounded-2xl shadow-xl bg-white border-0 p-0 m-0">
-                      <div className="h-24 w-full relative">
+                  <Popup className="custom-popup-dark" closeButton={false}>
+                    <div className="w-56 overflow-hidden rounded-3xl shadow-2xl glass-dark border border-white/10 p-0 m-0 backdrop-blur-xl">
+                      <div className="h-32 w-full relative">
                         <ProgressiveImage src={loc.image} aspectRatio="aspect-none h-full w-full" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                        <div className="absolute bottom-3 left-3 flex items-center gap-1.5 text-xs font-bold text-white">
+                          <Star className="w-3.5 h-3.5 text-primary-400 fill-primary-400" />
+                          {loc.rating}
+                        </div>
                       </div>
-                      <div className="p-3 bg-white">
-                        <h3 className="font-bold text-sm text-slate-900 truncate">{loc.name}</h3>
-                        <p className="text-xs text-slate-500 mb-3">{loc.category}</p>
-                        <button className="w-full text-xs font-bold text-white bg-primary-500 py-2 rounded-xl hover:bg-primary-600 transition-colors flex items-center justify-center gap-1.5 shadow-sm shadow-primary-500/20">
-                          <Navigation className="w-3 h-3" /> Directions
+                      <div className="p-4 bg-transparent">
+                        <h3 className="font-display text-base text-white truncate tracking-wide">{loc.name}</h3>
+                        <p className="text-xs font-bold uppercase tracking-widest text-white/50 mt-1 mb-4">{loc.category}</p>
+                        <button className="w-full text-xs font-bold uppercase tracking-wider text-black bg-primary-400 py-3 rounded-xl hover:bg-primary-300 transition-colors flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(255,184,0,0.3)]">
+                          <Navigation className="w-4 h-4" /> Directions
                         </button>
                       </div>
                     </div>
@@ -223,8 +229,8 @@ export function MapsPage() {
         )}
 
         <div className="absolute top-6 left-6 z-[400] md:hidden">
-          <div className="glass-premium rounded-full px-4 py-2 text-sm font-bold shadow-lg flex items-center gap-2">
-             <MapPin className="w-4 h-4 text-primary-500" />
+          <div className="glass-premium rounded-full px-5 py-2.5 text-sm font-bold tracking-wide shadow-[0_5px_20px_rgba(0,0,0,0.5)] flex items-center gap-2.5 text-white border border-white/10">
+             <MapPin className="w-4 h-4 text-primary-400" />
              Interactive Map
           </div>
         </div>
@@ -233,25 +239,26 @@ export function MapsPage() {
       <BottomSheet
         isOpen={isMobileSheetOpen}
         onClose={() => setIsMobileSheetOpen(false)}
-        className="md:hidden"
+        className="md:hidden glass-dark border-t border-white/10"
       >
         {selectedLocation && (
-          <div className="flex flex-col gap-4 pb-4">
-            <div className="w-full h-48 relative rounded-2xl overflow-hidden shrink-0">
+          <div className="flex flex-col gap-6 pb-6 pt-2">
+            <div className="w-full h-56 relative rounded-3xl overflow-hidden shrink-0 shadow-inner">
                <ProgressiveImage src={selectedLocation.image} aspectRatio="aspect-none h-full w-full" />
+               <div className="absolute inset-0 bg-gradient-to-t from-[#080D17]/80 to-transparent" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">{selectedLocation.name}</h2>
-              <div className="flex items-center gap-2 mb-4">
-                <span className="text-sm text-slate-500 font-medium">{selectedLocation.category}</span>
-                <span className="text-sm text-slate-300">•</span>
-                <span className="flex items-center text-sm font-bold text-slate-700 dark:text-slate-300">
-                  <Star className="w-4 h-4 text-amber-500 fill-amber-500 mr-1" />
+              <h2 className="text-3xl font-display font-light text-white mb-2 tracking-wide">{selectedLocation.name}</h2>
+              <div className="flex items-center gap-3 mb-6">
+                <span className="text-xs font-bold uppercase tracking-widest text-white/50">{selectedLocation.category}</span>
+                <span className="text-xs text-white/20">•</span>
+                <span className="flex items-center text-sm font-bold text-white">
+                  <Star className="w-4 h-4 text-primary-400 fill-primary-400 mr-1.5" />
                   {selectedLocation.rating}
                 </span>
               </div>
-              <button className="w-full text-sm font-bold text-white bg-primary-500 py-3.5 rounded-xl hover:bg-primary-600 active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary-500/25">
-                <Navigation className="w-4 h-4" /> Get Directions
+              <button className="w-full text-sm font-bold uppercase tracking-wider text-black bg-primary-400 py-4 rounded-2xl hover:bg-primary-300 active:scale-[0.98] transition-all flex items-center justify-center gap-2.5 shadow-[0_0_20px_rgba(255,184,0,0.2)]">
+                <Navigation className="w-5 h-5" /> Get Directions
               </button>
             </div>
           </div>

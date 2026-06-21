@@ -3,8 +3,8 @@ import { NavLink, Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Compass, Map, Wallet, Sparkles, User, Menu, Search, Sun, Moon, Globe } from 'lucide-react';
 import { cn } from '@/components/ui/Layout';
-import HamburgerDrawer from './HamburgerDrawer';
-import SearchCommand from './SearchCommand';
+import HamburgerDrawer from '@/components/navigation/HamburgerDrawer';
+import SearchCommand from '@/components/navigation/SearchCommand';
 import { useAuthStore } from '@/store/authStore';
 import { useTheme } from '@/core/theme';
 

@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/components/ui/Layout';
 
-export function Skeleton({ className, variant = 'default', ...props }) {
+function Skeleton({ className, variant = 'default', ...props }) {
   const variants = {
     default: 'skeleton rounded-lg',
     circle: 'skeleton rounded-full',

@@ -10,13 +10,22 @@ import { Link } from 'react-router-dom';
 
 const TRENDING_DESTINATIONS = [
   { 
-    id: 'tokyo', 
-    title: 'Kyoto', 
-    location: 'Japan', 
-    image: 'https://images.unsplash.com/photo-1492571350019-22de08371fd3?q=80&w=2070&auto=format&fit=crop', 
-    mood: 'Cultural Retreat', 
-    bestSeason: 'Spring (March - May)', 
+    id: 'udaipur', 
+    title: 'Udaipur', 
+    location: 'Rajasthan, India', 
+    image: 'https://images.unsplash.com/photo-1596895111956-bf1cf0599ce5?q=80&w=2070&auto=format&fit=crop', 
+    mood: 'Royal Heritage', 
+    bestSeason: 'October - March', 
     budget: '₹80,000 - ₹1,50,000' 
+  },
+  { 
+    id: 'kerala', 
+    title: 'Munnar & Backwaters', 
+    location: 'Kerala, India', 
+    image: 'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?q=80&w=2070&auto=format&fit=crop', 
+    mood: 'Nature Retreat', 
+    bestSeason: 'September - March', 
+    budget: '₹60,000 - ₹1,20,000' 
   },
   { 
     id: 'amalfi', 
@@ -25,25 +34,16 @@ const TRENDING_DESTINATIONS = [
     image: 'https://images.unsplash.com/photo-1533929736458-ca588d08c8be?q=80&w=2070&auto=format&fit=crop', 
     mood: 'Romantic Escape', 
     bestSeason: 'September', 
-    budget: '₹1,20,000 - ₹2,50,000' 
+    budget: '₹2,20,000 - ₹3,50,000' 
   },
   { 
-    id: 'bali', 
-    title: 'Ubud', 
-    location: 'Bali, Indonesia', 
-    image: 'https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?q=80&w=2070&auto=format&fit=crop', 
-    mood: 'Spiritual Sanctuary', 
-    bestSeason: 'June - August', 
-    budget: '₹40,000 - ₹90,000' 
-  },
-  { 
-    id: 'santorini', 
-    title: 'Santorini', 
-    location: 'Greece', 
-    image: 'https://images.unsplash.com/photo-1601581875309-fafbf2d3ed3a?q=80&w=2070&auto=format&fit=crop', 
-    mood: 'Luxury Seaside', 
-    bestSeason: 'May or September', 
-    budget: '₹1,50,000 - ₹3,00,000' 
+    id: 'kyoto', 
+    title: 'Kyoto', 
+    location: 'Japan', 
+    image: 'https://images.unsplash.com/photo-1492571350019-22de08371fd3?q=80&w=2070&auto=format&fit=crop', 
+    mood: 'Cultural Sanctuary', 
+    bestSeason: 'March - May', 
+    budget: '₹1,50,000 - ₹2,50,000' 
   },
 ];
 
@@ -63,7 +63,7 @@ export function LandingPage() {
   }, []);
 
   return (
-    <div className="w-full min-h-screen bg-white dark:bg-slate-950">
+    <div className="w-full min-h-screen bg-background">
       
       {/* 1. HERO PARALLAX SECTION */}
       <CinematicHero onSearchOpen={() => setIsSearchOpen(true)} />
@@ -81,23 +81,28 @@ export function LandingPage() {
       <FutureMemorySection onSearchOpen={() => setIsSearchOpen(true)} />
 
       {/* FOOTER */}
-      <footer className="border-t border-slate-200 dark:border-white/10 bg-white dark:bg-black py-16">
+      <footer className="border-t border-white/5 bg-[#080D17] py-20">
         <Container>
-          <div className="flex flex-col md:flex-row items-center justify-between gap-8">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-slate-900 to-slate-800 dark:from-white dark:to-slate-200 rounded-xl flex items-center justify-center text-white dark:text-slate-900 font-bold text-sm shadow-md">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-10">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-primary-600 to-primary-400 rounded-xl flex items-center justify-center text-white font-display font-bold text-lg shadow-glow-saffron">
                 WS
               </div>
-              <span className="font-bold text-lg text-slate-900 dark:text-white tracking-widest uppercase">
-                WanderSync AI
-              </span>
+              <div className="flex flex-col">
+                <span className="font-display font-semibold text-xl text-white tracking-wider uppercase">
+                  WanderSync
+                </span>
+                <span className="text-xs text-primary-600 dark:text-primary-400 font-serif italic">Infinity UX OS v25</span>
+              </div>
             </div>
-            <div className="flex items-center gap-8 text-sm font-medium uppercase tracking-widest text-slate-500 dark:text-slate-400">
-              <Link to="/explore" className="hover:text-slate-900 dark:hover:text-white transition-colors">Explore</Link>
-              <Link to="/planner" className="hover:text-slate-900 dark:hover:text-white transition-colors">Concierge</Link>
+            
+            <div className="flex items-center gap-10 text-sm font-medium uppercase tracking-[0.2em] text-white/40">
+              <Link to="/explore" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Destinations</Link>
+              <Link to="/planner" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">AI Concierge</Link>
             </div>
-            <p className="text-sm text-slate-400 font-medium tracking-wide">
-              © {new Date().getFullYear()} WanderSync AI. Experience the extraordinary.
+            
+            <p className="text-sm text-white/40 font-medium tracking-wide">
+              © {new Date().getFullYear()} WanderSync. Designed for the extraordinary.
             </p>
           </div>
         </Container>

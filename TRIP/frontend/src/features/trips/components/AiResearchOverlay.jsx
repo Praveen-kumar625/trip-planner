@@ -29,7 +29,7 @@ export function AiResearchOverlay({ destinationName }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xl"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xl"
     >
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {/* Decorative background glow */}
@@ -39,9 +39,9 @@ export function AiResearchOverlay({ destinationName }) {
       <motion.div 
         initial={{ scale: 0.9, y: 20 }}
         animate={{ scale: 1, y: 0 }}
-        className="w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800 relative z-10"
+        className="w-full max-w-md bg-black/80 rounded-3xl shadow-[0_0_40px_rgba(0,0,0,0.8)] overflow-hidden border border-white/10 backdrop-blur-2xl relative z-10"
       >
-        <div className="h-2 bg-slate-100 dark:bg-slate-800 relative overflow-hidden">
+        <div className="h-2 bg-white/10 relative overflow-hidden">
           <motion.div 
             className="absolute top-0 left-0 h-full bg-gradient-to-r from-amber-400 to-orange-500"
             initial={{ width: "0%" }}
@@ -56,10 +56,10 @@ export function AiResearchOverlay({ destinationName }) {
             <motion.div 
               animate={{ rotate: 360 }}
               transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-              className="absolute -inset-4 border-2 border-dashed border-amber-200 dark:border-amber-900/50 rounded-full"
+              className="absolute -inset-4 border-2 border-dashed border-amber-500/30 rounded-full"
             />
             {/* Inner icon container */}
-            <div className="w-16 h-16 bg-amber-50 dark:bg-amber-900/30 rounded-2xl flex items-center justify-center relative">
+            <div className="w-16 h-16 bg-amber-500/10 rounded-2xl flex items-center justify-center relative">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={currentStepIndex}
@@ -68,13 +68,13 @@ export function AiResearchOverlay({ destinationName }) {
                   exit={{ opacity: 0, scale: 0.5, rotate: 45 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <CurrentIcon className="w-8 h-8 text-amber-600 dark:text-amber-400" />
+                  <CurrentIcon className="w-8 h-8 text-amber-400" />
                 </motion.div>
               </AnimatePresence>
             </div>
           </div>
 
-          <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
+          <h3 className="text-2xl font-bold text-white mb-2">
             Crafting your trip to {destinationName || 'your destination'}
           </h3>
           
@@ -85,14 +85,14 @@ export function AiResearchOverlay({ destinationName }) {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                className="text-slate-500 dark:text-slate-400 font-medium absolute"
+                className="text-white/60 font-medium absolute"
               >
                 {RESEARCH_STEPS[currentStepIndex].text}
               </motion.p>
             </AnimatePresence>
           </div>
 
-          <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 w-full flex justify-center space-x-2">
+          <div className="mt-8 pt-6 border-t border-white/10 w-full flex justify-center space-x-2">
             <div className="w-2 h-2 rounded-full bg-amber-400 animate-bounce" style={{ animationDelay: '0ms' }} />
             <div className="w-2 h-2 rounded-full bg-amber-400 animate-bounce" style={{ animationDelay: '150ms' }} />
             <div className="w-2 h-2 rounded-full bg-amber-400 animate-bounce" style={{ animationDelay: '300ms' }} />

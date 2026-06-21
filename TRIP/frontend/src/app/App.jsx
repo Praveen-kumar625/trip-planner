@@ -3,9 +3,9 @@ import { Toaster } from 'sonner';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Suspense } from 'react';
 import { ReactLenis } from 'lenis/react';
-import { router } from './router';
-import { ErrorBoundary } from '../core/ErrorBoundary';
-import { ThemeProvider } from '../core/theme';
+import { router } from '@/app/router';
+import { ErrorBoundary } from '@/core/ErrorBoundary';
+import { ThemeProvider } from '@/core/theme';
 
 const queryClient = new QueryClient({
   defaultOptions: {

@@ -40,26 +40,4 @@ export function GlassCard({
   );
 }
 
-export function GlassOverlay({ children, className, blur = 'lg', ...props }) {
-  const blurMap = {
-    sm: 'backdrop-blur-sm',
-    md: 'backdrop-blur-md',
-    lg: 'backdrop-blur-lg',
-    xl: 'backdrop-blur-xl',
-    '2xl': 'backdrop-blur-2xl',
-  };
 
-  return (
-    <div
-      className={cn(
-        'bg-white/60 dark:bg-slate-950/60',
-        blurMap[blur],
-        'border border-white/20 dark:border-white/5',
-        className
-      )}
-      {...props}
-    >
-      {children}
-    </div>
-  );
-}

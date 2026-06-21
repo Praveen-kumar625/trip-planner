@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Sparkles, MapPin, Navigation, Loader2 } from 'lucide-react';
 import { DestinationSearch } from '@/components/destination';
@@ -15,6 +15,7 @@ import { useGooglePlaces } from '@/hooks/useGooglePlaces';
  */
 export function DestinationHeroInput({ onDestinationSelect }) {
   const [isFocused, setIsFocused] = useState(false);
+  const searchRef = useRef(null);
   const { isLoaded } = useGooglePlaces();
 
   const { fetchPlaceById } = useGooglePlaces();
@@ -47,16 +48,16 @@ export function DestinationHeroInput({ onDestinationSelect }) {
         transition={{ duration: 0.8, ease: 'easeOut' }}
         className="text-center mb-12"
       >
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/50 dark:bg-white/5 border border-white/20 dark:border-white/10 backdrop-blur-md mb-8 shadow-sm">
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md mb-8 shadow-sm">
           <Sparkles className="w-4 h-4 text-amber-500" />
-          <span className="text-sm font-medium bg-clip-text text-transparent bg-gradient-to-r from-amber-600 to-orange-500 dark:from-amber-400 dark:to-orange-400">
+          <span className="text-sm font-medium bg-clip-text text-transparent bg-gradient-to-r from-amber-400 to-orange-400">
             AI Travel Concierge
           </span>
         </div>
-        <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-6">
+        <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-white mb-6">
           Where to <span className="italic font-serif text-amber-500">next?</span>
         </h1>
-        <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto font-light">
+        <p className="text-lg md:text-xl text-white/60 max-w-2xl mx-auto font-light">
           Experience the world's most intelligent trip planner. Tell us your
           destination, and let our AI craft your perfect itinerary.
         </p>
@@ -72,33 +73,37 @@ export function DestinationHeroInput({ onDestinationSelect }) {
       >
         <div className="absolute -inset-1 bg-gradient-to-r from-amber-400 to-orange-500 rounded-3xl blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200" />
         <div
-          className="relative bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-white/40 dark:border-white/10 rounded-3xl p-2 shadow-2xl transition-all overflow-visible"
+          className="relative bg-black/40 backdrop-blur-xl border border-white/10 rounded-3xl p-2 shadow-2xl transition-all overflow-visible"
           onFocus={() => setIsFocused(true)}
           onBlur={(e) => {
             setTimeout(() => setIsFocused(false), 200);
           }}
         >
           <div className="flex items-center px-4 py-3">
-            <div className="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center shrink-0">
-              <MapPin className="w-6 h-6 text-amber-600 dark:text-amber-400" />
+            <div className="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center shrink-0">
+              <MapPin className="w-6 h-6 text-amber-400" />
             </div>
             <div className="flex-1 ml-4 h-14 relative z-50">
               {!isLoaded ? (
-                <div className="w-full h-full flex items-center pl-12 text-slate-400">
+                <div className="w-full h-full flex items-center pl-12 text-white/40">
                   <Loader2 className="w-5 h-5 animate-spin mr-3" /> Loading
                   destinations...
                 </div>
               ) : (
                 <DestinationSearch
+                  ref={searchRef}
                   onPlaceSelect={onDestinationSelect}
                   placeholder="Search any city, country, or landmark..."
                   className="w-full h-full"
-                  inputClassName="w-full h-full pl-12 pr-12 text-xl md:text-2xl bg-transparent border-none outline-none text-slate-900 dark:text-white placeholder:text-slate-400 font-medium"
+                  inputClassName="w-full h-full pl-12 pr-12 text-xl md:text-2xl bg-transparent border-none outline-none text-white placeholder:text-white/40 font-medium"
                 />
               )}
             </div>
-            <button className="w-12 h-12 rounded-2xl bg-slate-900 dark:bg-white flex items-center justify-center shrink-0 hover:scale-105 transition-transform cursor-pointer shadow-md">
-              <Navigation className="w-5 h-5 text-white dark:text-slate-900 ml-0.5" />
+            <button 
+              onClick={() => searchRef.current?.submit()}
+              className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center shrink-0 hover:scale-105 transition-transform cursor-pointer shadow-md"
+            >
+              <Navigation className="w-5 h-5 text-black ml-0.5" />
             </button>
           </div>
         </div>
@@ -108,7 +113,7 @@ export function DestinationHeroInput({ onDestinationSelect }) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1, delay: 0.6 }}
-        className="mt-12 flex items-center gap-6 text-sm font-medium text-slate-500 dark:text-slate-400"
+        className="mt-12 flex items-center gap-6 text-sm font-medium text-white/50"
       >
         <span>Popular:</span>
         <div className="flex gap-4">
@@ -116,7 +121,7 @@ export function DestinationHeroInput({ onDestinationSelect }) {
             <button
               key={dest.display}
               onClick={() => handlePopularClick(dest)}
-              className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors"
+              className="hover:text-amber-400 transition-colors"
             >
               {dest.display}
             </button>

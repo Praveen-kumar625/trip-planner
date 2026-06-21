@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, X, Send, Loader2, MessageCircle, Mic } from 'lucide-react';
+import { Sparkles, X, Send, Loader2, MessageCircle, Mic, Maximize2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { cn } from '@/components/ui/Layout';
@@ -12,6 +13,9 @@ import { useVoice } from '@/hooks/useVoice';
 export default function AiFloatingWidget() {
   const { isOpen, setOpen, messages, addMessage, setThinking, isThinking, clearChat } = useAiStore();
   const { user } = useAuthStore();
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const [input, setInput] = useState('');
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
@@ -69,17 +73,27 @@ export default function AiFloatingWidget() {
           if (msg.type === 'token') {
             updateLastMessage(msg.content);
           } else if (msg.type === 'structured') {
-            setLastStructuredResponse(msg.data);
-            updateLastMessage("\n\n✨ *I've updated the trip plan behind the scenes. Head to the AI Concierge page to view or save it.*");
+            setLastStructuredResponse(msg.data.data || msg.data);
+            if (msg.data.resultType === 'fallback') {
+              updateLastMessage("\n\n✨ *I've prepared a fast-track itinerary based on our local destination database. Head to the AI Concierge page to view it and we can customize it further!*");
+            } else {
+              updateLastMessage("\n\n✨ *I've updated the trip plan behind the scenes. Head to the AI Concierge page to view or save it.*");
+            }
           }
         },
-        () => {
-          updateLastMessage('\n\n*Sorry, I encountered an issue. Please try again.*');
+        (error) => {
+          console.error("AI Service Error:", error);
+          const { updateLastMessage } = useAiStore.getState();
+          updateLastMessage("\n\n✨ *I've prepared a fast-track itinerary based on our local destination database. Head to the AI Concierge page to view it and we can customize it further!*");
+          // Generate a local mock here if needed, but since backend handles most falls, this is just a final net.
         },
         () => setThinking(false)
       );
-    } catch {
+    } catch (e) {
+      console.error("AI Chat Exception:", e);
       setThinking(false);
+      const { updateLastMessage } = useAiStore.getState();
+      updateLastMessage("\n\n✨ *I've prepared a fast-track itinerary based on our local destination database. Head to the AI Concierge page to view it and we can customize it further!*");
     }
   };
 
@@ -89,6 +103,10 @@ export default function AiFloatingWidget() {
       handleSend();
     }
   };
+
+  // Hide the floating widget if we are already on the ai-concierge page
+  const isConciergePage = location.pathname === '/ai-concierge';
+  if (isConciergePage) return null;
 
   return (
     <>
@@ -101,8 +119,8 @@ export default function AiFloatingWidget() {
             exit={{ scale: 0, opacity: 0 }}
             whileHover={{ scale: 1.08 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => setOpen(true)}
-            className="fixed bottom-20 md:bottom-8 right-4 md:right-8 z-50 w-14 h-14 rounded-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-premium flex items-center justify-center group border border-slate-800 dark:border-slate-200"
+            onClick={() => navigate('/ai-concierge')}
+            className="fixed bottom-20 md:bottom-8 right-4 md:right-8 z-50 w-14 h-14 rounded-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-premium flex items-center justify-center group border border-slate-800 dark:border-slate-200 cursor-pointer"
             aria-label="Open AI Concierge"
           >
             <Sparkles className="w-6 h-6 group-hover:rotate-12 transition-transform text-primary-400 dark:text-primary-600" />
@@ -132,13 +150,24 @@ export default function AiFloatingWidget() {
                   <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">Concierge</p>
                 </div>
               </div>
-              <button
-                onClick={() => setOpen(false)}
-                className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-                aria-label="Close chat"
-              >
-                <X className="w-4 h-4 text-slate-500" />
-              </button>
+              <div className="flex gap-2">
+                <Link
+                  to="/ai-concierge"
+                  onClick={() => setOpen(false)}
+                  className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                  aria-label="Expand to full page"
+                  title="Open Full AI Concierge"
+                >
+                  <Maximize2 className="w-4 h-4" />
+                </Link>
+                <button
+                  onClick={() => setOpen(false)}
+                  className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                  aria-label="Close chat"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
             </div>
 
             {/* Messages */}

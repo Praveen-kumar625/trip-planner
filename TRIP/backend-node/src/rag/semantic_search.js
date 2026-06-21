@@ -1,4 +1,6 @@
-import { firestore } from '../config/firebase.js';
+// Semantic Search placeholder
+
+import { logger } from '../utils/logger.js';
 
 export class SemanticSearch {
   /**
@@ -9,7 +11,7 @@ export class SemanticSearch {
   static async retrieveContext(query) {
     // In production, use Gemini Embeddings to search Firestore Vector Search
     // For now, return a generic string to inject into the LLM context
-    console.log(`[RAG] Searching knowledge base for: ${query}`);
+    logger.info(`[RAG] Searching knowledge base for: ${query}`);
     
     return `
       Retrieved Knowledge Context:

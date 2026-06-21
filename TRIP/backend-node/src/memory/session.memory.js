@@ -1,50 +1,61 @@
-import { firestore, firebaseAdmin } from '../config/firebase.js';
+import { supabase } from '../config/supabase.js';
+import { logger } from '../utils/logger.js';
 
 export class AgentMemory {
   /**
    * Session Memory: Short term memory for the current chat session
    */
   static async getSessionHistory(userId, sessionId) {
-    const snapshot = await firestore
-      .collection('users')
-      .doc(userId)
-      .collection('sessions')
-      .doc(sessionId)
-      .collection('messages')
-      .orderBy('timestamp', 'asc')
-      .limitToLast(10) // Limit to last 10 messages for history truncation
-      .get();
+    const { data, error } = await supabase
+      .from('chat_messages')
+      .select('*')
+      .eq('userId', userId)
+      .eq('sessionId', sessionId)
+      .order('timestamp', { ascending: false })
+      .limit(10);
 
-    return snapshot.docs.map(doc => doc.data());
+    if (error) {
+      logger.error('Supabase getSessionHistory error:', { error });
+      return [];
+    }
+
+    // Reverse to get chronological order since we fetched descending
+    return data ? data.reverse() : [];
   }
 
   static async saveSessionMessage(userId, sessionId, role, content) {
     // Truncate content to max 2000 characters to prevent prompt injection and token burn
     const truncatedContent = content.length > 2000 ? content.substring(0, 2000) + '...' : content;
     
-    await firestore
-      .collection('users')
-      .doc(userId)
-      .collection('sessions')
-      .doc(sessionId)
-      .collection('messages')
-      .add({
+    const { error } = await supabase
+      .from('chat_messages')
+      .insert([{
+        userId,
+        sessionId,
         role,
         content: truncatedContent,
-        timestamp: firebaseAdmin.firestore.FieldValue.serverTimestamp()
-      });
+        timestamp: new Date().toISOString()
+      }]);
+
+    if (error) {
+      logger.error('Supabase saveSessionMessage error:', { error });
+    }
   }
 
   /**
    * Profile Memory: Extracting long-term implicit preferences
    * In a real RAG system, this would involve embeddings. 
-   * Here we fetch explicit and implicit preferences from Firestore.
    */
   static async getProfileContext(userId) {
-    const prefsDoc = await firestore.collection('preferences').doc(userId).get();
-    if (!prefsDoc.exists) return 'No known long-term preferences.';
+    const { data: prefs, error } = await supabase
+      .from('preferences')
+      .select('*')
+      .eq('id', userId)
+      .maybeSingle();
+
+    if (error || !prefs) return 'No known long-term preferences.';
     
-    const prefs = prefsDoc.data();
     return `User prefers: Budget level is ${prefs.budgetLevel || 'moderate'}. Dietary restrictions: ${prefs.dietary?.join(',') || 'none'}.`;
   }
 }
+

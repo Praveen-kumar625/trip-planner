@@ -1,12 +1,13 @@
 import { AuthRepository } from './repository.js';
 import { logger } from '../../utils/logger.js';
-import { firebaseAdmin } from '../../config/firebase.js';
 
 export class AuthService {
-  static async syncFirebaseUser(firebaseUser) {
-    const { uid, email, name, picture } = firebaseUser;
+  static async syncUser(authUser) {
+    const { uid, email, user_metadata } = authUser;
+    const name = user_metadata?.name || '';
+    const picture = user_metadata?.avatar_url || '';
     
-    // Check if user exists in Firestore
+    // Check if user exists in Database
     let user = await AuthRepository.getById(uid);
     
     if (!user) {
@@ -22,10 +23,10 @@ export class AuthService {
         }
       });
     } else {
-      // Optionally update last login or sync updated details from Firebase
+      // Optionally update last login
       logger.info(`Syncing existing user profile for ${uid}`);
       user = await AuthRepository.update(uid, {
-        lastLoginAt: firebaseAdmin.firestore.FieldValue.serverTimestamp()
+        lastLoginAt: new Date().toISOString()
       });
     }
     

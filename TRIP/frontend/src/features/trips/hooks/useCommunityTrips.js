@@ -1,5 +1,5 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { tripsService } from '../../../services/api/trips.service';
+import { tripsService } from '@/services/api/trips.service';
 
 export const useCommunityTrips = (limit = 10) => {
   return useInfiniteQuery({

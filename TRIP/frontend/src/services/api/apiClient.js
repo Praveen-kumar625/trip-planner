@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { toast } from 'sonner';
-import { auth } from '../../config/firebase';
-import { useAuthStore } from '../../store/authStore';
+import { supabase } from '@/config/supabase';
+import { useAuthStore } from '@/store/authStore';
 
 const rawBase = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'http://localhost:8000';
 const baseURL = rawBase.endsWith('/api/v1') ? rawBase : `${rawBase}/api/v1`;
@@ -15,10 +15,9 @@ const apiClient = axios.create({
 
 apiClient.interceptors.request.use(
   async (config) => {
-    const user = auth.currentUser;
-    if (user) {
-      const token = await user.getIdToken();
-      config.headers.Authorization = `Bearer ${token}`;
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      config.headers.Authorization = `Bearer ${session.access_token}`;
     }
     return config;
   },
@@ -34,10 +33,9 @@ apiClient.interceptors.response.use(
       originalRequest._retry = true;
       
       try {
-        const user = auth.currentUser;
-        if (user) {
-          const newToken = await user.getIdToken(true);
-          originalRequest.headers.Authorization = `Bearer ${newToken}`;
+        const { data: { session }, error: refreshError } = await supabase.auth.refreshSession();
+        if (session && !refreshError) {
+          originalRequest.headers.Authorization = `Bearer ${session.access_token}`;
           return apiClient(originalRequest);
         } else {
           useAuthStore.getState().logout();

@@ -1,19 +1,27 @@
 import { BaseRepository } from '../../firestore/repository.js';
-import { firestore } from '../../config/firebase.js';
+import { supabase } from '../../config/supabase.js';
+import { logger } from '../../utils/logger.js';
 
 class PreferencesRepositoryClass extends BaseRepository {
   constructor() {
-    // We will store preferences in a subcollection under the user, or just as a single document in 'preferences' with id = userId
+    // We will store preferences in a single document in 'preferences' with id = userId
     super('preferences');
   }
 
   // Override create/update since the ID will always be the userId
   async upsertPreferences(userId, data) {
-    const docRef = this.collection.doc(userId);
-    await docRef.set(data, { merge: true });
-    
-    const doc = await docRef.get();
-    return { id: doc.id, ...doc.data() };
+    const payload = { ...data, id: userId, updatedAt: new Date().toISOString() };
+    const { data: result, error } = await supabase
+      .from(this.collectionName)
+      .upsert(payload, { onConflict: 'id' })
+      .select()
+      .single();
+      
+    if (error) {
+      logger.error('Supabase query error (upsertPreferences):', { error });
+      throw error;
+    }
+    return result;
   }
 }
 

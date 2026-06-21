@@ -30,30 +30,30 @@ export function BudgetPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-neutral-950 p-4 md:p-8">
+    <div className="min-h-screen bg-[#080D17] p-4 md:p-8 selection:bg-primary-500 selection:text-white">
       <div className="max-w-7xl mx-auto space-y-8">
         
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-neutral-900 dark:text-white">Budget Analytics</h1>
-            <p className="text-neutral-500 mt-1">Track your travel expenses and remaining budget</p>
+            <h1 className="text-4xl md:text-5xl font-display font-light text-white tracking-wide">Budget <span className="font-serif italic text-primary-400">Analytics</span></h1>
+            <p className="text-white/50 mt-2 font-serif italic text-lg">Track your travel expenses and remaining budget</p>
           </div>
-          <select className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg px-4 py-2 text-sm font-medium text-neutral-700 dark:text-neutral-300 shadow-sm">
-            <option>All Trips</option>
-            <option>Kyoto, Japan</option>
-            <option>Santorini, Greece</option>
+          <select className="glass-dark border border-white/20 rounded-lg px-4 py-2 text-sm font-bold text-white shadow-premium hover:border-white/40 outline-none uppercase tracking-wider">
+            <option className="bg-[#080D17]">All Trips</option>
+            <option className="bg-[#080D17]">Kyoto, Japan</option>
+            <option className="bg-[#080D17]">Santorini, Greece</option>
           </select>
         </div>
 
         {isLoading ? (
           <div className="animate-pulse space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {[1, 2, 3].map(i => <div key={i} className="h-32 bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800" />)}
+              {[1, 2, 3].map(i => <div key={i} className="h-32 glass-dark rounded-2xl border border-white/10" />)}
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="h-96 bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800" />
-              <div className="h-96 bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800" />
+              <div className="h-96 glass-dark rounded-2xl border border-white/10" />
+              <div className="h-96 glass-dark rounded-2xl border border-white/10" />
             </div>
           </div>
         ) : (
@@ -64,53 +64,57 @@ export function BudgetPage() {
           >
             {/* KPI Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-white dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm flex flex-col justify-between">
+              <div className="glass-dark p-6 rounded-3xl border border-white/10 shadow-premium flex flex-col justify-between hover:border-white/30 transition-colors">
                 <div className="flex justify-between items-start">
                   <div>
-                    <p className="text-sm font-medium text-neutral-500">Total Budget</p>
-                    <h3 className="text-3xl font-bold text-neutral-900 dark:text-white mt-1">₹3,00,000</h3>
+                    <p className="text-xs font-bold uppercase tracking-widest text-white/50">Total Budget</p>
+                    <h3 className="text-3xl font-display font-light text-white mt-1 tracking-wide">₹3,00,000</h3>
                   </div>
-                  <div className="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center">
-                    <Wallet className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                  <div className="w-12 h-12 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center shadow-inner">
+                    <Wallet className="w-5 h-5 text-blue-400" />
                   </div>
                 </div>
-                <div className="mt-4 flex items-center text-sm">
-                  <span className="text-green-500 font-medium flex items-center"><TrendingUp className="w-4 h-4 mr-1" /> On Track</span>
+                <div className="mt-6 flex items-center text-sm">
+                  <span className="text-green-400 font-bold tracking-wide flex items-center"><TrendingUp className="w-4 h-4 mr-1" /> On Track</span>
                 </div>
               </div>
 
-              <div className="bg-white dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm flex flex-col justify-between">
+              <div className="glass-dark p-6 rounded-3xl border border-white/10 shadow-premium flex flex-col justify-between hover:border-white/30 transition-colors">
                 <div className="flex justify-between items-start">
                   <div>
-                    <p className="text-sm font-medium text-neutral-500">Spent So Far</p>
-                    <h3 className="text-3xl font-bold text-neutral-900 dark:text-white mt-1">₹1,74,000</h3>
+                    <p className="text-xs font-bold uppercase tracking-widest text-white/50">Spent So Far</p>
+                    <h3 className="text-3xl font-display font-light text-white mt-1 tracking-wide">₹1,74,000</h3>
                   </div>
-                  <div className="w-10 h-10 rounded-full bg-orange-50 dark:bg-orange-900/30 flex items-center justify-center">
-                    <IndianRupee className="w-5 h-5 text-orange-600 dark:text-orange-400" />
+                  <div className="w-12 h-12 rounded-full bg-orange-500/10 border border-orange-500/20 flex items-center justify-center shadow-inner">
+                    <IndianRupee className="w-5 h-5 text-orange-400" />
                   </div>
                 </div>
-                <div className="mt-4 flex items-center text-sm">
-                  <span className="text-neutral-500">58% of total budget</span>
-                </div>
-                {/* Progress Bar */}
-                <div className="w-full bg-neutral-100 dark:bg-neutral-800 rounded-full h-2 mt-3">
-                  <div className="bg-orange-500 h-2 rounded-full" style={{ width: '58%' }}></div>
+                <div className="mt-6 flex flex-col gap-3 text-sm">
+                  <div className="flex justify-between items-center text-white/50 font-bold uppercase tracking-wider text-xs">
+                    <span>58% spent</span>
+                    <span>42% left</span>
+                  </div>
+                  {/* Progress Bar */}
+                  <div className="w-full bg-white/5 rounded-full h-1.5 overflow-hidden">
+                    <div className="bg-orange-500 h-full rounded-full" style={{ width: '58%' }}></div>
+                  </div>
                 </div>
               </div>
 
-              <div className="bg-white dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm flex flex-col justify-between">
-                <div className="flex justify-between items-start">
+              <div className="glass-premium p-6 rounded-3xl border border-primary-500/20 shadow-premium-lg flex flex-col justify-between relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary-500 to-transparent opacity-50" />
+                <div className="flex justify-between items-start relative z-10">
                   <div>
-                    <p className="text-sm font-medium text-neutral-500">Remaining</p>
-                    <h3 className="text-3xl font-bold text-neutral-900 dark:text-white mt-1">₹1,26,000</h3>
+                    <p className="text-xs font-bold uppercase tracking-widest text-white/50">Remaining</p>
+                    <h3 className="text-3xl font-display font-light text-primary-400 mt-1 tracking-wide">₹1,26,000</h3>
                   </div>
-                  <div className="w-10 h-10 rounded-full bg-green-50 dark:bg-green-900/30 flex items-center justify-center">
-                    <PieChartIcon className="w-5 h-5 text-green-600 dark:text-green-400" />
+                  <div className="w-12 h-12 rounded-full bg-green-500/10 border border-green-500/20 flex items-center justify-center shadow-inner">
+                    <PieChartIcon className="w-5 h-5 text-green-400" />
                   </div>
                 </div>
-                <div className="mt-4 flex items-center text-sm">
-                  <span className="text-green-500 font-medium flex items-center"><TrendingDown className="w-4 h-4 mr-1" /> Excellent</span>
-                  <span className="text-neutral-500 ml-2">~₹18,000/day available</span>
+                <div className="mt-6 flex items-center text-sm relative z-10">
+                  <span className="text-green-400 font-bold tracking-wide flex items-center"><TrendingDown className="w-4 h-4 mr-1" /> Excellent</span>
+                  <span className="text-white/40 ml-2 font-serif italic">~₹18,000/day available</span>
                 </div>
               </div>
             </div>
@@ -119,8 +123,8 @@ export function BudgetPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               
               {/* Category Breakdown Pie Chart */}
-              <div className="bg-white dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm">
-                <h3 className="text-lg font-bold text-neutral-900 dark:text-white mb-6">Expense Breakdown</h3>
+              <div className="glass-dark p-8 rounded-3xl border border-white/10 shadow-premium">
+                <h3 className="text-xl font-display font-light text-white mb-8 tracking-wide">Expense Breakdown</h3>
                 <div className="h-[300px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
@@ -138,20 +142,20 @@ export function BudgetPage() {
                         ))}
                       </Pie>
                       <Tooltip 
-                        contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                        itemStyle={{ color: '#171717', fontWeight: 600 }}
+                        contentStyle={{ backgroundColor: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.5)' }}
+                        itemStyle={{ color: '#fff', fontWeight: 600, fontFamily: 'Outfit, sans-serif' }}
                         formatter={(value) => [`₹${value.toLocaleString('en-IN')}`, 'Amount']}
                       />
                     </PieChart>
                   </ResponsiveContainer>
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-6">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 mt-8">
                   {expenseData.map((category) => (
-                    <div key={category.name} className="flex items-center gap-2">
+                    <div key={category.name} className="flex items-center gap-3">
                       <div className="w-3 h-3 rounded-full" style={{ backgroundColor: category.color }} />
                       <div>
-                        <p className="text-xs text-neutral-500">{category.name}</p>
-                        <p className="text-sm font-semibold text-neutral-900 dark:text-white">₹{category.value.toLocaleString('en-IN')}</p>
+                        <p className="text-xs font-bold uppercase tracking-wider text-white/50">{category.name}</p>
+                        <p className="text-base font-display text-white mt-0.5">₹{category.value.toLocaleString('en-IN')}</p>
                       </div>
                     </div>
                   ))}
@@ -159,20 +163,21 @@ export function BudgetPage() {
               </div>
 
               {/* Daily Spending Bar Chart */}
-              <div className="bg-white dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm">
-                <h3 className="text-lg font-bold text-neutral-900 dark:text-white mb-6">Daily Spending</h3>
+              <div className="glass-dark p-8 rounded-3xl border border-white/10 shadow-premium">
+                <h3 className="text-xl font-display font-light text-white mb-8 tracking-wide">Daily Spending</h3>
                 <div className="h-[300px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={dailyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e5e5" />
-                      <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#737373' }} dy={10} />
-                      <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#737373' }} tickFormatter={(value) => `₹${value.toLocaleString('en-IN')}`} />
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
+                      <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'rgba(255,255,255,0.5)', fontWeight: 600 }} dy={10} />
+                      <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'rgba(255,255,255,0.5)', fontWeight: 600 }} tickFormatter={(value) => `₹${value.toLocaleString('en-IN')}`} />
                       <Tooltip 
-                        cursor={{ fill: 'rgba(0,0,0,0.05)' }}
-                        contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                        cursor={{ fill: 'rgba(255,255,255,0.02)' }}
+                        contentStyle={{ backgroundColor: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.5)' }}
+                        itemStyle={{ color: '#fff', fontWeight: 600, fontFamily: 'Outfit, sans-serif' }}
                         formatter={(value) => [`₹${value.toLocaleString('en-IN')}`, 'Spent']}
                       />
-                      <Bar dataKey="amount" fill="#3b82f6" radius={[4, 4, 0, 0]} barSize={32} />
+                      <Bar dataKey="amount" fill="#3b82f6" radius={[6, 6, 0, 0]} barSize={24} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>

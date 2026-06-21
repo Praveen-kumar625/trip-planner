@@ -3,6 +3,7 @@
  * Wraps getGeocode and getLatLng from use-places-autocomplete for clean usage.
  */
 import { getGeocode, getLatLng } from 'use-places-autocomplete';
+import { GetPlaceDetails, PHOTO_REF_URL } from '@/services/api/places.service.js';
 
 /**
  * Extract structured location data from a Google Places suggestion.
@@ -21,6 +22,23 @@ export async function resolvePlace(address, placeId) {
   const getShort = (type) =>
     components.find((c) => c.types.includes(type))?.short_name || '';
 
+  let photoUrl = null;
+  try {
+    // Attempt to fetch high-res photos via the new Google Places API v1
+    const details = await GetPlaceDetails({ textQuery: address });
+    const place = details?.data?.places?.[0];
+    if (place && place.photos && place.photos.length > 0) {
+      // API returns photo names like "places/{placeId}/photos/{photoRef}"
+      const photoName = place.photos[0].name; 
+      // Handle edge case if {NAME} in PHOTO_REF_URL needs to be replaced
+      // Usually place.photos[0].name IS the full path e.g. "places/123/photos/abc"
+      // But the user's snippet has `https://places.googleapis.com/v1/{NAME}/media...`
+      photoUrl = PHOTO_REF_URL.replace('{NAME}', photoName);
+    }
+  } catch (error) {
+    console.error('Failed to fetch high-res photo from Places v1 API:', error);
+  }
+
   return {
     placeId: result.place_id || placeId,
     city: get('locality') || get('administrative_area_level_2') || get('administrative_area_level_1'),
@@ -32,7 +50,8 @@ export async function resolvePlace(address, placeId) {
     longitude: lng,
     name: get('locality') || get('administrative_area_level_2') || address.split(',')[0],
     timezone: null, // Can be fetched separately if needed
-    photos: [],
+    image: photoUrl,
+    photos: photoUrl ? [photoUrl] : [],
   };
 }
 

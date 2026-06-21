@@ -1,5 +1,5 @@
-import apiClient from './apiClient';
-import { auth } from '../../config/firebase';
+import apiClient from '@/services/api/apiClient';
+import { supabase } from '@/config/supabase';
 
 const rawBase = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'http://localhost:8000';
 const baseURL = rawBase.endsWith('/api/v1') ? rawBase : `${rawBase}/api/v1`;
@@ -15,8 +15,8 @@ export const aiService = {
         throw new Error('No internet connection. Please check your network and try again.');
       }
 
-      const user = auth.currentUser;
-      const token = user ? await user.getIdToken() : '';
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session ? session.access_token : '';
 
       const response = await fetch(`${baseURL}/ai/stream`, {
         method: 'POST',
@@ -73,7 +73,11 @@ export const aiService = {
       onComplete && onComplete();
 
     } catch (error) {
-      if (retries > 0 && error.message !== 'No internet connection. Please check your network and try again.') {
+      if (
+        retries > 0 &&
+        error.message !== 'No internet connection. Please check your network and try again.' &&
+        !error.message.includes('INVALID_API_KEY')
+      ) {
         console.warn(`Stream request failed. Retrying in ${delay}ms...`, error);
         setTimeout(() => aiService.streamChat(payload, onMessage, onError, onComplete, retries - 1, delay * 2), delay);
       } else {

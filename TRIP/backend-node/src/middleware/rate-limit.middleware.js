@@ -1,9 +1,11 @@
 import 'uncrypto';
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
+import rateLimit from 'express-rate-limit';
 import { env } from '../config/env.js';
+import { logger } from '../utils/logger.js';
+import { RateLimitError } from '../utils/errors.js';
 
-// Fallback to memory store if no Redis config is provided (for local dev)
 const cache = new Map();
 
 let redisClient = null;
@@ -14,15 +16,28 @@ if (env.UPSTASH_REDIS_REST_URL && env.UPSTASH_REDIS_REST_TOKEN) {
   });
 }
 
-// Create rate limiters
+// Fallback in-memory limiters
+const memoryGeneralLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100,
+  message: { error: 'Too many requests, please try again later.' },
+  handler: (req, res, next, options) => {
+    next(new RateLimitError(options.message.error));
+  }
+});
+
+const memoryAiLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 10,
+  message: { error: 'AI Rate limit exceeded. Please wait a moment before sending more messages.' },
+  handler: (req, res, next, options) => {
+    next(new RateLimitError(options.message.error));
+  }
+});
+
 const generalLimiter = new Ratelimit({
   redis: redisClient || {
-    sadd: () => {},
-    eval: () => [0, 0, 0],
-    get: (key) => cache.get(key) || null,
-    set: (key, value) => { cache.set(key, value); return 'OK'; },
-    incr: (key) => { const v = (cache.get(key) || 0) + 1; cache.set(key, v); return v; },
-    pexpire: () => 1
+    sadd: () => {}, eval: () => [0, 0, 0], get: () => null, set: () => 'OK', incr: () => 1, pexpire: () => 1
   },
   limiter: Ratelimit.slidingWindow(100, '15 m'),
   ephemeralCache: cache,
@@ -30,12 +45,7 @@ const generalLimiter = new Ratelimit({
 
 const aiLimiter = new Ratelimit({
   redis: redisClient || {
-    sadd: () => {},
-    eval: () => [0, 0, 0],
-    get: (key) => cache.get(key) || null,
-    set: (key, value) => { cache.set(key, value); return 'OK'; },
-    incr: (key) => { const v = (cache.get(key) || 0) + 1; cache.set(key, v); return v; },
-    pexpire: () => 1
+    sadd: () => {}, eval: () => [0, 0, 0], get: () => null, set: () => 'OK', incr: () => 1, pexpire: () => 1
   },
   limiter: Ratelimit.slidingWindow(10, '1 m'),
   ephemeralCache: cache,
@@ -43,8 +53,7 @@ const aiLimiter = new Ratelimit({
 
 export const upstashRateLimiter = async (req, res, next) => {
   if (!redisClient) {
-    // If no Redis configured, skip real rate limiting and pass through or use simple memory
-    return next();
+    return memoryGeneralLimiter(req, res, next);
   }
 
   try {
@@ -56,18 +65,18 @@ export const upstashRateLimiter = async (req, res, next) => {
     res.setHeader('X-RateLimit-Reset', reset);
 
     if (!success) {
-      return res.status(429).json({ error: 'Too many requests, please try again later.' });
+      return next(new RateLimitError('Too many requests, please try again later.'));
     }
     next();
   } catch (error) {
-    console.error('Rate limit error:', error);
-    next(); // Pass through on Redis errors to avoid taking down the app
+    logger.error('Rate limit error:', { error });
+    next();
   }
 };
 
 export const upstashAiRateLimiter = async (req, res, next) => {
   if (!redisClient) {
-    return next();
+    return memoryAiLimiter(req, res, next);
   }
 
   try {
@@ -79,11 +88,11 @@ export const upstashAiRateLimiter = async (req, res, next) => {
     res.setHeader('X-RateLimit-Reset', reset);
 
     if (!success) {
-      return res.status(429).json({ error: 'AI Rate limit exceeded. Please wait a moment before sending more messages.' });
+      return next(new RateLimitError('AI Rate limit exceeded. Please wait a moment before sending more messages.'));
     }
     next();
   } catch (error) {
-    console.error('AI Rate limit error:', error);
+    logger.error('AI Rate limit error:', { error });
     next();
   }
 };

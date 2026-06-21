@@ -1,22 +1,24 @@
-import { firestore, firebaseAdmin } from '../config/firebase.js';
+import { supabase } from '../config/supabase.js';
 import { logger } from '../utils/logger.js';
 
-const getTimestamp = () => firebaseAdmin.firestore.FieldValue.serverTimestamp();
-
 /**
- * Generic Base Repository for Firestore
+ * Generic Base Repository for Supabase
  */
 export class BaseRepository {
   constructor(collectionName) {
     this.collectionName = collectionName;
-    this.collection = firestore.collection(collectionName);
   }
 
   async getById(id) {
     try {
-      const doc = await this.collection.doc(id).get();
-      if (!doc.exists) return null;
-      return { id: doc.id, ...doc.data() };
+      const { data, error } = await supabase
+        .from(this.collectionName)
+        .select('*')
+        .eq('id', id)
+        .maybeSingle();
+
+      if (error) throw error;
+      return data;
     } catch (error) {
       logger.error(`Error fetching ${this.collectionName}/${id}:`, error);
       throw error;
@@ -25,21 +27,22 @@ export class BaseRepository {
 
   async create(id, data) {
     try {
+      const payload = {
+        ...data,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
       if (id) {
-        await this.collection.doc(id).set({
-          ...data,
-          createdAt: getTimestamp(),
-          updatedAt: getTimestamp()
-        });
-        return { id, ...data };
-      } else {
-        const ref = await this.collection.add({
-          ...data,
-          createdAt: getTimestamp(),
-          updatedAt: getTimestamp()
-        });
-        return { id: ref.id, ...data };
+        payload.id = id;
       }
+      const { data: insertedData, error } = await supabase
+        .from(this.collectionName)
+        .insert([payload])
+        .select()
+        .single();
+
+      if (error) throw error;
+      return insertedData;
     } catch (error) {
       logger.error(`Error creating in ${this.collectionName}:`, error);
       throw error;
@@ -48,11 +51,19 @@ export class BaseRepository {
 
   async update(id, data) {
     try {
-      await this.collection.doc(id).update({
+      const payload = {
         ...data,
-        updatedAt: getTimestamp()
-      });
-      return { id, ...data };
+        updatedAt: new Date().toISOString()
+      };
+      const { data: updatedData, error } = await supabase
+        .from(this.collectionName)
+        .update(payload)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return updatedData;
     } catch (error) {
       logger.error(`Error updating ${this.collectionName}/${id}:`, error);
       throw error;
@@ -61,7 +72,12 @@ export class BaseRepository {
 
   async delete(id) {
     try {
-      await this.collection.doc(id).delete();
+      const { error } = await supabase
+        .from(this.collectionName)
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
       return true;
     } catch (error) {
       logger.error(`Error deleting ${this.collectionName}/${id}:`, error);

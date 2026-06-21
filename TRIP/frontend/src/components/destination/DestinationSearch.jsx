@@ -1,11 +1,11 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useCallback, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { MapPin, X, AlertCircle, Loader2, Search } from 'lucide-react';
 import { useDestinationSearch } from '@/hooks/useDestinationSearch';
-import { DestinationDropdown } from './DestinationDropdown';
-import { DestinationEmpty } from './DestinationEmpty';
-import { DestinationSkeleton } from './DestinationSkeleton';
-import { DestinationCard } from './DestinationCard';
+import { DestinationDropdown } from '@/components/destination/DestinationDropdown';
+import { DestinationEmpty } from '@/components/destination/DestinationEmpty';
+import { DestinationSkeleton } from '@/components/destination/DestinationSkeleton';
+import { DestinationCard } from '@/components/destination/DestinationCard';
 
 /**
  * DestinationSearch — Premium Google-style destination autocomplete.
@@ -22,7 +22,7 @@ import { DestinationCard } from './DestinationCard';
  *  - showCard — whether to show the DestinationCard after selection (default: false).
  *  - types — Google Places type restrictions (default: ['(cities)']).
  */
-export function DestinationSearch({
+export const DestinationSearch = forwardRef(({
   onPlaceSelect,
   value = '',
   placeholder = 'Search cities, countries, landmarks, airports...',
@@ -30,7 +30,7 @@ export function DestinationSearch({
   inputClassName = '',
   showCard = false,
   types = ['(cities)'],
-}) {
+}, ref) => {
   const {
     ready,
     value: searchValue,
@@ -83,32 +83,45 @@ export function DestinationSearch({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [handleDismiss]);
 
-  const onInputChange = useCallback(
-    (e) => {
-      handleInput(e.target.value);
-      setHasInteracted(true);
-      if (!e.target.value) {
-        setIsOpen(false);
-      }
-    },
-    [handleInput]
-  );
+  function onInputChange(e) {
+    handleInput(e.target.value);
+    setHasInteracted(true);
+    if (!e.target.value) {
+      setIsOpen(false);
+    }
+  }
 
-  const onSuggestionSelect = useCallback(
-    async (prediction) => {
-      setActiveIndex(-1);
-      await handleSelect(prediction);
-    },
-    [handleSelect]
-  );
+  async function onSuggestionSelect(prediction) {
+    setActiveIndex(-1);
+    await handleSelect(prediction);
+  }
 
-  const onClear = useCallback(() => {
+  function onClear() {
     handleClear();
     setIsOpen(false);
     setActiveIndex(-1);
     setHasInteracted(false);
     onPlaceSelect?.(null);
-  }, [handleClear, onPlaceSelect]);
+  }
+
+  useImperativeHandle(ref, () => ({
+    submit: () => {
+      if (hasSuggestions && suggestions.length > 0) {
+        onSuggestionSelect(suggestions[activeIndex >= 0 ? activeIndex : 0]);
+      } else if (selectedPlace) {
+        onPlaceSelect?.(selectedPlace);
+      } else if (searchValue) {
+        onPlaceSelect?.({
+          name: searchValue,
+          city: searchValue,
+          country: '',
+          formattedAddress: searchValue,
+          latitude: 0,
+          longitude: 0,
+        });
+      }
+    }
+  }), [hasSuggestions, suggestions, activeIndex, searchValue, selectedPlace, onPlaceSelect]);
 
   /**
    * Full keyboard navigation:
@@ -144,6 +157,8 @@ export function DestinationSearch({
           e.preventDefault();
           if (activeIndex >= 0 && activeIndex < suggestions.length) {
             onSuggestionSelect(suggestions[activeIndex]);
+          } else if (hasSuggestions && suggestions.length > 0) {
+            onSuggestionSelect(suggestions[0]);
           }
           break;
         case 'Escape':
@@ -296,4 +311,4 @@ export function DestinationSearch({
       )}
     </div>
   );
-}
+});

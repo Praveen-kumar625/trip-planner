@@ -1,5 +1,6 @@
 import { BaseRepository } from '../../firestore/repository.js';
-import { firestore } from '../../config/firebase.js'; 
+import { supabase } from '../../config/supabase.js';
+import { logger } from '../../utils/logger.js';
 
 class BudgetRepositoryClass extends BaseRepository {
   constructor() {
@@ -7,15 +8,19 @@ class BudgetRepositoryClass extends BaseRepository {
   }
 
   async getBudgetByTripId(userId, tripId) {
-    const snapshot = await this.collection
-      .where('userId', '==', userId)  
-      .where('tripId', '==', tripId)
-      .limit(1)
-      .get();
+    const { data, error } = await supabase
+      .from(this.collectionName)
+      .select('*')
+      .eq('userId', userId)
+      .eq('tripId', tripId)
+      .maybeSingle();
       
-    if (snapshot.empty) return null;
-    const doc = snapshot.docs[0];
-    return { id: doc.id, ...doc.data() };
+    if (error) {
+      logger.error('Supabase query error (getBudgetByTripId):', { error });
+      throw error;
+    }
+    
+    return data;
   }
 }
 

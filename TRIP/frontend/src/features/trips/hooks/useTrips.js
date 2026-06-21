@@ -1,6 +1,6 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { tripsService } from '../../../services/api/trips.service';
-import { useAuthStore } from '../../../store/authStore';
+import { tripsService } from '@/services/api/trips.service';
+import { useAuthStore } from '@/store/authStore';
 
 export const useTrips = (limit = 10) => {
   const { user } = useAuthStore();
