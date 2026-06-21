@@ -3,6 +3,13 @@ import RootLayout from '@/layouts/RootLayout';
 
 export const router = createBrowserRouter([
   {
+    path: '/intelligence/:destinationId',
+    lazy: async () => {
+      const IntelligenceDemoPage = (await import('@/pages/IntelligenceDemoPage')).default;
+      return { Component: IntelligenceDemoPage };
+    },
+  },
+  {
     path: '/',
     element: <RootLayout />,
     children: [

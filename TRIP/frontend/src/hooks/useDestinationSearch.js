@@ -1,51 +1,56 @@
-import { useCallback, useRef, useState } from 'react';
-import usePlacesAutocomplete from 'use-places-autocomplete';
-import { useJsApiLoader } from '@react-google-maps/api';
+import { useCallback, useRef, useState, useEffect } from 'react';
 import { resolvePlace } from '@/services/placesService';
-
-const LIBRARIES = ['places'];
-const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+import { SearchMapplsPlaces } from '@/services/api/places.service.js';
 
 export function useDestinationSearch({
   debounce = 200,
   types = ['(cities)'],
   componentRestrictions = undefined,
 } = {}) {
-  const { isLoaded: scriptLoaded } = useJsApiLoader({
-    googleMapsApiKey: API_KEY || '',
-    libraries: LIBRARIES,
-  });
-
+  const [value, setValue] = useState('');
+  const [suggestions, setSuggestions] = useState([]);
+  const [suggestionsLoading, setSuggestionsLoading] = useState(false);
+  
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [isResolving, setIsResolving] = useState(false);
   const [resolveError, setResolveError] = useState(null);
   const inputRef = useRef(null);
 
-  const {
-    ready,
-    value,
-    suggestions: { status, data: suggestions, loading: suggestionsLoading },
-    setValue,
-    clearSuggestions,
-    init,
-  } = usePlacesAutocomplete({
-    initOnMount: false,
-    requestOptions: {
-      types,
-      componentRestrictions,
-    },
-    debounce,
-    cache: 60 * 60,
-    defaultValue: '',
-  });
+  const debounceTimer = useRef(null);
 
-  if (scriptLoaded && !ready) {
-    init();
-  }
+  const clearSuggestions = useCallback(() => {
+    setSuggestions([]);
+  }, []);
+
+  const fetchSuggestions = useCallback(async (query) => {
+    if (!query || query.trim().length < 2) {
+      setSuggestions([]);
+      return;
+    }
+    setSuggestionsLoading(true);
+    try {
+      const response = await SearchMapplsPlaces(query);
+      const results = response?.data?.suggestedLocations || [];
+      const mapped = results.map(s => ({
+        place_id: s.eLoc,
+        description: s.placeName ? `${s.placeName}, ${s.placeAddress}` : s.placeAddress,
+        structured_formatting: {
+          main_text: s.placeName || s.placeAddress,
+          secondary_text: s.placeAddress || '',
+        }
+      }));
+      setSuggestions(mapped);
+    } catch (err) {
+      console.error('Failed to fetch Mappls suggestions:', err);
+      setSuggestions([]);
+    } finally {
+      setSuggestionsLoading(false);
+    }
+  }, []);
 
   const handleSelect = useCallback(
     async (prediction) => {
-      setValue(prediction.description, false);
+      setValue(prediction.description);
       clearSuggestions();
       setResolveError(null);
       setIsResolving(true);
@@ -65,7 +70,7 @@ export function useDestinationSearch({
         return null;
       }
     },
-    [setValue, clearSuggestions]
+    [clearSuggestions]
   );
 
   const handleInput = useCallback(
@@ -75,26 +80,34 @@ export function useDestinationSearch({
         setSelectedPlace(null);
       }
       setResolveError(null);
+      
+      // Debounced search
+      if (debounceTimer.current) {
+        clearTimeout(debounceTimer.current);
+      }
+      debounceTimer.current = setTimeout(() => {
+        fetchSuggestions(newValue);
+      }, debounce);
     },
-    [setValue, selectedPlace]
+    [selectedPlace, debounce, fetchSuggestions]
   );
 
   const handleClear = useCallback(() => {
-    setValue('', false);
+    setValue('');
     clearSuggestions();
     setSelectedPlace(null);
     setResolveError(null);
     inputRef.current?.focus();
-  }, [setValue, clearSuggestions]);
+  }, [clearSuggestions]);
 
   const handleDismiss = useCallback(() => {
     clearSuggestions();
   }, [clearSuggestions]);
 
-  const hasSuggestions = status === 'OK' && suggestions.length > 0;
+  const hasSuggestions = suggestions.length > 0;
 
   return {
-    ready: ready && scriptLoaded,
+    ready: true, // No external script needed
     value,
     inputRef,
     suggestions,

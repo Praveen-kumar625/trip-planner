@@ -2,7 +2,9 @@ import React, { useState, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Sparkles, MapPin, Navigation, Loader2 } from 'lucide-react';
 import { DestinationSearch } from '@/components/destination';
-import { useGooglePlaces } from '@/hooks/useGooglePlaces';
+import { useMapplsPlaces } from '@/hooks/useMapplsPlaces';
+
+import { useNavigate } from 'react-router-dom';
 
 /**
  * DestinationHeroInput — Full-screen hero destination input for the landing page.
@@ -16,9 +18,10 @@ import { useGooglePlaces } from '@/hooks/useGooglePlaces';
 export function DestinationHeroInput({ onDestinationSelect }) {
   const [isFocused, setIsFocused] = useState(false);
   const searchRef = useRef(null);
-  const { isLoaded } = useGooglePlaces();
+  const navigate = useNavigate();
+  const { isLoaded } = useMapplsPlaces();
 
-  const { fetchPlaceById } = useGooglePlaces();
+  const { fetchPlaceById } = useMapplsPlaces();
   const POPULAR_DESTINATIONS = [
     { name: 'Kyoto', display: 'Kyoto, Japan' },
     { name: 'Amalfi Coast', display: 'Amalfi Coast, Italy' },
@@ -27,17 +30,12 @@ export function DestinationHeroInput({ onDestinationSelect }) {
 
   const handlePopularClick = useCallback(
     async (dest) => {
-      const [city, country] = dest.display.split(', ');
-      onDestinationSelect({
-        name: city,
-        city: city,
-        country: country,
-        formattedAddress: dest.display,
-        latitude: 0,
-        longitude: 0,
-      });
+      const placeId = dest.name === 'Kyoto' ? 'KYOT01' : 
+                      dest.name === 'Amalfi Coast' ? 'AMAL01' : 
+                      dest.name === 'Bali' ? 'BALI01' : 'JAB01';
+      navigate(`/intelligence/${placeId}`);
     },
-    [onDestinationSelect]
+    [navigate]
   );
 
   return (
@@ -92,7 +90,11 @@ export function DestinationHeroInput({ onDestinationSelect }) {
               ) : (
                 <DestinationSearch
                   ref={searchRef}
-                  onPlaceSelect={onDestinationSelect}
+                  onPlaceSelect={(place) => {
+                    if (place) {
+                      navigate(`/intelligence/${place.eLoc || 'JAB01'}`);
+                    }
+                  }}
                   placeholder="Search any city, country, or landmark..."
                   className="w-full h-full"
                   inputClassName="w-full h-full pl-12 pr-12 text-xl md:text-2xl bg-transparent border-none outline-none text-white placeholder:text-white/40 font-medium"

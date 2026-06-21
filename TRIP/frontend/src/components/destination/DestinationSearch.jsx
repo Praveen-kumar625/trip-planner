@@ -289,7 +289,7 @@ export const DestinationSearch = forwardRef(({
             {/* Google Attribution */}
             <div className="px-4 py-2 border-t border-neutral-100 flex items-center justify-end">
               <span className="text-[10px] text-neutral-400 font-medium">
-                Powered by Google
+                Powered by Mappls
               </span>
             </div>
           </motion.div>

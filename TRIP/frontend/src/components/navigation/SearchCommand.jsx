@@ -2,14 +2,14 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, MapPin, Clock, ArrowRight, X, Sparkles, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useGooglePlaces } from '@/hooks/useGooglePlaces';
+import { useMapplsPlaces } from '@/hooks/useMapplsPlaces';
 
 const recentSearches = ['Goa, India', 'Weekend getaways near Mumbai', 'Luxury resorts under ₹50,000 in Kerala'];
 
 export default function SearchCommand({ isOpen, onClose }) {
   const [query, setQuery] = useState('');
   const navigate = useNavigate();
-  const { isLoaded, searchPlaces, fetchPlaceById, predictions, isSearching } = useGooglePlaces();
+  const { isLoaded, searchPlaces, fetchPlaceById, predictions, isSearching } = useMapplsPlaces();
   const [debounceTimer, setDebounceTimer] = useState(null);
 
   useEffect(() => {
@@ -31,11 +31,11 @@ export default function SearchCommand({ isOpen, onClose }) {
   }, [isLoaded, searchPlaces, debounceTimer]);
 
   const handleSelectPrediction = useCallback(async (prediction) => {
-    const placeData = await fetchPlaceById(prediction.place_id);
+    const placeData = await fetchPlaceById(prediction.place_id || prediction.eLoc);
     if (placeData) {
       sessionStorage.setItem('trip_destination', JSON.stringify(placeData));
       onClose();
-      navigate('/ai-concierge');
+      navigate(`/intelligence/${placeData.eLoc || 'JAB01'}`);
     }
   }, [fetchPlaceById, navigate, onClose]);
 
